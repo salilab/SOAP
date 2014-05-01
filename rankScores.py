@@ -206,7 +206,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
         if os.path.isfile(self.ssppath+'.hdf5'):
             os.system('ln -s '+self.ssppath+'.hdf5 ./'+self.sspname+'.hdf5')
         makemdt=open('runme.py','w')
-        makemdt.write('keeptry=5\nwhile keeptry:\n    try:\n        from SOAP import *\n        keeptry=0\n    except:\n        keeptry-=1\n'
+        makemdt.write('keeptry=5\nwhile keeptry:\n    try:\n        from SOAP.rankScores import *\n        keeptry=0\n    except:\n        keeptry-=1\n'
                       +'import sys \n \nrsp=rawsp(\''+self.pdbset+'\',\''
                       +self.features+'\',\''+self.genmethod+'\')\n'+'ssp=scaledsp(\''+self.pm+'\',rsp)\n'
                       +'so=spdsscore('+str(self.dslist)+',\''+self.bm+'\',ssp)\n'

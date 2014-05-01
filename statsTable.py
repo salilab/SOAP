@@ -539,7 +539,7 @@ class rawsp(object):
         inputlist.write(','.join(['pdbs'+str(i) for i in range(1,nors+1)]))
         inputlist.close()
         makemdt=open('runme.py','w')
-        makemdt.write('keeptry=5\nwhile keeptry:\n    try:\n        from SOAP import *\n        keeptry=0\n    except:\n        keeptry-=1\n'
+        makemdt.write('keeptry=5\nwhile keeptry:\n    try:\n        from SOAP.statsTable import *\n        keeptry=0\n    except:\n        keeptry-=1\n'
                       +'import sys \n \nrsp=rawsp(\''+self.pdbset+'\',\''
                       +self.features+'\',\''+self.genmethod+'\')\n'+'rsp.opdb='+str(self.opdb)+'\n'
                       +'rsp.'+routine+'(sys.argv[1])')
@@ -1387,7 +1387,7 @@ class scaledsp(rawsp):
         inputlist.close()
         os.system('cp '+runenv.scriptpath+' ./')
         makemdt=open('runme.py','w')
-        makemdt.write('keeptry=5\nwhile keeptry:\n    try:\n        from SOAP import *\n        keeptry=0\n    except:\n        keeptry-=1\n'
+        makemdt.write('keeptry=5\nwhile keeptry:\n    try:\n        from SOAP.statsTable import *\n        keeptry=0\n    except:\n        keeptry-=1\n'
                       +'import sys \nso=gpsmoothing()\n'
                       +'so.runtask_cluster(sys.argv[1])')
         makemdt.flush()
