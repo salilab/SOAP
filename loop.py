@@ -3,6 +3,10 @@
 
 """
 from env import *
+from modeller import physical
+from modeller.schedule import schedule, step
+from modeller.optimizers import conjugate_gradients as CG
+from modeller.automodel.autosched import * 
 
 class MyLoop(loopmodel):
     # This routine picks the residues to be refined by loop modeling
@@ -10,7 +14,7 @@ class MyLoop(loopmodel):
                  deviation=None, library_schedule=None, csrfile=None,
                  inifile=None, assess_methods=None, loop_assess_methods=None,
                  refinepot=['$(LIB)/atmcls-mf.lib','$(LIB)/dist-mf.lib'],
-                 loops=[],calcrmsds='111'):
+                 loops=[],calcrmsds='111',nonbond_spine=0.1,contact_shell=12.0,deviations=50):
         loopmodel.__init__(self, env, sequence, alnfile, knowns, inimodel,
                  deviation, library_schedule, csrfile,
                  inifile, assess_methods, loop_assess_methods)
@@ -18,16 +22,18 @@ class MyLoop(loopmodel):
         self.refinepotential=refinepot
         self.load_native_model()
         self.calc_rmsds=calcrmsds
+        self.deviations=deviations
         self.loop.env.schedule_scale = physical.values(default=1.0,
-                                                       nonbond_spline=0.02)#0.6
+                                                       nonbond_spline=nonbond_spine)#0.6
         edat = self.loop.env.edat
-        edat.contact_shell=12.00
+        edat.contact_shell=contact_shell
         edat.dynamic_sphere=True#True
         edat.dynamic_lennard=False#False
         edat.dynamic_coulomb=False#False
         edat.relative_dielectric=1.0
         edat.dynamic_modeller=True#True
         #self.loop.library_schedule
+        self.loop.library_schedule=loopschedule
 
 
     def read_potential(self):
@@ -137,7 +143,7 @@ class MyLoop(loopmodel):
         else:
             self.read_ini_loop_model(ini_model)
 
-        atmsel.randomize_xyz(deviation=50)
+        atmsel.randomize_xyz(deviation=self.deviations)
 
         if parallel:
             self.group_restraints = self.read_potential()
@@ -186,7 +192,7 @@ class MyLoop(loopmodel):
             
                
 class sprefine(object):
-    def __init__(self,dslist='101',bm='loop.100.8',criteria='bestrmsd',spmodel=None):
+    def __init__(self,dslist='101',bm='loop.100.8',criteria='bestrmsd',nonbond_spline=0.1,contact_shell=12.0,deviations=50,spmodel=None):
         #use statistical potential to refine loops/strutures, and analyze the refine results to judge the statistical potential.
         if spmodel: #needfix???
             if spmodel['scoretype']!='sprefine':
@@ -213,6 +219,9 @@ class sprefine(object):
         self.j=[]
         self.nors=3000
         self.cv=None
+        self.nonbond_spline=nonbond_spline
+        self.contact_shell=contact_shell
+        self.deviations=deviations
         
     def get_refine_dict(self):
         if self.refinetype=='loop':
@@ -346,7 +355,7 @@ class sprefine(object):
         m = MyLoop(env,
                    inimodel=modelfile, # initial model of the target
                    sequence=modelname,loop_assess_methods=(assess.DOPE),
-                   refinepot=self.refpot,loops=loops)
+                   refinepot=self.refpot,loops=loops, nonbond_spine=self.nonbond_spline,contact_shell=self.contact_shell,deviations=self.deviations)
         #m.load_native_model()
         m.loop.starting_model= self.startNum           # index of the first loop model
         m.loop.ending_model  = self.endNum
@@ -603,3 +612,36 @@ class sprefine(object):
                     rmsdlist.append(rmsddict[key])
             brmsdlist.append(np.array(rmsdlist).min())
         return brmsdlist
+
+def sgmd(atmsel, actions):
+    """Very slow MD annealing"""
+    sgmdrefine(atmsel, actions, cap=1.39, timestep=4.0,
+           equil_its=300, equil_equil=20,
+           equil_temps=(150.0, 250.0, 400.0, 700.0, 1000.0, 1300.0),
+           sampl_its=1000, sampl_equil=200,
+           sampl_temps=(1300.0, 1000.0, 800.0, 600.0, 500.0, 430.0, 370.0,
+                        320.0, 300.0))
+
+def sgmdrefine(atmsel, actions, cap, timestep, equil_its, equil_equil,
+           equil_temps, sampl_its, sampl_equil, sampl_temps):
+    from modeller.optimizers import molecular_dynamics
+
+    mdl = atmsel.get_model()
+    md = molecular_dynamics(cap_atom_shift=cap, md_time_step=timestep,
+                            md_return='FINAL', output=mdl.optimize_output,
+                            actions=actions,friction=0,guide_factor=0,guide_time=0)
+    init_vel = True
+    # First run for equilibration, the second for sampling:
+    for (its, equil, temps) in ((equil_its, equil_equil, equil_temps),(sampl_its, sampl_equil, sampl_temps)):
+        for temp in temps:
+            md.optimize(atmsel, max_iterations=its, equilibrate=equil,
+                        temperature=temp, init_velocities=init_vel)
+            init_vel=False
+
+def loopschedule():
+    return schedule(4,
+           [ step(CG, None, mk_scale(default=1.00, nonbond=0.0, spline=1.00)),
+             step(CG, None, mk_scale(default=2.00, nonbond=0.01, spline=0.01)),
+             step(CG, None, mk_scale(default=1.00, nonbond=0.10, spline=0.10)),
+             step(CG, None, mk_scale(default=1.00, nonbond=0.50, spline=0.50)),
+             step(CG, None, physical.values(default=4.00)) ])

@@ -6,6 +6,7 @@ from env import *
 from rankScores import *
 from benchmark import dsscorestats
 from refineScores import *
+from loop import sprefine
         
 class scorer(object):
     def __init__(self,model=[]):
@@ -523,7 +524,7 @@ class scorer(object):
         ratiolist=[]
         svdilist=[]
         pathlist=[]
-        refdict={id(r):r for r in self.model['scorers'] if r['type']=='sf'}
+        refdict=dict([(id(r),r) for r in self.model['scorers'] if r['type']=='sf'])
         for spmodel in self.model['scorers']:
             if spmodel['type']!='scaledsp':
                 continue

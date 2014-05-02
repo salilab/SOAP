@@ -645,7 +645,218 @@ def load_scorer(originalscorer,indexlen):
         pass
     return scorer
 
+class Mymodel(model):
+    def select_loop_atoms(self,loops):
+        s=selection()
+        if not isinstance(loops[0],list):
+            self.add_loop2selection(loops,s)
+        else:
+            for loop in loops:
+                self.add_loop2selection(loop,s)
+        return s
+   
+    def add_loop2selection(self,loop,s):
+        if loop[0]=='':
+            loop[0]=self.chains[0].name
+        try:
+            s.add(selection(self.residue_range(str(loop[2])+':'+loop[0],str(loop[3])+':'+loop[0])))
+        except:
+            lind=self.residues[str(loop[2])+':'+loop[0]].index
+            s.add(selection(self.residues[lind:(lind+loop[1])]))    
+    
+    def load_model_file(self,nativef):
+        if nativef[-2:]=='gz':
+            fh=gzip.open(nativef)
+        else:
+            fh=open(nativef)
+        fhc=fh.read()
+        self.fname=nativef
+        self.atomlines=re.findall('\\n(ATOM.*)','\n'+fhc+'\n')
+        self.hetatomlines=re.findall('\\n(HETATM.*)','\n'+fhc+'\n')
+        self.gen_atomlist()
+        
+    def gen_atomlist(self):#[chainname,residue number,residue name,atom name, alternative indicator, x,y,x,occupancy, B-factor, elem symbol, charge,index]
+        self.atomlist=[]
+        k=-1
+        for atomline in self.atomlines:
+            k=k+1
+            atompars=[atomline[21],int(atomline[22:26]),atomline[17:20].strip(),atomline[12:16].strip(),atomline[16], float(atomline[30:38]),float(atomline[38:46]),float(atomline[46:54]),float(atomline[54:60]),float(atomline[60:66]),k]
+            #if len(atomline)>=80:
+            #        atompars.append(atomline[76:78].strip())
+            #        atompars.append((atomline[78:80]))
+            self.atomlist.append(atompars)
+        self.atomlist.sort(key=itemgetter(0,1)) #sort the atom file by the chainids and the residue numbers, because some of the pdb files is messed up.
+        newatomlines=[]
+        for atompars in self.atomlist:
+            newatomlines.append(self.atomlines[atompars[-1]])
+        self.atomlines=newatomlines
+    
+    def gen_chainlist(self): #get the chain name and pos [chain name, chainstartpos,chainendpos, [[residuename,residue num, residue startpos, residue endpos]...]]
+        currentchain=''
+        chainlist=[]
+        currentresidue=''
+        residuelist=[]
+        try:
+            k=-1
+            for atompars in self.atomlist:
+                k=k+1
+                if atompars[0]!=currentchain:
+                    currentchain=atompars[0]
+                    chainlist.append([atompars[0],k])
+                    if len(chainlist)>1:
+                        chainlist[-2].append(k-1)
+                        chainlist[-2].append(residuelist)
+                        chainlist[-2][3][-1].append(k-1)
+                        residuelist=[]
+                if atompars[1]!=currentresidue:
+                    currentresidue=atompars[1]
+                    residuelist.append([atompars[2],atompars[1],k])
+                    if len(residuelist)>1:
+                        residuelist[-2].append(k-1)
+            chainlist[-1].append(k)
+            chainlist[-1].append(residuelist)
+            chainlist[-1][3][-1].append(k)
+        except Exception,e:
+            traceback.print_exc()
+            pdb.set_trace()
+        self.chainlist=chainlist
+                
+    def gen_atomindexdict(self):
+        atomindexdict={}
+        for k in range(0,len(self.atomlist)):
+            atompars=self.atomlist[k]
+            atomid=atompars[0]+str(atompars[1])+atompars[2]+atompars[3]
+            atomindexdict[atompars[0]+str(atompars[1])+atompars[2]+atompars[3]]=k
+        self.atomindexdict=atomindexdict
+            
+    def only_std_residue_heavy_atom(self):
+        resatoms=get_residues_atoms()
+        atomlines=[]
+        for k in range(0,len(self.atomlist)):
+            atompars=self.atomlist[k]
+            if atompars[2] in set(resatoms['resname3']) and atompars[3] in set(resatoms['resatomdict'][atompars[2]]):
+                atomlines.append(self.atomlines[k])
+        self.atomlines=atomlines
+        self.gen_atomlist()
+        self.gen_chainlist()
+        self.gen_atomindexdict()
+    
+    def transfer_model_atoms(self,mdl2):
+        self.gen_atomindexdict()
+        mdl2.gen_atomindexdict()
+        #copy mdl2 atoms into model 1
+        for key in mdl2.atomindexdict:
+            try:
+                self.atomlines[self.atomindexdict[key]]=self.atomlines[self.atomindexdict[key]][0:11]+mdl2.atomlines[mdl2.atomindexdict[key]][11:]
+            except:
+                pdb.set_trace()
+        
+    def transfer_residues(self, mdl2,chain, residuerange):
+        #copy coordinates in the residuerange from mdl2 to current model
+        selfstartpos=self.get_residue_index(chain,residuerange[0])[2]
+        selfendpos=self.get_residue_index(chain,residuerange[1])[3]
+        mdl2startpos=mdl2.get_residue_index(chain,residuerange[0])[2]
+        mdl2endpos=mdl2.get_residue_index(chain,residuerange[1])[3]
+        self.atomlines[selfstartpos:selfendpos+1]=mdl2.atomlines[mdl2startpos:mdl2endpos+1]
+        self.gen_atomlist()
+        
+    def save_model(self,filename):
+        fh=open(filename,'w')
+        fh.write('\n'.join(self.atomlines))
+        fh.close()
+    
+    def get_residue_index(self,chainid,residuenum):
+        for item in self.chainlist:
+            if item[0]!=chainid:
+                continue
+            for res in item[3]:
+                if residuenum==res[1]:
+                    return res
 
+    def copy_native(self,code,tdir):
+        code=code.lower()
+        print os.system('cp '+runenv.opdbdir+code[1:3]+'/pdb'+code+'.ent.gz '+tdir)
+        print os.system('gunzip '+tdir+'pdb'+code+'.ent.gz ')
+
+    def clash_contact(self,code):
+        if os.path.isdir('clashtemp'):
+            print os.system('rm -r clashtemp')
+        os.mkdir('clashtemp')
+        os.chdir('clashtemp')
+        self.copy_native(code,'./')
+        print os.system('cp ~/Dropbox/Code/crystal_contacts.py ./')
+        print os.system('chimera --nogui crystal_contacts.py')
+        fh=open('selfclash','r')
+        scs=fh.read()
+        fh.close()
+        fh=open('otherclash','r')
+        ocs=fh.read()
+        fh.close()
+        fh=open('othercontact','r')
+        octs=fh.read()
+        fh.close()
+        clashlist=[]
+        contactlist=[]
+        rep=re.compile('#([0-9]+) ([A-Z]{3}) ([0-9]+)\.([A-Z]{1}) ([A-Z0-9\.\']+)\s* #([0-9]+) ([A-Z]{3}) ([0-9]+)\.([A-Z]{1}) ([A-Z0-9\.\']+)\s* ([0-9\-\.]+)\s* ([0-9\-\.]+)')
+        allcontacts=rep.findall(octs)
+        allclashes=rep.findall(scs)+rep.findall(ocs)
+        clashlist=[]
+        for item in allclashes:
+            clashlist.append([[item[0],item[3],item[2],item[1],item[4]],[item[5],item[8],item[7],item[6],item[9]],item[10],item[11]])
+        contactlist=[]
+        for item in allcontacts:
+            contactlist.append([[item[0],item[3],item[2],item[1],item[4]],[item[5],item[8],item[7],item[6],item[9]],item[10],item[11]]) 
+        os.chdir('..')
+        print os.system('rm -r clashtemp')
+        return clashlist,contactlist
+
+    def select(self,loops):
+        s=selection()
+        for loop in loops:
+            try:
+                s.add(selection(self.residue_range(str(loop[2])+':'+loop[0],str(loop[3])+':'+loop[0])))
+            except:
+                lind=self.residues[str(loop[2])+':'+loop[0]].index
+                s.add(selection(self.residues[lind:(lind+loop[1])]))
+        return s
+    
+    def get_residues(self,loops):
+        return [loop[0]+str(lnum) for loop in loops for lnum in range(loop[2],loop[3]+1)]
+    
+    def has_nonstd(self,loops):
+        s=self.select(loops)
+        l=self.get_residues(loops)
+        return len(l), len(set(a.residue for a in s))
+
+    def has_clash(self,loops,code):
+        clash,_=self.clash_contact(code)
+        loopres=self.get_residues(loops)
+        clashlist=[]
+        for item in clash:
+            if item[0][0]=='0':
+                clashlist.append(item[0][1]+item[0][2])
+            if item[1][0]=='0':
+                clashlist.append(item[1][1]+item[1][2])
+        rl=[]
+        for item in clashlist:
+            if item in loopres:
+                print 'clash with '+','.join(item)+'  '
+                rl.append('clash with '+','.join(item)+'  ')
+        return rl
+    
+     
+
+    def gen_base_file(self,chain,residuerange,basefilename,othername):
+        selfstartpos=self.get_residue_index(chain,residuerange[0])[2]
+        selfendpos=self.get_residue_index(chain,residuerange[1])[3]
+        otheratomlines=self.atomlines[selfstartpos:selfendpos+1]
+        self.atomlines[selfstartpos]='replacethis'
+        for i in range(selfendpos,selfstartpos,-1):
+            self.atomlines.pop(i)
+        self.save_model(basefilename)
+        self.atomlines=otheratomlines
+        self.save_model(othername)
+        self.gen_atomlist()
 
 
 def load_pickle(fn):
