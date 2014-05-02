@@ -6,6 +6,7 @@
 from feature import *
 from env import *
 from sequences import *
+from decoys import decoysets
                     
 class rawsp(object):
     def __init__(self,pdbset='',features='',genmethod='',tlib=None,decoy=False,routine='calc_sp_all', model={}):
@@ -1289,6 +1290,28 @@ class rawsp(object):
         if len(libname)>0:
             print os.system('mv '+type+'.npy '+runenv.libdir+'/'+libname)
             print os.system('scp '+runenv.libdir+'/'+libname+' '+runenv.jobserver+':~/lib/')
+
+    def write_hdf5(self,path, mdtarray, permute=False):
+        env = environ()
+        env.libs.topology.read('${LIB}/top_heav.lib')
+        env.libs.parameters.read('${LIB}/par.lib')        
+        mlib=mdt.Library(env)
+        mlib.atom_classes.read('$(LIB)/atmcls-mf.lib')
+        mlib.bond_classes.read('${LIB}/bndgrp.lib')
+        featurelist=feature(self.features,mlib).get_featurelist()
+        m=mdt.Table(mlib,features=featurelist,bin_type=mdt.Float,shape=[-1]*len(featurelist))
+        mdl = model(env)
+        mdl.build_sequence('CCG/CCG')
+        aln = alignment(env)
+        aln.append_model(mdl, align_codes='tmp')
+        csmin, csmax,kcut, kcut1, bs,bsm, errsv,ssp=decode_genmethod(self.genmethod)        
+        m.add_alignment(aln,chain_span_range=(-csmax,-csmin,csmin,csmax),residue_span_range=(-kcut1,-kcut,kcut,kcut1),bond_span_range=(bs,bsm))#,startpos=0,endpos=0,scale=0,refyes=False,refmdt='',io=io)
+        ma=m.get_array_view()
+        ma[...]=mdtarray
+        if permute:
+            d,a2,a1=featurelist
+            m = m.reshape(features=(a1,a2,d), offset=[0,0,0], shape=m.shape[::-1])
+        m.write_hdf5(path,gzip=True)
         
 class scaledsp(rawsp):
     def __init__(self, pm='',rspo=[],model=[],previouspm=''):
@@ -1615,27 +1638,6 @@ class scaledsp(rawsp):
             np.save(self.ssppath+'.'+refname+'.npy',mdtb)
         return mdtb
     
-    def write_hdf5(self,path, mdtarray, permute=False):
-        env = environ()
-        env.libs.topology.read('${LIB}/top_heav.lib')
-        env.libs.parameters.read('${LIB}/par.lib')        
-        mlib=mdt.Library(env)
-        mlib.atom_classes.read('$(LIB)/atmcls-mf.lib')
-        mlib.bond_classes.read('${LIB}/bndgrp.lib')
-        featurelist=feature(self.features,mlib).get_featurelist()
-        m=mdt.Table(mlib,features=featurelist,bin_type=mdt.Float,shape=[-1]*len(featurelist))
-        mdl = model(env)
-        mdl.build_sequence('CCG/CCG')
-        aln = alignment(env)
-        aln.append_model(mdl, align_codes='tmp')
-        csmin, csmax,kcut, kcut1, bs,bsm, errsv,ssp=decode_genmethod(self.genmethod)        
-        m.add_alignment(aln,chain_span_range=(-csmax,-csmin,csmin,csmax),residue_span_range=(-kcut1,-kcut,kcut,kcut1),bond_span_range=(bs,bsm))#,startpos=0,endpos=0,scale=0,refyes=False,refmdt='',io=io)
-        ma=m.get_array_view()
-        ma[...]=mdtarray
-        if permute:
-            d,a2,a1=featurelist
-            m = m.reshape(features=(a1,a2,d), offset=[0,0,0], shape=m.shape[::-1])
-        m.write_hdf5(path,gzip=True)
         
     def write_lib(self,path=[],mdtarray=[]):
         env = environ()

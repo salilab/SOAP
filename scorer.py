@@ -523,6 +523,7 @@ class scorer(object):
         ratiolist=[]
         svdilist=[]
         pathlist=[]
+        refdict={id(r):r for r in self.model['scorers'] if r['type']=='sf'}
         for spmodel in self.model['scorers']:
             if spmodel['type']!='scaledsp':
                 continue
@@ -545,19 +546,21 @@ class scorer(object):
             for sfmodel in spmodel['refs']:
                 sfv=sf(**sfmodel).get_sf()
                 ref=np.squeeze(extendsum(ref,sfv))
+                del refdict[id(sfmodel)]
             if atompairclustering:
                 reflist.append(ref)
             ratiolist.append(spmodel['ratio'])
             ssp=scaledsp(model=spmodel)
             if atompairclustering:
                 ssp.add_ref(reflist,affix,filetype,apca=apca,ratio=ratiolist,permute=permute)
-                #return ssp.ssppath
             elif decomposition:
                 ssp.add_ref(ref,affix,filetype,ratio=ratiolist,svdilist=svdilist,permute=permute)
-                #return ssp.ssppath
             else:
                 ssp.add_ref(ref,affix,filetype,ratio=ratiolist,permute=permute)
             pathlist.append(ssp.ssppath)
+        for i, sfmodel in refdict.items():
+            sfo=sf(**sfmodel)
+            sfo.write_potential(affix,self.model['bmtype']['bm'],ratio=sfmodel['ratio'])
         print pathlist
         return pathlist
 
