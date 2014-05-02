@@ -202,7 +202,6 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
         inputlist=open('inputlist','w')
         inputlist.write(','.join(['pdbs'+str(i) for i in range(1,nors+1)]))
         inputlist.close()
-        os.system('cp '+runenv.scriptpath+' ./')
         if os.path.isfile(self.ssppath+'.hdf5'):
             os.system('ln -s '+self.ssppath+'.hdf5 ./'+self.sspname+'.hdf5')
         makemdt=open('runme.py','w')

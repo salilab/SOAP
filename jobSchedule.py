@@ -11,9 +11,9 @@ class task(object):
         self.dir=dir
         self.rdirname=rdirname
         if '#' in self.rdirname:# '#' is not recoginized by sge as valid filename
-            self.logpath=os.path.join(runenv.runlogpath, self.rdirname.replace('#',''))
+            self.logpath=os.path.join(runenv.serverLogPath, self.rdirname.replace('#',''))
         else:
-            self.logpath=os.path.join(runenv.serverbasedir,rdirname,'output')
+            self.logpath=os.path.join(runenv.serverUserPath,rdirname,'output')
         self.runname='runme.sh' #should not be initilized with other values
         self.rtrys=0
         self.afterprocessing=afterprocessing
@@ -158,7 +158,6 @@ class task(object):
                     print os.system('ssh '+runenv.jobserver+' \' ln -s '+runenv.jobserverhdf5path+hf+' ~/'+self.rdirname+'/'+hf+'\'')
                 else:
                     rc1=os.system('scp -r * '+runenv.jobserver+':~/'+self.rdirname+'/')
-                print os.system('scp '+runenv.scriptpath+' '+runenv.jobserver+':~/'+self.rdirname+'/')
                  
                 time.sleep(0.1)
             rc2=os.system('ssh '+runenv.jobserver+' \'cd '+self.rdirname+';gunzip *gz;qsub '+self.queues+' ./'+self.runname+'\'')#
@@ -623,7 +622,7 @@ class task(object):
         #def input():
         signal.alarm(TIMEOUT)
         try:
-            print 'You have 120s to interrupt the code to handle the error, otherwise code will continue looping \n 0-quit and delete;\n 1-quit this job;\n 2-re-raise;\n 3-quit whole script and delete;\n 4-enter debug mode;\n 5-continue\n 6-restart runs with new sp.py\n 7-re-parepare and restart job \n 8-ignore erros \n '
+            print 'You have 120s to interrupt the code to handle the error, otherwise code will continue looping \n 0-quit and delete;\n 1-quit this job;\n 2-re-raise;\n 3-quit whole script and delete;\n 4-enter debug mode;\n 5-continue\n 6-restart runs with updated SOAP code\n 7-re-parepare and restart job \n 8-ignore erros \n '
             s = raw_input()
         except:
             return 0

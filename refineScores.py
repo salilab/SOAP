@@ -36,7 +36,6 @@ class sprefinescore(object):
         inputlist.write(','.join(['runme.py' for i in range(1,nors+1)]))
         inputlist.close()
         #copy scripts to this rundir
-        os.system('cp '+runenv.scriptpath+' ./')
         #generate the lib file for modeller refinement
         self.ssp.write_lib_dist150()
         os.system('cp '+self.ssppath+'.lib ./')
@@ -625,7 +624,6 @@ class sprefine(object):
         inputlist=open('inputlist','w')
         inputlist.write(','.join([str(i)+'.pickle' for i in range(1,nors+1)]))
         inputlist.close()
-        os.system('cp '+runenv.scriptpath+' ./')
         makemdt=open('runme.py','w')
         makemdt.write('from SOAP import *\nimport sys \n \nspopt=sprefine(sys.argv[1],\''+self.bm+'\',\''+self.criteria+'\')\nspopt.runpath=\''+self.runpath+'\'\n\nspopt.initialize_dslist()'+'\nspopt.initialize_runenv()'+'\nspopt.assess_cluster_node()\n')
         makemdt.flush()

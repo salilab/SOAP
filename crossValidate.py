@@ -1033,7 +1033,6 @@ class k2cvcluster(k2cvlocal):
         inputlist=open('inputlist','w')
         inputlist.write(','.join(['runme.py' for i in range(1,nors+1)]))
         inputlist.close()
-        os.system('cp '+runenv.scriptpath+' ./')
         makemdt=open('runme.py','w')
         makemdt.write('keeptry=5\nwhile keeptry:\n    try:\n        from SOAP import *\n        keeptry=0\n    except:\n        keeptry-=1\n'
                       +'import sys \n \nspopt=k2cvcluster()\n'

@@ -529,7 +529,6 @@ class rawsp(object):
             pir('pdb_'+self.pdbset+'.pir').sep_pir('./',nors,residuepower=residuepower)
         nors=int(os.popen('ls | grep -c pdbs').read())
         self.nors=nors
-        os.system('cp '+runenv.scriptpath+' ./')
         inputlist=open('inputlist','w')
         inputlist.write(','.join(['pdbs'+str(i) for i in range(1,nors+1)]))
         inputlist.close()
@@ -1380,7 +1379,6 @@ class scaledsp(rawsp):
         inputlist=open('inputlist','w')
         inputlist.write(','.join(['runme.py' for i in range(1,nors+1)]))
         inputlist.close()
-        os.system('cp '+runenv.scriptpath+' ./')
         makemdt=open('runme.py','w')
         makemdt.write('keeptry=5\nwhile keeptry:\n    try:\n        from SOAP.statsTable import *\n        keeptry=0\n    except:\n        keeptry-=1\n'
                       +'import sys \nso=gpsmoothing()\n'
