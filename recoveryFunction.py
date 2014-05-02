@@ -27,7 +27,7 @@ class sf(object):
 
     def write_potential(self,affix,genmethod, ratio=1):
         ro=rawsp(pdbset='X_2.2A',features=self.features,genmethod=genmethod)
-        ro.write_hdf5(self.features+'.'+affix+'.hdf5', self.get_sf(), permute=False)
+        ro.write_hdf5(self.features+'.'+affix+'.hdf5', ratio*self.get_sf(), permute=False)
 
     def initialize(self):
         if self.features.endswith('a158as158'):
