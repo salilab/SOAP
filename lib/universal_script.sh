@@ -32,7 +32,7 @@ input=$taskid
 # specific to the user and SGE job.
 cd /netapp/sali/gqdong/undefinedrundir/
 export PYTHONPATH=$PYTHONPATH:SOAPPATH
-
+export RUNPATH=/netapp/sali/gqdong/undefinedrundir
 # Copy input files to $TMPDIR here...
 
 startsec=`date +%s`
