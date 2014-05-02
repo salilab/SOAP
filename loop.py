@@ -33,7 +33,7 @@ class MyLoop(loopmodel):
         edat.relative_dielectric=1.0
         edat.dynamic_modeller=True#True
         #self.loop.library_schedule
-        self.loop.library_schedule=loopschedule
+        self.loop.library_schedule=loopschedule()
 
 
     def read_potential(self):
