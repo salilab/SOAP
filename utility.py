@@ -128,7 +128,7 @@ def isfirstlowest(array1):
     weave.inline(code,['array1','al','re','c2'],type_converters=converters.blitz, compiler='gcc')
     return re
 
-def filter_lib(atomtype='CA',ofp='/bell2/gqdong/statpot/lib/atmcls-mf.lib',ffp='/bell2/gqdong/statpot/lib/caatm.lib'):
+def filter_lib(atomtype='CA',ofp='atmcls-mf.lib',ffp='caatm.lib'):
     fh=open(ofp)
     fc=fh.read()
     fh.close()
@@ -150,7 +150,7 @@ def extendsum(array1,array2):
 
 def read_bndgrp(libpath=''):
     if not libpath:
-        libpath='/bell1/home/gqdong/Documents/mdt/data/bndgrp.lib'
+        libpath='bndgrp.lib'
     fh=open(libpath)
     fhc=fh.read()
     fh.close()
@@ -612,7 +612,7 @@ def get_system_freemem():
     return float(result)
     
 def get_starting_jobs():
-    fl=os.listdir('/netapp/sali/gqdong/runstatus/')
+    fl=os.listdir(runenv.serverUserPath+'runstatus/')
     fl=[f for f in fl if f.startswith(hcn+'#')]
     return fl
 

@@ -569,7 +569,7 @@ class sprefine(object):
         self.dir=runenv.runs
         self.task.get_tasksn()
         self.rundir=str(self.task.rsn)
-        self.runpath='/netapp/sali/gqdong/'+self.rundir+'/'
+        self.runpath=runenv.serverUserPath+self.rundir+'/'
         #self.task=task('','',afterprocessing=self,preparing=self)        
         self.task.dir=self.dir+self.rundir+'/'
         self.task.rdirname=self.rundir
@@ -642,7 +642,7 @@ class sprefine(object):
     def get_task(self,cv=None):
         if cv!=None:
             self.cv=cv
-            self.refpot[1]=os.path.join('/netapp/sali/gqdong/lib',cv.rundir+'.lib')
+            self.refpot[1]=os.path.join(runenv.serverUserPath+'lib',cv.rundir+'.lib')
         self.task=task('','',afterprocessing=self,preparing=self)
         return self.task
     
@@ -700,7 +700,7 @@ class sprefine(object):
     def assess(self,refpot=[]):
         if refpot:
             self.refpot=refpot
-        if hcn=='bell.ucsf.edu':
+        if runenv.hostn==0:
             self.runtask_cluster(500)
             result=self.result
         else:

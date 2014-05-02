@@ -19,7 +19,7 @@ class task(object):
         self.afterprocessing=afterprocessing
         self.k=0
         self.runstatusdict={}
-        self.baton2diskfull=False
+        self.serverdiskfull=False
         self.unnoticederror=False
         self.started=False
         self.preparing=preparing
@@ -226,7 +226,7 @@ class task(object):
                     cn=cn+1
             else:
                 ct=False
-        if self.baton2diskfull:
+        if self.serverdiskfull:
             print "Disk quota exceeded, please clean disk before continue!!!!!!!!!!!!!!"
             pdb.set_trace()
             return 0
@@ -249,7 +249,7 @@ class task(object):
             f=fl2[0]
         proc1=subprocess.Popen('ssh '+runenv.jobserver+' '+'\'cd '+self.logpath+'; cat '+f+' \'',shell=True,stdout=subprocess.PIPE)
         fc=proc1.communicate()[0]
-        self.baton2diskfull=False
+        self.serverdiskfull=False
         if re.search('fork failure',fc) or re.search('Dynamic memory allocation failed',fc):
             print "memory problem with the run"
             ecode="memory problem with the run"
@@ -262,7 +262,7 @@ class task(object):
             print "EOFError when reading "+fc
             ecode='EOFError'
         elif re.search('No space left on device',fc):
-            print "The node or baton2 has no space left"
+            print "The node or server has no space left"
             ecode='No space'
         elif re.search('Killed',fc):
             print "Killed?????"
@@ -282,7 +282,7 @@ class task(object):
         elif re.search('Disk quota exceeded',fc):
             print "Disk quota exceeded, please clean disk before continue!!!!!!!!!!!!!!"
             ecode='Disk quota exceeded'
-            self.baton2diskfull=True
+            self.serverdiskfull=True
         else:
             print "Unknown problem"
             ecode='Unknown'
@@ -386,7 +386,7 @@ class task(object):
         #except Exception,e:
         #    traceback.print_exc()
         print os.system('ssh '+runenv.jobserver+' \'rm -r '+self.rdirname+' \'')
-        if not self.logpath in ['/netapp/sali/gqdong/output','/netapp/sali/gqdong/output/']:
+        if not self.logpath in [runenv.serverUserPath+'output',runenv.serverUserPath+'output/']:
             print os.system('ssh '+runenv.jobserver+' \'rm -r '+self.logpath+' \'')
         #if runtimetest:
         #    np.save("../runtime"+str(self.rsn),self.runtime)
@@ -959,7 +959,7 @@ def report_job_runstatus(runpath, runsuccess, runnumber, outputname,inputname='r
             
 def generate_job_submit_script(freememory,spname,runtime,nors,parallel=0,mem_total=0,additional_resources=''):
     runmdt=open('runme.sh','w')
-    submdt=file('/bell1/home/gqdong/Dropbox/Code/'+scriptname,'r')
+    submdt=file(runenv.libdir+scriptname,'r')
     submdtf=submdt.read()
     if parallel:
         submdtf=submdtf.replace('memundefined','#$ -l mem_free='+str(freememory)+'G\n#$ -pe smp '+str(parallel)+'\n'+additional_resources)
@@ -972,7 +972,7 @@ def generate_job_submit_script(freememory,spname,runtime,nors,parallel=0,mem_tot
     if "#" in spname:
         nspname=spname.replace('#','')
         submdtf=submdtf.replace('undefinedrundir/output','output/'+nspname)
-        print os.system('ssh '+runenv.jobserver+' mkdir '+'/netapp/sali/gqdong/output/'+nspname)
+        print os.system('ssh '+runenv.jobserver+' mkdir '+runenv.serverUserPath+'output/'+nspname)
     submdtf=submdtf.replace('undefinedrundir',spname)
     submdtf=submdtf.replace('timeundefined',runtime)
     submdtf=submdtf.replace('#$ -p 0',"#$ -p "+str(runenv.runpriority))

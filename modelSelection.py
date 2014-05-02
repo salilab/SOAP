@@ -245,7 +245,7 @@ class spss(object):
             fh.close()
             for key in self.__dict__.keys():
                 self.__dict__[key]=a.__dict__[key]
-            self.logdir=a.logdir#'/bell2/gqdong/statpot/results/DecoysRUS_casp58_baker1/NativeSelection+0.1xcc/bndsep6--d30#15a158as158.d30#15-0.86009,-1308.715_0.915+0.004_0.861+0.005_0.906/'
+            self.logdir=a.logdir
             self.logdir2=a.logdir2
             return None
         self.write2log(self.get_valuesets())
@@ -306,7 +306,7 @@ class spss(object):
         path=''#self.modelexist()
         if len(path)>0:
             return path
-        bdir2='/bell1/home/gqdong/Dropbox/spresults/'
+        bdir2='~/Dropbox/spresults/'
         tdir=bdir2+'_'.join(self.model['bmtype']['dslist'])
         if not os.path.isdir(tdir):
             os.mkdir(tdir)

@@ -32,7 +32,7 @@ class MyLoop(loopmodel):
 
     def read_potential(self):
         return group_restraints(self.env, classes='$(LIB)/atmcls-mf.lib',
-                                parameters='/netapp/sali/gqdong/sps/soap_loop/dist.lib')
+                                parameters=runenv.serverUserPath+'sps/soap_loop/dist.lib')
 
 
     def loop_restraints(self, atmsel, aln):

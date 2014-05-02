@@ -34,7 +34,7 @@ class rawsp(object):
             self.spname=pdbset+'.'+features+'.'+genmethod
             self.sppath=self.dir+self.spname
         elif runenv.hostn==1:
-            self.dir=runenv.basedir
+            self.dir='./'
             self.spname=pdbset+'.'+features+'.'+genmethod
             self.sppath=self.dir+self.spname
         self.nors=200
@@ -243,7 +243,7 @@ class rawsp(object):
                 m.write_hdf5(temppath+str(runnumber)+'.result.hdf5')
             except:
                 try:
-                    temppath='/scrapp2/gqdong/'+os.getenv('JOB_ID')+'/'
+                    temppath='/scrapp2/'+runenv.username+'/'+os.getenv('JOB_ID')+'/'
                     os.makedirs(temppath)
                     print os.system('mkdir '+temppath)
                     m.write_hdf5(temppath+str(runnumber)+'.result.hdf5')
@@ -506,14 +506,9 @@ class rawsp(object):
         os.chdir(self.dir)
         #os.system('rm -r '+self.prd)
         freememory=feature(self.features).get_runmem()
-        self.runpath='/netapp/sali/gqdong/'+self.spname+'/'
-        if freememory>100: #put the temporary time somewhere else when the resulting file is large.
-            temp='/bell4/gqdong/'+self.spname
-            os.mkdir(temp)
-            os.system('ln -s '+temp+' '+'./'+self.prd)
-        else:
-            if not (os.access(self.prd,os.F_OK)):
-                os.mkdir(self.prd)
+        self.runpath=runenv.serverUserPath+self.spname+'/'
+        if not (os.access(self.prd,os.F_OK)):
+            os.mkdir(self.prd)
         freememory=freememory+0.2
         if freememory>2:
             self.nors=min(int(1800/freememory),50)
@@ -562,7 +557,7 @@ class rawsp(object):
                 np.save(temppath+str(runnumber)+'.result.npy',idist)
             except:
                 try:
-                    temppath='/scrapp/gqdong/'+os.getenv('JOB_ID')+'/'
+                    temppath='/scrapp/'+runenv.userName+'/'+os.getenv('JOB_ID')+'/'
                     print os.system('mkdir '+temppath)
                     np.save(temppath+str(runnumber)+'.result.npy',idist)
                     runsuccess=True
@@ -1331,7 +1326,7 @@ class scaledsp(rawsp):
                 if not os.path.isfile(nssp.ssppath+'.hdf5'):
                     taskchains.append(nssp.get_scale_task())
         if len(taskchains)>0:
-            return taskchain(chains=taskchains)
+            return taskchain(chains=taskchains) 
         else:
             return 0
         
@@ -1339,7 +1334,7 @@ class scaledsp(rawsp):
         if self.pm.startswith('gps') or self.pm.startswith('ks') or self.pm.startswith('sks'):
             self.task=task('','',afterprocessing=self,preparing=self,targetfile=self.dir+self.sspname+'.hdf5')
             self.rundir=self.sspname
-            self.runpath='/netapp/sali/gqdong/'+self.rundir+'/'
+            self.runpath=runenv.serverUserPath+self.rundir+'/'
             self.task.dir=self.dir+self.rundir+'/'
             self.task.rdirname=self.rundir
             return self.task

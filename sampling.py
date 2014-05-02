@@ -819,7 +819,6 @@ class optimizer(object):
                 break
         print self.optm['temperature_distribution']
         print self.exchange_times/self.exchange_totaltimes
-        #pickle.dump([self.optm['temperature_distribution'],self.exchange_times/self.exchange_totaltimes],open('/netapp/sali/gqdong/'+str(random.random())+'.pickle','w'))
         return pl
     
     def mcmc_converge_single_pt(self,save=True):

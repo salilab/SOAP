@@ -426,8 +426,8 @@ class decoys4single(object):
         print 'building docking decoys'
         fl=os.listdir('./')
         #renaming the chains
-        print os.system('/bell1/home/gqdong/Download/PatchDock/mainchain.pl '+self.code+'_r_u.pdb A')#use unbound
-        print os.system('/bell1/home/gqdong/Download/PatchDock/mainchain.pl '+self.code+'_l_u.pdb B')
+        print os.system('PatchDock/mainchain.pl '+self.code+'_r_u.pdb A')#use unbound
+        print os.system('PatchDock/mainchain.pl '+self.code+'_l_u.pdb B')
         #combine the two files
         fh=open(self.code+'_r_b.pdb','a')
         fh.write('\n')
@@ -463,8 +463,8 @@ class decoys4single(object):
         pdbfilelist=[item for item in fl if item.endswith('pdb')]
         #renaming the chains
         print os.system('cp '+runenv.ddbdir+'ppd/benchmark4/'+self.code+'* ./')
-        print os.system('/bell1/home/gqdong/Download/PatchDock/mainchain.pl '+self.code.upper()+'_r_u.pdb A')
-        print os.system('/bell1/home/gqdong/Download/PatchDock/mainchain.pl '+self.code.upper()+'_l_u.pdb B')
+        print os.system('PatchDock/mainchain.pl '+self.code.upper()+'_r_u.pdb A')
+        print os.system('PatchDock/mainchain.pl '+self.code.upper()+'_l_u.pdb B')
         #combine the two files
         fh=open(self.code.upper()+'_r_u.pdb','a')
         fh.write('\n')
@@ -540,8 +540,8 @@ class decoys4single(object):
         lf=[item for item in fl if re.search('_l_',item)][0]
         resfile=[item for item in fl if item[-3:]=='res'][0]
         #renaming the chains
-        print os.system('/bell1/home/gqdong/Download/PatchDock/mainchain.pl '+sd['rpdb'][:-3]+' A')
-        print os.system('/bell1/home/gqdong/Download/PatchDock/mainchain.pl '+sd['lpdb'][:-3]+' B')
+        print os.system('PatchDock/mainchain.pl '+sd['rpdb'][:-3]+' A')
+        print os.system('PatchDock/mainchain.pl '+sd['lpdb'][:-3]+' B')
         #combine the two files
         print os.system(' cat '+sd['rpdb'][:-3]+' '+sd['lpdb'][:-3]+' > '+self.dsname+'.'+self.code+'.base.pdb') 
         #generate pir file for the base structure

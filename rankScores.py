@@ -197,7 +197,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
         pir(decoysets( self.dslist).pirpath).sep_pir('./',self.nors,permin=scoreminnumber,residuepower=residuepower)
         nors=int(os.popen('ls | grep -c pdbs').read())
         self.nors=nors
-        self.runpath='/netapp/sali/gqdong/'+self.scorename+'/'
+        self.runpath=runenv.serverUserPath+self.scorename+'/'
         #write the input list for different runs
         inputlist=open('inputlist','w')
         inputlist.write(','.join(['pdbs'+str(i) for i in range(1,nors+1)]))
@@ -210,7 +210,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
                       +'import sys \n \nrsp=rawsp(\''+self.pdbset+'\',\''
                       +self.features+'\',\''+self.genmethod+'\')\n'+'ssp=scaledsp(\''+self.pm+'\',rsp)\n'
                       +'so=spdsscore('+str(self.dslist)+',\''+self.bm+'\',ssp)\n'
-                      +'so.ssppath=\'/netapp/sali/gqdong/'+self.scorename+'/'+self.sspname+'\'\n'
+                      +'so.ssppath=\''+runenv.serverUserPath+self.scorename+'/'+self.sspname+'\'\n'
                       +'so.test='+str(self.test)+'\n'
                       +'so.calc_score(sys.argv[1])')
         makemdt.flush()
@@ -357,7 +357,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
             env.edat.energy_terms.append(pair)
         elif self.features=='soap_pep':
             from modeller import soap_peptide
-            pair = soap_peptide.Scorer('/netapp/sali/gqdong/sps/soap_pep/soap_pep.hdf5')
+            pair = soap_peptide.Scorer('soap_pep.hdf5')
             env.edat.sphere_stdv=-1
             env.edat.contact_shell=6
             env.edat.dynamic_sphere=False
@@ -504,9 +504,9 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
                 print os.system('gunzip '+os.path.join(scratchdir,sml+'.pdb.gz'))
                 print os.system('/netapp/sali/openeye/wrappers/v2012.Oct.1/python/examples/oechem/convert.py '+sml+'.pdb '+sml+'.mol2')
                 if self.features =='posescore':
-                    print os.system('/netapp/sali/haofan/imp/bin/imppy.sh python /netapp/sali/gqdong/gst/test_PLscore.py '+os.path.join(runenv.ddbdir,smll[0],smll[1],smll[0]+'.'+smll[1]+'.base.pdb')+' '+sml)
+                    print os.system('/netapp/sali/haofan/imp/bin/imppy.sh python '+runenv.serverUserPath+'/gst/test_PLscore.py '+os.path.join(runenv.ddbdir,smll[0],smll[1],smll[0]+'.'+smll[1]+'.base.pdb')+' '+sml)
                 elif self.features =='rankscore':
-                    print os.system('/netapp/sali/haofan/imp/bin/imppy.sh python /netapp/sali/gqdong/gst/rankscore.py '+os.path.join(runenv.ddbdir,smll[0],smll[1],'base.pdb')+' '+sml)
+                    print os.system('/netapp/sali/haofan/imp/bin/imppy.sh python '+runenv.serverUserPath+'/gst/rankscore.py '+os.path.join(runenv.ddbdir,smll[0],smll[1],'base.pdb')+' '+sml)
                 #print os.system('rm '+os.path.join(scratchdir,sml+'.pdb*'))
                 fh3=open(os.path.join(scratchdir,sml+'.score'))
                 fc=fh3.read()
@@ -552,9 +552,9 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
                     print os.system('cp '+os.path.join(fd,sml+'.pdb.gz')+' '+scratchdir)
                     print os.system('gunzip '+os.path.join(scratchdir,sml+'.pdb.gz'))
                 if self.genmethod=='fpd':
-                    print os.system('/netapp/sali/gqdong/rosetta_source/bin/FlexPepDocking.linuxgccrelease -database /netapp/sali/gqdong/rosetta_source/rosetta_database/ -flexpep_score_only -s '+os.path.join(scratchdir,sml+'.pdb')+' -out:file:scorefile '+os.path.join(scratchdir,sml+'.score'))                    
+                    print os.system(runenv.serverUserPath+'rosetta_source/bin/FlexPepDocking.linuxgccrelease -database '+runenv.serverUserPath+'/rosetta_source/rosetta_database/ -flexpep_score_only -s '+os.path.join(scratchdir,sml+'.pdb')+' -out:file:scorefile '+os.path.join(scratchdir,sml+'.score'))                    
                 else:
-                    print os.system('/netapp/sali/gqdong/rosetta_source/bin/score.linuxgccrelease -database /netapp/sali/gqdong/rosetta_source/rosetta_database/ -s '+os.path.join(scratchdir,sml+'.pdb')+' -out:file:scorefile '+os.path.join(scratchdir,sml+'.score'))
+                    print os.system(runenv.serverUserPath+'/rosetta_source/bin/score.linuxgccrelease -database '+runenv.serverUserPath+'/rosetta_source/rosetta_database/ -s '+os.path.join(scratchdir,sml+'.pdb')+' -out:file:scorefile '+os.path.join(scratchdir,sml+'.score'))
                 #print os.system('rm '+os.path.join(scratchdir,sml+'.pdb*'))
                 fh3=open(os.path.join(scratchdir,sml+'.score'))
                 fc=fh3.read()
@@ -603,9 +603,9 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
             #fdname=fd.split('/')[-2]
             rer=re.search('([0-9]{1,2})([A-Z\-]{1})([0-9]{1,4})',fdname[4:]).groups()
             if fdname=='1a2y7A26':
-                decoyfile=open('/netapp/sali/gqdong/loop/'+fdname).read()
+                decoyfile=open(runenv.serverUserPath+'/loop/'+fdname).read()
             else:
-                decoyfile=open('/netapp/sali/gqdong/loop/'+rer[0]+'res_decoys/'+fdname[:4]+rer[0]+'-'+rer[2]).read()
+                decoyfile=open(runenv.serverUserPath+'/loop/'+rer[0]+'res_decoys/'+fdname[:4]+rer[0]+'-'+rer[2]).read()
             dfl=decoyfile.split('ENDMDL')
             dflines=[]
             dfdict={}
@@ -690,10 +690,10 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
         wd=os.getcwd()
         scorestr=''
         os.chdir(scratchdir)
-        print os.system('cp /netapp/sali/gqdong/sps/epad/EPAD/*sh ./')
-        print os.system('cp -r /netapp/sali/gqdong/sps/epad/EPAD/bin ./')
-        print os.system('cp -r /netapp/sali/gqdong/sps/epad/EPAD/config ./')
-        print os.system('cp -r /netapp/sali/gqdong/sps/epad/EPAD/SEQ ./')
+        print os.system('cp '+runenv.serverUserPath+'sps/epad/EPAD/*sh ./')
+        print os.system('cp -r '+runenv.serverUserPath+'sps/epad/EPAD/bin ./')
+        print os.system('cp -r '+runenv.serverUserPath+'sps/epad/EPAD/config ./')
+        print os.system('cp -r '+runenv.serverUserPath+'sps/epad/EPAD/SEQ ./')
         #os.mkdir(os.path.join(scratchdir,'SEQ'))
         os.mkdir(os.path.join(scratchdir,'DECOYS'))        
         #print os.system('mv *.seq '+os.path.join(scratchdir,'SEQ'))
@@ -729,7 +729,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
 
     def calc_dock_score(self,runnumber,tmml,fdl):
         wd=os.getcwd()
-        rdir='/scratch/gqdong/'+str(time.time())
+        rdir='/scratch/'+runenv.userName+'/'+str(time.time())
         print os.system('mkdir -p '+rdir)
         os.chdir(rdir)
         scorestr=''
@@ -759,13 +759,13 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
                 print os.system('cp '+os.path.join(fd,fid['olpdbAB'])+' ./')               
                 fl=''
                 for tm, i in zip(sml, range(len(sml))):
-                    print os.system('/netapp/sali/gqdong/bin/pdb_trans64 '+tm+' <'+fid['lpdb']+'.AB'+' >ltemp.pdb')
+                    print os.system(runenv.serverUserPath+'bin/pdb_trans64 '+tm+' <'+fid['lpdb']+'.AB'+' >ltemp.pdb')
                     print os.system('cat '+fid['rpdb']+'.AB'+' ltemp.pdb > '+str(i)+'.pdb')
                     fl=fl+str(i)+'.pdb\n'
                 fh=open('pdblist','w')
                 fh.write(fl)
                 fh.close()
-                print os.system('/netapp/sali/gqdong/bin/zrank_linux_64bit/zrank pdblist >/dev/null')
+                print os.system(runenv.serverUserPath+'bin/zrank_linux_64bit/zrank pdblist >/dev/null')
                 fh=open('pdblist.zr.out')
                 for line in fh:
                     if len(line)>4:
@@ -775,7 +775,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
             elif self.features=='rdock':
                 fl=''           
                 for tm, i in zip(sml, range(len(sml))):
-                    print os.system('/netapp/sali/gqdong/bin/pdb_trans64 '+tm+' <'+fid['lpdb']+' >ltemp.pdb')
+                    print os.system(runenv.serverUserPath+'bin/pdb_trans64 '+tm+' <'+fid['lpdb']+' >ltemp.pdb')
                     if fid['lpdb'][0:4] in ['1ACB','2J7P','1HE8','1YVB','1I4D','1ZM4']:
                         print os.system('cat  ltemp.pdb '+fid['rpdb']+' > '+str(i)+'.pdb')
                     else:
@@ -784,8 +784,8 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
                 fh=open('pdblist','w')
                 fh.write(fl)
                 fh.close()
-                print os.system('/netapp/sali/gqdong/rosetta_source/bin/score.linuxgccrelease -database /netapp/sali/gqdong/rosetta_source/rosetta_database -s '+fid['lpdb']+' -score:weights docking') 
-                print os.system('/netapp/sali/gqdong/rosetta_source/bin/score.linuxgccrelease -database /netapp/sali/gqdong/rosetta_source/rosetta_database -s '+fid['rpdb']+' -score:weights docking')
+                print os.system(runenv.serverUserPath+'rosetta_source/bin/score.linuxgccrelease -database '+runenv.serverUserPath+'rosetta_source/rosetta_database -s '+fid['lpdb']+' -score:weights docking') 
+                print os.system(runenv.serverUserPath+'rosetta_source/bin/score.linuxgccrelease -database '+runenv.serverUserPath+'rosetta_source/rosetta_database -s '+fid['rpdb']+' -score:weights docking')
                 fh=open('default.sc')
                 fh.readline()
                 sepscore=0
@@ -795,7 +795,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
                         sepscore+=float(item[1].strip())
                 fh.close()
                 print os.system('rm default.sc')
-                print os.system('/netapp/sali/gqdong/rosetta_source/bin/score.linuxgccrelease -database /netapp/sali/gqdong/rosetta_source/rosetta_database -in:file:l pdblist -score:weights docking >/dev/null')
+                print os.system(runenv.serverUserPath+'rosetta_source/bin/score.linuxgccrelease -database '+runenv.serverUserPath+'rosetta_source/rosetta_database -in:file:l pdblist -score:weights docking >/dev/null')
                 fh=open('default.sc')
                 fh.readline()
                 for line in fh:

@@ -863,7 +863,6 @@ class k2cvcluster(k2cvlocal):
             self.spsfo.quit=False
             for i in self.runnumdict[int(self.inputcode)][1]:
                 self.spsfo.scorer=load_scorer(self.scorerlist[inputindex][0],self.spsfo.indexlen)
-                print os.system('rm /netapp/sali/gqdong/runstatus/'+hcn+'#'+str(self.rsn)+'#'+str(self.rid))
                 res.append(self.spsfo.runtask_local(i,self.testscorer))
                 if self.spsfo.quit:
                     break
@@ -1015,7 +1014,7 @@ class k2cvcluster(k2cvlocal):
         self.dir=runenv.runs
         self.task.get_sn()
         self.rundir=str(self.task.rsn)
-        self.runpath='/netapp/sali/gqdong/'+self.rundir+'/'
+        self.runpath=runenv.serverUserPath+self.rundir+'/'
         #self.task=task('','',afterprocessing=self,preparing=self)        
         self.task.dir=self.dir+self.rundir+'/'
         self.task.rdirname=self.rundir
@@ -1139,10 +1138,10 @@ class k2cvcluster(k2cvlocal):
         #fm=get_system_freemem()
         #if fm/1000.0<self.freememory:
         #    sys.exit(0)
-        if self.freememory<20 or hcn=='bell.ucsf.edu':
+        if self.freememory<20 or runenv.hostn==0:
             return mypickle().loadpickleonly('input')
         else:
-            if not hcn=='bell.ucsf.edu':
+            if runenv.hostn==1:
                 time.sleep(self.rid*0.2)
                 fl=get_starting_jobs()
                 while len(fl)>0:
@@ -1150,7 +1149,6 @@ class k2cvcluster(k2cvlocal):
                     print "jobs are starting on  "+hcn
                 fm=get_system_freemem()
                 if fm/1000.0>(self.freememory+1.5):
-                    print os.system('touch /netapp/sali/gqdong/runstatus/'+hcn+'#'+str(self.rsn)+'#'+str(self.rid))
                     return mypickle().loadpickleonly('input')
                 else:
                     print "not enough free memory on node"
@@ -1183,6 +1181,6 @@ class k2cvcluster(k2cvlocal):
         print rp
         libpath=rp[0]+'.opt.lib'
         print libpath
-        print os.system('scp '+libpath+' '+runenv.jobserver+':'+os.path.join('/netapp/sali/gqdong/lib',self.rundir+'.lib'))
+        print os.system('scp '+libpath+' '+runenv.jobserver+':'+os.path.join(self.serverUserPath+'lib',self.rundir+'.lib'))
         
                 
