@@ -645,3 +645,15 @@ def loopschedule():
              step(CG, None, mk_scale(default=1.00, nonbond=0.10, spline=0.10)),
              step(CG, None, mk_scale(default=1.00, nonbond=0.50, spline=0.50)),
              step(CG, None, physical.values(default=4.00)) ])
+
+class checkRMSD(actions.action):
+    """calcualte the RMSDs of intermediate loops"""
+    def __init__(self, skip, loopObj,first=False,
+                 last=False, start=0):
+        actions.action.__init__(self, skip, first, last)
+        self.num = start
+        self.loopObj=loopObj
+
+    def __call__(self, opt):
+        self.loopObj.user_after_single_loop_model(self.loopObj.loop.outputs[-1])
+        self.num = self.num + 1
