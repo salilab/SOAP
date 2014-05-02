@@ -31,7 +31,7 @@ input=$taskid
 # Make a temporary directory on the scratch disk,
 # specific to the user and SGE job.
 cd /netapp/sali/gqdong/undefinedrundir/
-
+export PYTHONPATH=$PYTHONPATH:SOAPPATH
 
 # Copy input files to $TMPDIR here...
 

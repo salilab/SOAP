@@ -122,9 +122,9 @@ class task(object):
         self.get_inputlist()
         self.submit_task()
         if '#' in self.rdirname:# '#' is not recoginized by sge as valid filename
-            self.logpath=os.path.join(runenv.runlogpath, self.rdirname.replace('#',''))
+            self.logpath=os.path.join(runenv.serverLogPath, self.rdirname.replace('#',''))
         else:
-            self.logpath=os.path.join(runenv.serverbasedir,self.rdirname,'output')         
+            self.logpath=os.path.join(runenv.serverUserPath,self.rdirname,'output')         
         return 0
 
     def run_task_local(self,command,inputlist=None):
@@ -960,6 +960,7 @@ def generate_job_submit_script(freememory,spname,runtime,nors,parallel=0,mem_tot
     runmdt=open('runme.sh','w')
     submdt=file(runenv.libdir+scriptname,'r')
     submdtf=submdt.read()
+    submdtf=submdtf.replace("SOAPPATH",os.path.split(runenv.serverInstallPath[:-1])[0])
     if parallel:
         submdtf=submdtf.replace('memundefined','#$ -l mem_free='+str(freememory)+'G\n#$ -pe smp '+str(parallel)+'\n'+additional_resources)
     else:

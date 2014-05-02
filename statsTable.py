@@ -160,7 +160,7 @@ class rawsp(object):
         
     def calc_sp_all(self,runnumber):
         """Methods to generate the statistical potential from PDB files  in the currnt directory."""
-        self.runpath=get_path_to_thisfile()
+        self.runpath=runenv.basedir
         features=self.features
         pdbfile='pdbs'+str(runnumber)
         print 'running pdb: '+pdbfile
@@ -243,7 +243,7 @@ class rawsp(object):
                 m.write_hdf5(temppath+str(runnumber)+'.result.hdf5')
             except:
                 try:
-                    temppath='/scrapp2/'+runenv.username+'/'+os.getenv('JOB_ID')+'/'
+                    temppath=runenv.serverScrathPath+'/'+os.getenv('JOB_ID')+'/'
                     os.makedirs(temppath)
                     print os.system('mkdir '+temppath)
                     m.write_hdf5(temppath+str(runnumber)+'.result.hdf5')
@@ -542,7 +542,7 @@ class rawsp(object):
         return []
     
     def calc_sp_i(self,runnumber,reportstatus=True):
-        self.runpath=get_path_to_thisfile()
+        self.runpath=runenv.basedir
         pirfile='pdbs'+str(runnumber)
         dnlist=pir(pirfile).get_codelist()
         if self.atompairclustering:
@@ -556,7 +556,7 @@ class rawsp(object):
                 np.save(temppath+str(runnumber)+'.result.npy',idist)
             except:
                 try:
-                    temppath='/scrapp/'+runenv.userName+'/'+os.getenv('JOB_ID')+'/'
+                    temppath=runenv.serverScrathPath+'/'+os.getenv('JOB_ID')+'/'
                     print os.system('mkdir '+temppath)
                     np.save(temppath+str(runnumber)+'.result.npy',idist)
                     runsuccess=True
@@ -2015,7 +2015,7 @@ class gpsmoothing(object):
     
     def runtask_cluster(self,runnum):
         print runnum
-        self.runpath=get_path_to_thisfile()
+        self.runpath=runenv.basedir
         fh=open('input.pickle')
         nso=pickle.load(fh)
         fh.close()

@@ -841,7 +841,7 @@ class k2cvcluster(k2cvlocal):
         #the individual nodes on the cluster will run this function, if other funtions needs to be run here, chage the code here.
         self.rid=int(inputcode)
         self.path='./'
-        self.runpath=get_path_to_thisfile()
+        self.runpath=runenv.basedir
         self.inputcode=str(inputcode)
         inputindex=self.runnumdict[int(self.inputcode)][0]
         self.runstatus=np.zeros(len(self.runnumlist[inputindex]))
