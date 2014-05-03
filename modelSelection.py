@@ -246,7 +246,7 @@ class spss(object):
             for key in self.__dict__.keys():
                 self.__dict__[key]=a.__dict__[key]
             self.logdir=a.logdir
-            self.logdir2=a.logdir2
+            #self.logdir2=a.logdir2
             return None
         self.write2log(self.get_valuesets())
         self.currentcutoffpercinitial=0.09
@@ -306,21 +306,21 @@ class spss(object):
         path=''#self.modelexist()
         if len(path)>0:
             return path
-        bdir2='~/Dropbox/spresults/'
-        tdir=bdir2+'_'.join(self.model['bmtype']['dslist'])
-        if not os.path.isdir(tdir):
-            os.mkdir(tdir)
-        tdir=tdir+'/'+self.model['bmtype']['criteria']
-        if not os.path.isdir(tdir):
-            os.mkdir(tdir)
+        #bdir2='~/Dropbox/spresults/'
+        #tdir=bdir2+'_'.join(self.model['bmtype']['dslist'])
+        #if not os.path.isdir(tdir):
+        #    os.mkdir(tdir)
+        #tdir=tdir+'/'+self.model['bmtype']['criteria']
+        #if not os.path.isdir(tdir):
+        #    os.mkdir(tdir)
         logfoldername=sys.argv[0][:-3]
         os.chdir(self.baselogdir)
         fl=os.listdir('./')
         existlogfoldernum=len([item for item in fl if item.startswith(logfoldername)])
         logfoldername=logfoldername+str(existlogfoldernum+1)
         self.logdir=self.baselogdir+logfoldername+'/'
-        self.logdir2=tdir+'/'+logfoldername+'/'
-        os.mkdir(self.logdir2)
+        #self.logdir2=tdir+'/'+logfoldername+'/'
+        #os.mkdir(self.logdir2)
         os.mkdir(self.logdir)
         os.chdir(self.logdir)
         return ''
@@ -536,7 +536,7 @@ class spss(object):
             logfile.write(logstr+'\n')
             print logstr
             logfile.close()
-            print os.system('cp '+self.logdir+'log '+self.logdir2)
+            #print os.system('cp '+self.logdir+'log '+self.logdir2)
             print("lock released")        
         
     def get_valuesets(self):
@@ -563,8 +563,8 @@ class spss(object):
         print os.system('cp '+self.baselogdir+bbd+'/bestmodel.pickle '+self.logdir)
         print os.system('touch '+self.logdir+'BMF-'+bbd)
         print os.system('cp '+sys.path[1]+'/'+sys.argv[0]+' '+self.logdir)
-        print os.system('cp '+self.logdir+'log '+self.logdir2)# keep the log in dropbox
-        print os.system('cp '+self.logdir+'*py '+self.logdir2)# keep the log in dropbox
+        #print os.system('cp '+self.logdir+'log '+self.logdir2)# keep the log in dropbox
+        #print os.system('cp '+self.logdir+'*py '+self.logdir2)# keep the log in dropbox
         #print "Waiting for pool to finish"
         #p.close()
         #print "Pool close"
@@ -576,11 +576,11 @@ class spss(object):
         for key in self.resultdict:
             bd=[f for f in fl if f.startswith(self.resultdict[key][2])][0]
             print os.system('rm '+self.baselogdir+'runs/'+bd+'/figinput*')
-        print os.system('cp '+self.baselogdir+bbd+'/*eps '+self.logdir2)
+        #print os.system('cp '+self.baselogdir+bbd+'/*eps '+self.logdir2)
         print os.system('mv '+self.logdir+' '+self.logdir[:-1]+'-'+bd[5:])
-        print os.system('mv '+self.logdir2+' '+self.logdir2[:-1]+'-'+bd[5:])
+        #print os.system('mv '+self.logdir2+' '+self.logdir2[:-1]+'-'+bd[5:])
         self.logdir=self.logdir[:-1]+'-'+bd[5:]+'/'
-        self.logdir2=self.logdir2[:-1]+'-'+bd[5:]+'/'
+        #self.logdir2=self.logdir2[:-1]+'-'+bd[5:]+'/'
         with FileLock("spsslog.shelve", timeout=100, delay=2) as lock:
             print("Lock acquired.")
             resultdictlog=shelve.open(self.baselogdir+'spsslog.shelve')

@@ -6,6 +6,7 @@
 
 from env import *
 from utility import mypickle
+from sequences import *
 
 class decoys4single(object): 
     """Single set of decoys, serving as the building block for :class:`decoyset`, corresponding to a single subfolder in the :class:`decoyset`'s folder. All the decoy structure files should present in this subfolder.
@@ -191,7 +192,7 @@ class decoys4single(object):
          
     def copy2ddb(self):
         #copy decoys to jobserver
-        tdir=runenv.serverpath+'decoys/'+self.dsname+'/'+self.code
+        tdir=runenv.serverUserPath+'decoys/'+self.dsname+'/'+self.code
         print os.system('gzip *pdb')
         print os.system('gunzip *base*')
         pdblist=" ".join([item+'.pdb.gz' for item in self.dnlist])
@@ -451,7 +452,7 @@ class decoys4single(object):
         self.extrapar=[('dg','f4'),('dasa','f4'),('irmsd','f4')]
         self.build_sa(rmsdlist)  
         #copy to cluster
-        tdir=runenv.serverpath+'decoys/'+self.dsname+'/'+self.code
+        tdir=runenv.serverUserPath+'decoys/'+self.dsname+'/'+self.code
         print os.system('ssh '+runenv.jobserver+' mkdir '+tdir)
         print os.system('scp *base* '+runenv.jobserver+':'+tdir)
         print os.system('scp need* '+runenv.jobserver+':'+tdir)
@@ -524,7 +525,7 @@ class decoys4single(object):
         fh.write(totalpir)
         fh.close()
         #copy files to cluster
-        tdir=runenv.serverpath+'decoys/'+self.dsname+'/'+self.code
+        tdir=runenv.serverUserPath+'decoys/'+self.dsname+'/'+self.code
         print os.system('ssh '+runenv.jobserver+' mkdir '+tdir)
         print os.system('scp *base* '+runenv.jobserver+':'+tdir)
         print os.system('scp need* '+runenv.jobserver+':'+tdir)
@@ -590,7 +591,7 @@ class decoys4single(object):
         fh=open(self.code+'.pir','w')
         fh.write(totalpir)
         fh.close()
-        tdir=runenv.serverpath+'decoys/'+self.dsname+'/'+self.code
+        tdir=runenv.serverUserPath+'decoys/'+self.dsname+'/'+self.code
         print os.system('ssh '+runenv.jobserver+' mkdir '+tdir)
         print os.system('scp *base* '+runenv.jobserver+':'+tdir)
         print os.system('scp need* '+runenv.jobserver+':'+tdir)
@@ -805,7 +806,7 @@ class decoyset(object):
                 fll.append(f)
         self.codelist=fll
         sdl=[]
-        tdir=runenv.serverpath+'decoys/'+self.dsname
+        tdir=runenv.serverUserPath+'decoys/'+self.dsname
         print os.system('ssh '+runenv.jobserver+' mkdir '+tdir)
         sal=self.cat_singles()
         self.bulid_rmsd_array(sal)

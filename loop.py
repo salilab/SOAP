@@ -6,7 +6,8 @@ from env import *
 from modeller import physical
 from modeller.schedule import schedule, step
 from modeller.optimizers import conjugate_gradients as CG
-from modeller.automodel.autosched import * 
+from modeller.automodel.autosched import *
+log.none()
 
 class MyLoop(loopmodel):
     # This routine picks the residues to be refined by loop modeling
