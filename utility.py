@@ -4,6 +4,8 @@
 """
 from env import *
 
+
+
 def squeeze_dict(d):
     nd={}
     for key in d:
@@ -226,7 +228,7 @@ class mypickle(object):
                 nl=1
                 for nsi in ns:
                     nl=nl*nsi
-                if nl<10000:
+                if nl<1000:
                     continue
                 self.savesinglearray(od,key,nameprefix)
             else:
@@ -313,7 +315,8 @@ class mypickle(object):
                 
     def load(self,nameprefix):
         print "loading pickle file"
-        fh=open(nameprefix+'.pickle','rb')
+        name=nameprefix if nameprefix.endswith('.pickle') else nameprefix+'.pickle'
+        fh=open(name,'rb')
         obj=pickle.load(fh)
         fh.close()
         print "finished loading pickle file"

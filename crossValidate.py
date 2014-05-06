@@ -21,6 +21,7 @@ class k2cv(object):
         else:
             self.sample=[]
         self.nots=2
+
         
     def partfunc(self,osample,k,i):
         sample=copy.copy(osample)
@@ -304,16 +305,48 @@ class k2cv(object):
             sfo=so.scorerlist[i]
         plt.plot(sfo.sfv)   
 
-    def write2logshelve(self):
+
+    def write2logshelve(self,model=None):
+        if model==None:
+            model=self.spsfo.scorer.originalmodel        
         os.chdir(self.logdir)
         with FileLock("log.shelve", timeout=100, delay=2) as lock:
-            print("Lock acquired.")       
+            print("Lock acquired.")     
             resultdictlog=shelve.open(self.logdir+'log.shelve')
-            if not 'str' in self.spsfo.scorer.originalmodel:
-                self.spsfo.scorer.originalmodel['str']=any2str(self.spsfo.scorer.originalmodel)
-            resultdictlog[self.spsfo.scorer.originalmodel['str']]=[self.resultarray,self.resultstr,self.rundir,self.bestmodel,self.bestmodelresult,self.logpath] 
+            del model['str']
+            model['str']=any2str(model)  
+            resultdictlog[model['str']]=[self.resultarray,self.resultstr,self.rundir,self.bestmodel,self.bestmodelresult,self.logpath] 
             resultdictlog.close()
             print("lock released")
+
+
+    def modelinlog(self,model=None):
+        if model==None:
+            model=self.spsfo.scorer.originalmodel
+        os.chdir(self.logdir)
+        del model['str']
+        model['str']=any2str(model)        
+        with FileLock("log.shelve", timeout=100, delay=2) as lock:
+            print("Lock acquired.")
+            if not os.path.isfile(self.logdir+'log.shelve'):
+                nmr=[]
+            else:
+                resultdictlog=shelve.open(self.logdir+'log.shelve')
+                if model['str'] in resultdictlog:
+                    nmr=resultdictlog[model['str']]
+                    #ko=k2cvcluster()
+                    #rundirname=[item for item in os.listdir(os.path.join(self.baselogdir,'runs')) if item.startswith(nmr[2])][0]
+                    #ko.load_fromlogdir(os.path.join(self.baselogdir,'runs',rundirname))
+                    #nmr[0]=ko.resultarray
+                else:
+                    nmr=[]
+                resultdictlog.close()
+            print("lock released")
+        if len(nmr)==0:
+            return False
+        else:
+            self.resultarray,self.resultstr,self.rundir,self.bestmodel,self.bestmodelresult,self.logpath=nmr
+            return True
         
     def write2db(self):
         #create the database if non exist
@@ -541,16 +574,29 @@ class k2cvcluster(k2cvlocal):
         self.spsfo=spsfo
         self.runspernode=1
         self.runpath='./'
-        self.statsstr=''
+        self.statsstr='' 
         self.testperc=-1
-        self.testsample=[]
+        self.testsample=[] 
         self.rid=0
-        self.rsn=0
+        self.rsn=0 
         self.repeat=1
         if logpath:
             self.load_fromlogdir(logpath)
         if initialize:
             self.initialize_model()
+        if runenv.hostn==0 and len(model)>0:
+            try:
+                bdir=runenv.basedir+'results/'
+                tdir=bdir+'_'.join(self.model['bmtype']['dslist'])
+                if not os.path.isdir(tdir):
+                    os.mkdir(tdir)
+                tdir=tdir+'/'+self.model['bmtype']['criteria']
+                if not os.path.isdir(tdir):
+                    os.mkdir(tdir)
+                self.logdir=tdir+'/'
+            except:
+                traceback.print_exc()
+                pdb.set_trace()
             
     def initialize_scorer(self):
         so=scorer(model=self.originalmodel)
@@ -809,8 +855,11 @@ class k2cvcluster(k2cvlocal):
         self.runnumdict=rnd
         
     def get_task(self):
-        self.task=task('','',afterprocessing=self,preparing=self)
-        return self.task
+        if self.modelinlog(self.model):
+            return 0
+        else:
+            self.task=task('','',afterprocessing=self,preparing=self)
+            return self.task
     
     def prepare_cross_validation_sample(self):
         sample=self.sample
@@ -1174,12 +1223,14 @@ class k2cvcluster(k2cvlocal):
 
     def generate_potential(self):        
         so=scorer(model=self.model)
+        if not hasattr(self,'finaloptpar'):
+            self.load_fromlogdir(self.logpath)
         print so.assess(self.finaloptpar)
         print so.assess_model()
         rp=so.write_potential(filetype='lib')
         print rp
         libpath=rp[0]+'.opt.lib'
         print libpath
-        print os.system('scp '+libpath+' '+runenv.jobserver+':'+os.path.join(self.serverUserPath+'lib',self.rundir+'.lib'))
+        print os.system('scp '+libpath+' '+runenv.jobserver+':'+os.path.join(runenv.serverUserPath+'lib',self.rundir+'.lib'))
         
                 

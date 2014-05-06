@@ -67,9 +67,21 @@ class sps(object):
         tcl.append(localtask(func=self.initialize_model_pir,inputlist=[model]))
         self.initialize_model_distributions(model,tcl)
         self.initialize_model_scores(model,tcl)
-        cv=k2cvcluster(model=model, initialize=False)
+        if 'refineProtocal' in model:
+            nm=copy.deepcopy(model)
+            del nm['refineProtocal']
+        else:
+            nm=model
+        cv=k2cvcluster(model=nm, initialize=False)
         self.cvlist.append(cv)
-        tcl.append(cv.get_task())
+        t=cv.get_task()
+        if t!=0:
+            tcl.append(t)
+        if 'refineProtocal' in model:#use the eval function to further evaluate the devired potential
+            lfo=sprefine(refineProtocal=model['refineProtocal'])
+            rt=lfo.get_task(cv)
+            if rt!=0:
+                tcl.append(rt)
         return taskchain(chains=tcl)
 
 
@@ -148,6 +160,7 @@ class sps(object):
         self.cvlist=[]
         listoftasks=[]
         for model in self.models:
+            
             so=scorer(model=model)
             opt=optimizer(scorer=so)
             cv=k2cvcluster(spsfo=opt)
@@ -156,15 +169,6 @@ class sps(object):
         self.cvtask=tasklist(tasklist=listoftasks)
         
     def cv(self):
-        ml=[]
-        for mdl in self.models:
-            nmr=modelinlog(mdl)
-            if len(nmr)>0:
-                print nmr[1]
-                self.logpathlist.append(nmr)
-            else:
-                ml.append(mdl)
-        self.models=ml
         alltasks=self.get_alltasks()
         #finished getting tasks, now start running
         #pdb.set_trace()
@@ -257,7 +261,7 @@ class spss(object):
         self.num2evalall=10
         if 'refineProtocal' in model:
             self.refineProtocal=model['refineProtocal']
-            del model['refineProtocal']
+            #del model['refineProtocal']
         else:
             self.refineProtocal={}
     
@@ -388,17 +392,6 @@ class spss(object):
         for cv,i in zip(spso.cvlist,mil):
             self.resultdict[str(mkl[i])]=[cv.resultarray,cv.resultstr,cv.rundir,cv.bestmodel,cv.bestmodelresult] #the format is the same as the dictionary
         #hijack the result here to
-        if self.evalPotFunc!=None:#use the eval function to further evaluate the devired potential
-            rl=[]
-            tcl=[]
-            for key,value in self.resultdict.items():
-                cvo=k2cvcluster(logpath=value[5])                
-                cvo.generate_potential()
-                rl.append([cvo,value[0]])
-                tcl.append(self.evalPotFunc(cvo))#get refine task
-            tasklist(tcl).monitor2end()
-            for cvo, ra in rl:
-                ra[-1]=cvo.resultsummary
         self.runsnlist=self.runsnlist+spso.get_cvrundir()
         pickedindex=self.analyze_results(mkl,logprefix)
         clusterslist=[]
@@ -413,6 +406,7 @@ class spss(object):
             #pdb.set_trace()
         return pickedindex
 
+
     def show_current_result(self,spso,mkl):
         for cv,mk in zip(spso.cvlist,mkl):
             try:
@@ -423,13 +417,16 @@ class spss(object):
     def get_current_keyvalues(self):
         vl=[]
         for dsearch in self.dsearches:
-            if not isinstance(dsearch['key'],list):
-                vl.append(dsearch['object'][dsearch['key']])
-            else:
-                svl=[]
-                for i in range(len(dsearch['key'])):
-                    svl.append(dsearch['object'][i][dsearch['key'][i]])
-                vl.append(svl)
+            try:
+                if not isinstance(dsearch['key'],list):
+                    vl.append(dsearch['object'][dsearch['key']])
+                else:
+                    svl=[]
+                    for i in range(len(dsearch['key'])):
+                        svl.append(dsearch['object'][i][dsearch['key'][i]])
+                    vl.append(svl)
+            except:
+                pdb.set_trace()
         return vl
         
     def get_resultarray(self,mkl):
@@ -978,30 +975,6 @@ def convert2old(nm):
     print nm
     return nm
 
-def modelinlog(nm):
-    bdir=runenv.basedir+'results/'
-    tdir=bdir+'_'.join(nm['bmtype']['dslist'])
-    tdir=tdir+'/'+nm['bmtype']['criteria']
-    logdir=tdir+'/'
-    os.chdir(logdir)
-    with FileLock("log.shelve", timeout=100, delay=2) as lock:
-        print("Lock acquired.")
-        if not os.path.isfile(logdir+'log.shelve'):
-            nmr=[]
-        else:
-            resultdictlog=shelve.open(logdir+'log.shelve')
-            if not 'str' in nm:
-                nm['str']=any2str(nm)
-            if nm['str'] in resultdictlog:
-                nmr=resultdictlog[nm['str']]
-            else:
-                nmr=[]
-            resultdictlog.close()
-        print("lock released")
-    return nmr
 
-
-
-        
         
     

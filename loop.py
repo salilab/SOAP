@@ -193,7 +193,14 @@ class MyLoop(loopmodel):
             
                
 class sprefine(object):
-    def __init__(self,dslist='101',bm='loop.100.8',criteria='bestrmsd',nonbond_spline=0.1,contact_shell=12.0,deviations=50,spmodel=None):
+    def __init__(self,dslist='101',bm='loop.100.8',criteria='bestrmsd',nonbond_spline=0.1,contact_shell=12.0,deviations=50,spmodel=None,refineProtocal=None):
+        if refineProtocal!=None:
+            self.refineProtocal=refineProtocal
+            dslist=refineProtocal['dslist']
+            bm=refineProtocal['bm']
+            nonbond_spline=refineProtocal['nonbond_spline']
+            contact_shell=refineProtocal['contact_shell']
+            deviations=refineProtocal['deviations']            
         #use statistical potential to refine loops/strutures, and analyze the refine results to judge the statistical potential.
         if spmodel: #needfix???
             if spmodel['scoretype']!='sprefine':
@@ -401,6 +408,9 @@ class sprefine(object):
         return resultlist
 
     def prepare_task_input(self):
+        if self.cv!=None:
+            self.cv.generate_potential()
+            self.refpot[1]=os.path.join(runenv.serverUserPath+'lib',self.cv.rundir+'.lib')
         self.initialize_dslist()
         self.dir=runenv.runs
         self.task.get_tasksn()
@@ -476,8 +486,12 @@ class sprefine(object):
 
     def get_task(self,cv=None):
         if cv!=None:
-            self.cv=cv
-            self.refpot[1]=os.path.join(runenv.serverUserPath+'lib',cv.rundir+'.lib')
+            self.cv=cv            
+            om=copy.deepcopy(cv.model)
+            om['refineProtocal']=self.refineProtocal
+            self.model=om
+            if self.cv.modelinlog(self.model):
+                return 0
         self.task=task('','',afterprocessing=self,preparing=self)
         return self.task
     
@@ -527,7 +541,6 @@ class sprefine(object):
         #del self.clusters
         self.result=rd
         #pdb.set_trace()
-        
         del self.task
         gc.collect()
         return self.analyze_loop_modeling()
@@ -567,7 +580,11 @@ class sprefine(object):
         self.averageRMSD=ra[:,:,0].min(axis=1).mean()+ra[:,:,1].min(axis=1).mean()
         if self.cv!=None:
             self.cv.resultsummary=self.averageRMSD
+            self.cv.resultarray[0]=self.averageRMSD
+            self.cv.write2logshelve(self.model)
         return self.averageRMSD
+
+        
 
     def analyze_loop_modeling_results(self,result):
         mn=9999999999

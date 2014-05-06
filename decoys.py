@@ -7,6 +7,7 @@
 from env import *
 from utility import mypickle
 from sequences import *
+#sys.modules['sp']=sys.modules[__name__]
 
 class decoys4single(object): 
     """Single set of decoys, serving as the building block for :class:`decoyset`, corresponding to a single subfolder in the :class:`decoyset`'s folder. All the decoy structure files should present in this subfolder.
@@ -1234,4 +1235,15 @@ class decoysets(decoyset):
         self.setpos=setpos
         self.codelist=codelist
         self.dslist=dslist
+        
+        
+def touch_ds(path):
+    for root, dirs,files in os.walk(path):
+        os.chdir(root)
+        for f in files:
+            if f.endswith('.pickle'):
+                ds=mypickle().load(f)
+                pdb.set_trace()
+                mypickle().dump(dss,f)
+
         
