@@ -9,7 +9,6 @@ from crossValidate import *
 #import multiprocessing.util as util
 #util.log_to_stderr(util.SUBDEBUG)
 debug=True
-#import errno
 
 
 def cvplot(cl):
