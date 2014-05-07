@@ -59,8 +59,8 @@ class dsscorestats(object):
         
     def report_stats(self,report):
         csa=np.copy(self.statsarray)
-        print csa
-        print csa.mean()
+        #print csa
+        #print csa.mean()
         rv=0
         #report a single number indicating the performance of the potential
         for i in range(self.numofc):
