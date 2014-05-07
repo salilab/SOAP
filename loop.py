@@ -354,9 +354,9 @@ class sprefine(object):
         try:
             rs=-2-int(self.dslist)
         except:
-            rs=-2
+            rs=-2        # directories for input atom files
+
         env = environ(rand_seed=rs)
-        # directories for input atom files
         env.io.atom_files_directory = [os.path.join(runenv.loopStructurePath,self.dslist),scratchdir,runenv.opdbdir,'.']
         # Create a new class based on 'loopmodel' so that we can redefine
         # select_loop_atoms (necessary)
@@ -471,8 +471,8 @@ class sprefine(object):
         inputlist=open('inputlist','w')
         inputlist.write(','.join([str(i)+'.pickle' for i in range(1,nors+1)]))
         inputlist.close()
-        makemdt=open('runme.py','w')
-        makemdt.write('from SOAP.loop import *\nimport sys \n \nspopt=sprefine(sys.argv[1],\''+self.bm+'\',\''+self.criteria+'\')\nspopt.runpath=\''+self.runpath+'\'\n\nspopt.initialize_dslist()'+'\nspopt.initialize_runenv()'+'\nspopt.assess_cluster_node()\n')
+        makemdt=open('runme.py','w')#nonbond_spline=0.1,contact_shell=12.0,deviations=50
+        makemdt.write('from SOAP.loop import *\nimport sys \n \nspopt=sprefine(sys.argv[1],"'+self.bm+'","'+self.criteria+'","'+self.nonbond_spline+'","'+self.contact_shell+'","'+self.deviations+'")\nspopt.runpath=\''+self.runpath+'\'\n\nspopt.initialize_dslist()'+'\nspopt.initialize_runenv()'+'\nspopt.assess_cluster_node()\n')
         makemdt.flush()
         dp=self.slavenumber
         generate_job_submit_script(freememory,self.rundir,runtime,nors,parallel=self.slavenumber)        
