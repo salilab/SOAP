@@ -1140,7 +1140,7 @@ class k2cvcluster(k2cvlocal):
             self.originalresult=rdll
             for i in range(srn):
                 print "num"+str(i)
-                bestresult=-99999 #choose the best train restult
+                bestresult=-np.inf #choose the best train restult
                 print bestresult
                 bestrd=[]
                 for j in range(self.repeat):
