@@ -357,7 +357,7 @@ class sprefine(object):
             rs=-2
         env = environ(rand_seed=rs)
         # directories for input atom files
-        env.io.atom_files_directory = [os.path.join(runenv.basedir,'loop/',self.dslist),scratchdir,runenv.opdbdir,'.']
+        env.io.atom_files_directory = [os.path.join(runenv.loopStructurePath,self.dslist),scratchdir,runenv.opdbdir,'.']
         # Create a new class based on 'loopmodel' so that we can redefine
         # select_loop_atoms (necessary)
         m = MyLoop(env,
