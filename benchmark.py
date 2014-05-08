@@ -429,7 +429,10 @@ class dsscorestats(object):
             elif self.getworstvalue:
                 self.statsarray[i,ai]=-1
             else:
-                self.statsarray[i,ai]=np.corrcoef(score,rmsds)[0,1]
+		self.statsarray[i,ai]=np.corrcoef(score,rmsds)[0,1]
+		if np.isnan(self.statsarray[i,ai]):
+		    self.statsarray[i,ai]=-1
+		
 
     def analyze_dcg(self):#discounted cumulative gain
         rmsdnpa=self.score

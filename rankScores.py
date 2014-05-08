@@ -498,7 +498,6 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
             fd=fdl[i]
             for sml in tmml[i]:
                 smll=sml.split('.')
-                
                 print os.system('cp '+os.path.join(runenv.ddbdir,smll[0],smll[1],sml+'.pdb.gz')+' '+scratchdir)
                 print os.system('gunzip '+os.path.join(scratchdir,sml+'.pdb.gz'))
                 print os.system('/netapp/sali/openeye/wrappers/v2012.Oct.1/python/examples/oechem/convert.py '+sml+'.pdb '+sml+'.mol2')
