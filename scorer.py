@@ -526,6 +526,7 @@ class scorer(object):
         pathlist=[]
         refdict=dict([(id(r),r) for r in self.model['scorers'] if r['type']=='sf'])
         for spmodel in self.model['scorers']:
+            ratiolist=[]
             if spmodel['type']!='scaledsp':
                 continue
             if not atompairclustering and 'bm' in spmodel and re.search('(ap[0-9]+)n',spmodel['bm']):
