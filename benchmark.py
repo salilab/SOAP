@@ -52,7 +52,9 @@ class dsscorestats(object):
             elif key=='lbslope':
                 self.analyze_lbslope()
             elif key=='dcg':
-                self.analyze_dcg()                
+                self.analyze_dcg()
+            elif key=='enrichment':
+                self.analyze_enrichment()		
             else:
                 raise Exception('Do not know how to analyze score with criteria: '+slevel)
         return self.report_stats(report)
@@ -131,7 +133,11 @@ class dsscorestats(object):
                 self.criterialist.append(criteriadict['cc'])  
             elif sl.startswith('dcg'):
                 criteriadict['dcg']={'ctsn':ctsn,'ct':'dcg','ratio':ratio}
-                self.criterialist.append(criteriadict['dcg'])  
+                self.criterialist.append(criteriadict['dcg'])
+            elif sl.startswith('enrichment'):
+                criteriadict['enrichment']={'ctsn':ctsn,'ct':'enrichment','ratio':ratio}
+                self.criterialist.append(criteriadict['enrichment'])
+		self.ds.sa['rmsd']=1-self.ds.sa['rmsd']#make 1 be postiive example, 0 negative example
             elif sl.startswith('lbslope'):
                 criteriadict['lbslope']={'ctsn':ctsn,'ct':'lbslope','ratio':ratio}
                 self.criterialist.append(criteriadict['lbslope'])
@@ -433,7 +439,6 @@ class dsscorestats(object):
 		if np.isnan(self.statsarray[i,ai]):
 		    self.statsarray[i,ai]=-1
 		
-
     def analyze_dcg(self):#discounted cumulative gain
         rmsdnpa=self.score
         poslist=self.ds.indexlist
@@ -449,6 +454,25 @@ class dsscorestats(object):
                 sind=np.argsort(score)
             ta=(500-rmsds)/(sind+1)
             self.statsarray[i,ai]=(ta[ta>0]).sum()
+
+    def analyze_enrichment(self):
+	"""
+	    Calculate the enrichment score
+	"""
+        rmsdnpa=self.score
+        poslist=self.ds.indexlist
+        ai=self.criteriadict['enrichment']['ctsn']
+        for i in range(0,len(poslist)):
+            score=rmsdnpa[poslist[i][0]:poslist[i][1]]
+            rmsds=self.ds.sa['rmsd'][poslist[i][0]:poslist[i][1]]
+            if self.getidealvalue:
+                sind=np.arange(poslist[i][1]-poslist[i][0])
+            elif self.getworstvalue:
+                sind=np.arange(poslist[i][1]-poslist[i][0]-1,-1,-1)
+            else:
+                sind=np.argsort(score)
+	    va=-np.log(np.nonzero(rmsds[sind])[0])
+            self.statsarray[i,ai]=va.sum()/len(va)
                 
     def analyze_lbslope(self):
     #calculate the slope of the lower bond line in the score vs rmsd file.

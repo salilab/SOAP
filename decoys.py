@@ -1236,14 +1236,5 @@ class decoysets(decoyset):
         self.codelist=codelist
         self.dslist=dslist
         
-        
-def touch_ds(path):
-    for root, dirs,files in os.walk(path):
-        os.chdir(root)
-        for f in files:
-            if f.endswith('.pickle'):
-                ds=mypickle().load(f)
-                pdb.set_trace()
-                mypickle().dump(dss,f)
 
         

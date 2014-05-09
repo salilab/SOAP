@@ -219,7 +219,7 @@ class sprefine(object):
         self.nofloops=int(bml[-1])
         self.startNum=0
         self.endNum=self.nofloops
-        self.slavenumber=int(bm[-1])
+        self.slavenumber=0
         self.codedict={}
         self.pe='local'
         self.calc_rmsds=True
@@ -472,9 +472,8 @@ class sprefine(object):
         inputlist.write(','.join([str(i)+'.pickle' for i in range(1,nors+1)]))
         inputlist.close()
         makemdt=open('runme.py','w')#nonbond_spline=0.1,contact_shell=12.0,deviations=50
-        makemdt.write('from SOAP.loop import *\nimport sys \n \nspopt=sprefine(sys.argv[1],"'+self.bm+'","'+self.criteria+'",'+str(self.nonbond_spline)+','+str(self.contact_shell)+','+str(self.deviations)+')\nspopt.runpath=\''+self.runpath+'\'\nspopt.refpot[1]="'+self.refpot[1]+'"\n\nspopt.initialize_dslist()'+'\nspopt.initialize_runenv()'+'\nspopt.assess_cluster_node()\n')
+        makemdt.write('from SOAP.loop import *\nimport sys \n \nspopt=sprefine(sys.argv[1],"'+self.bm+'","'+self.criteria+'",'+str(self.nonbond_spline)+','+str(self.contact_shell)+','+str(self.deviations)+')\nspopt.runpath=\''+self.runpath+'\'\nspopt.refpot[1]="'+self.refpot[1]+'"\n\nspopt.initialize_dslist()'+'\n'+'\nspopt.assess_cluster_node()\n')
         makemdt.flush()
-        dp=self.slavenumber
         generate_job_submit_script(freememory,self.rundir,runtime,nors,parallel=self.slavenumber)        
         return 0
 
@@ -578,13 +577,12 @@ class sprefine(object):
             ra[k,:,:]=np.array(result[key])[:mn,:]
             k+=1
         self.averageRMSD=ra[:,:,0].min(axis=1).mean()+ra[:,:,1].min(axis=1).mean()
+        print self.averageRMSD
         if self.cv!=None:
             self.cv.resultsummary=self.averageRMSD
-            self.cv.resultarray[0]=self.averageRMSD
+            self.cv.resultarray[-1]=self.averageRMSD
             self.cv.write2logshelve(self.model)
         return self.averageRMSD
-
-        
 
     def analyze_loop_modeling_results(self,result):
         mn=9999999999
