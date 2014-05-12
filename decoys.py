@@ -21,7 +21,8 @@ class decoys4single(object):
       - `path`: the path to the :class:`decoyset`, the place to create the subfoler for this set of decoys.
       - `dtype`: list of numpy data types defining the strctured array (you should not change this)
       - `extrapar`: numpy data types for additonal propertites of each decoy structure is define here
-        specially for atom class features (see :class:`features.AtomType`)"""   
+        specially for atom class features (see :class:`features.AtomType`)"""
+        
     def __init__(self,code='',dsname='',path=''):
         """Intialize the class with :attr:`code`, :attr:`dsname`, and :attr:`path`"""
         self.code=code

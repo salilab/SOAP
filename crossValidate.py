@@ -627,7 +627,7 @@ class k2cvcluster(k2cvlocal):
             self.initialize_model()
             self.prepare_cross_validation_sample()
         self.analyze_clustering_results()
-        self.rundir=os.path.split(lp)[-1].split('-')[0]
+        #self.rundir=os.path.split(lp)[-1].split('-')[0]
         
     def initialize_model(self):
         if self.model!=[]:

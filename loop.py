@@ -38,8 +38,8 @@ class MyLoop(loopmodel):
 
 
     def read_potential(self):
-        return group_restraints(self.env, classes='$(LIB)/atmcls-mf.lib',
-                                parameters=runenv.serverUserPath+'sps/soap_loop/dist.lib')
+        return group_restraints(self.env, classes=self.refinepotential[0],
+                                parameters=self.refinepotential[1])
 
 
     def loop_restraints(self, atmsel, aln):
