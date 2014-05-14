@@ -193,14 +193,16 @@ class MyLoop(loopmodel):
             
                
 class sprefine(object):
-    def __init__(self,dslist='101',bm='loop.100.8',criteria='bestrmsd',nonbond_spline=0.1,contact_shell=12.0,deviations=50,spmodel=None,refineProtocal=None):
+    def __init__(self,dslist='101',bm='loop.100.8',criteria='bestrmsd',nonbond_spline=0.1,contact_shell=12.0,deviations=50,assess='',spmodel=None,refineProtocal=None):
         if refineProtocal!=None:
             self.refineProtocal=refineProtocal
             dslist=refineProtocal['dslist']
             bm=refineProtocal['bm']
             nonbond_spline=refineProtocal['nonbond_spline']
             contact_shell=refineProtocal['contact_shell']
-            deviations=refineProtocal['deviations']            
+            deviations=refineProtocal['deviations']
+            if 'assess' in refineProtocal:
+                assess=refineProtocal['assess']
         #use statistical potential to refine loops/strutures, and analyze the refine results to judge the statistical potential.
         if spmodel: #needfix???
             if spmodel['scoretype']!='sprefine':
@@ -210,6 +212,7 @@ class sprefine(object):
             criteria=model['criteria']
         self.bm=bm
         self.dslist=dslist
+        self.assess=assess
         self.criteria=criteria
         #self.codelist=decoysets(self.dslist).get_nativelist()  not applicalbel for loops    
         self.refpot=['$(LIB)/atmcls-mf.lib','$(LIB)/dist-mf.lib']
@@ -360,6 +363,10 @@ class sprefine(object):
         env.io.atom_files_directory = [os.path.join(runenv.loopStructurePath,self.dslist),scratchdir,runenv.opdbdir,'.']
         # Create a new class based on 'loopmodel' so that we can redefine
         # select_loop_atoms (necessary)
+        if self.assess=='SOAP':
+            loop_assess_methods=(assess.DOPE, soap_loop.Scorer())
+        else:
+            loop_assess_methods=(assess.DOPE)
         m = MyLoop(env,
                    inimodel=modelfile, # initial model of the target
                    sequence=modelname,loop_assess_methods=(assess.DOPE),
@@ -424,7 +431,10 @@ class sprefine(object):
         os.system('rm -r '+self.rundir)
         os.mkdir(self.rundir)
         os.chdir(self.dir+self.rundir)
-        freememory=1
+        if self.assess=='SOAP':
+            freememory=2
+        else:
+            freememory=1
         self.freememory=freememory
         loopdict=self.codedict
         #separate the dslist into individual small sets
