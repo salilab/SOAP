@@ -36,8 +36,8 @@ class MyLoop(loopmodel):
         edat.dynamic_modeller=True#True
         #self.loop.library_schedule
         self.loop.library_schedule=loopschedule()
-        if self.calc_rmsds:
-            self.initilialize_rmsd_calcualtion()
+        self.rmsd_calc_initialized=False
+
 
 
     def initilialize_rmsd_calcualtion(self):
@@ -52,6 +52,7 @@ class MyLoop(loopmodel):
         aln.append_model(self.ormdl, align_codes='c1', atom_files=self.inimodel)
         aln.append_model(self, align_codes='c2')
         self.aln=aln
+        self.rmsd_calc_initialized=True
 
     def read_potential(self):
         return group_restraints(self.env, classes=self.refinepotential[0],
@@ -114,6 +115,8 @@ class MyLoop(loopmodel):
     def user_after_single_loop_model(self,out):
         if not self.calc_rmsds:
             return 0
+        if not self.rmsd_calc_initialized:
+            self.initilialize_rmsd_calcualtion()        
         # We can now use the calculated RMS, DRMS, etc. from the returned 'r' object:
         rt=str(self.calc_rmsds)
         if rt[-1]=='1':
