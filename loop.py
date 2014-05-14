@@ -90,6 +90,8 @@ class MyLoop(loopmodel):
         return s
    
     def add_loop2selection(self,loop,s):
+        if loop[0]=='':
+            loop[0]=self.chains[0].name
         try:
             s.add(selection(self.residue_range(str(loop[2])+':'+loop[0],str(loop[3])+':'+loop[0])))
         except:
