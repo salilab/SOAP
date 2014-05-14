@@ -15,15 +15,16 @@ class MyLoop(loopmodel):
                  deviation=None, library_schedule=None, csrfile=None,
                  inifile=None, assess_methods=None, loop_assess_methods=None,
                  refinepot=['$(LIB)/atmcls-mf.lib','$(LIB)/dist-mf.lib'],
-                 loops=[],calcrmsds='111',nonbond_spine=0.1,contact_shell=12.0,deviations=50):
+                 loops=[],calcrmsds='111',nonbond_spine=0.1,contact_shell=12.0,deviations=50,energytrace=False):
         loopmodel.__init__(self, env, sequence, alnfile, knowns, inimodel,
                  deviation, library_schedule, csrfile,
                  inifile, assess_methods, loop_assess_methods)
         self.loops=loops
         self.refinepotential=refinepot
-        self.load_native_model()
+        #self.load_native_model()
         self.calc_rmsds=calcrmsds
         self.deviations=deviations
+        self.energytrace=energytrace
         self.loop.env.schedule_scale = physical.values(default=1.0,
                                                        nonbond_spline=nonbond_spine)#0.6
         edat = self.loop.env.edat
@@ -35,7 +36,22 @@ class MyLoop(loopmodel):
         edat.dynamic_modeller=True#True
         #self.loop.library_schedule
         self.loop.library_schedule=loopschedule()
+        if self.calc_rmsds:
+            self.initilialize_rmsd_calcualtion()
 
+
+    def initilialize_rmsd_calcualtion(self):
+        ormdl=Mymodel(self.env)
+        ormdl.read(file=self.inimodel)
+        self.ormdl=ormdl
+        self.ors=ormdl.select_loop_atoms(self.loops)
+        #self.load_native_model()
+        s2=self.select_loop_atoms()
+        self.s2=s2
+        aln=alignment(self.env)
+        aln.append_model(self.ormdl, align_codes='c1', atom_files=self.inimodel)
+        aln.append_model(self, align_codes='c2')
+        self.aln=aln
 
     def read_potential(self):
         return group_restraints(self.env, classes=self.refinepotential[0],
@@ -98,26 +114,21 @@ class MyLoop(loopmodel):
     def user_after_single_loop_model(self,out):
         if not self.calc_rmsds:
             return 0
-        ormdl=Mymodel(self.env)
-        ormdl.read(file=self.inimodel)
-        self.ormdl=ormdl
-        self.ors=ormdl.select_loop_atoms(self.loops)
-        #self.load_native_model()
-        s2=self.select_loop_atoms()
-        aln=alignment(self.env)
-        aln.append_model(self.ormdl, align_codes='c1', atom_files=self.inimodel)
-        aln.append_model(self, align_codes='c2')
         # We can now use the calculated RMS, DRMS, etc. from the returned 'r' object:
         rt=str(self.calc_rmsds)
         if rt[-1]=='1':
-            r = self.ors.superpose(self, aln,fit=False,refine_local=False)
+            r = self.ors.superpose(self, self.aln,fit=False,refine_local=False)
             out['rmsd']=min(r.rms,out['rmsd'])
         if len(rt)>=2 and rt[-2]=='1':
-            r=self.ors.only_mainchain().superpose(self, aln,fit=False,refine_local=False)
+            r=self.ors.only_mainchain().superpose(self, self.aln,fit=False,refine_local=False)
             out['mcrmsd']=min(r.rms,out['rmsd'])
         if len(rt)>=3 and rt[-3]=='1':
-            r=self.ors.only_sidechain().superpose(self, aln,fit=False,refine_local=False)
+            r=self.ors.only_sidechain().superpose(self, self.aln,fit=False,refine_local=False)
             out['scrmsd']=r.rms
+        if self.energytrace:
+            if not 'trace' in out:
+                out['trace']=[]
+            out['trace'].append((out['mcrmsd'],self.loop.assess_methods[0](atmsel)[1],self.loop.assess_methods[1](atmsel)[1]))                
         print r.rms
         return r.rms
     
@@ -365,12 +376,14 @@ class sprefine(object):
         # select_loop_atoms (necessary)
         if self.assess=='SOAP':
             loop_assess_methods=(assess.DOPE, soap_loop.Scorer())
+            energytrace=True
         else:
             loop_assess_methods=(assess.DOPE)
+            energytrace=False
         m = MyLoop(env,
                    inimodel=modelfile, # initial model of the target
-                   sequence=modelname,loop_assess_methods=(assess.DOPE),
-                   refinepot=self.refpot,loops=loops, nonbond_spine=self.nonbond_spline,contact_shell=self.contact_shell,deviations=self.deviations)
+                   sequence=modelname,loop_assess_methods=loop_assess_methods,
+                   refinepot=self.refpot,loops=loops, nonbond_spine=self.nonbond_spline,contact_shell=self.contact_shell,deviations=self.deviations,energytrace=energytrace)
         #m.load_native_model()
         m.loop.starting_model= self.startNum           # index of the first loop model
         m.loop.ending_model  = self.endNum
@@ -397,7 +410,7 @@ class sprefine(object):
         #pdb.set_trace()
         for i in range(0,len(loopoutput)):
             try:
-                resultlist.append((loopoutput[i]['rmsd'],loopoutput[i]['mcrmsd'],loopoutput[i]['DOPE score']))
+                resultlist.append((loopoutput[i]['rmsd'],loopoutput[i]['mcrmsd'],loopoutput[i]['trace']))
             except Exception,e:
                 print >> sys.stderr, e 
                 continue
@@ -542,10 +555,13 @@ class sprefine(object):
                 fh=open(str(i+1)+'.pickle','rb')
                 res=pickle.load(fh)
                 fh.close()
-                if res.keys()[0] in rd:
-                    rd[res.keys()[0]].extend(res.values()[0])
+                if not res.keys()[0] in rd:
+                    rd[res.keys()[0]]=[]
+                if self.assess=='SOAP':
+                    for item in res.values()[0]:
+                        rd[res.keys()[0]].extend(item[-1])
                 else:
-                    rd[res.keys()[0]]=res.values()[0]
+                    rd[res.keys()[0]].extend(res.values()[0])
         #print os.system('rm -r '+self.dir+self.rundir)
         #del self.clusters
         self.result=rd
@@ -586,12 +602,19 @@ class sprefine(object):
         for key in result:
             ra[k,:,:]=np.array(result[key])[:mn,:]
             k+=1
-        self.averageRMSD=ra[:,:,0].min(axis=1).mean()+ra[:,:,1].min(axis=1).mean()
+        if self.assess=='SOAP':
+            self.averageRMSD=ra[:,:,0].min(axis=1)
+            print "min rmsd",self.averageRMSD
+            minind=ra[:,:,1].argmin(axis=1)
+            print "soap min rmsd",np.mean(ra[np.arange(ra.shape[0]),minind,np.zeros(ra.shape[0],dtype=np.int)])
+        else:
+            self.averageRMSD=ra[:,:,0].min(axis=1).mean()+ra[:,:,1].min(axis=1).mean()
         print self.averageRMSD
         if self.cv!=None:
-            self.cv.resultsummary=self.averageRMSD
-            self.cv.resultarray[-1]=self.averageRMSD
+            self.cv.resultsummary=-self.averageRMSD
+            self.cv.resultarray[-1]=-self.averageRMSD
             self.cv.write2logshelve(self.model)
+
         return self.averageRMSD
 
     def analyze_loop_modeling_results(self,result):
