@@ -415,7 +415,8 @@ class sprefine(object):
         #pdb.set_trace()
         for i in range(0,len(loopoutput)):
             try:
-                resultlist.append((loopoutput[i]['rmsd'],loopoutput[i]['mcrmsd'],loopoutput[i]['trace']))
+                lastone='trace' if self.assess=='SOAP' else 'DOPE score'
+                resultlist.append((loopoutput[i]['rmsd'],loopoutput[i]['mcrmsd'],loopoutput[i][lastone]))
             except Exception,e:
                 print >> sys.stderr, e 
                 continue
@@ -571,8 +572,11 @@ class sprefine(object):
         #del self.clusters
         self.result=rd
         #pdb.set_trace()
-        del self.task
-        gc.collect()
+        try:
+            del self.task
+            gc.collect()
+        except:
+            traceback.print_exc()
         return self.analyze_loop_modeling()
     
     def assess(self,refpot=[]):
