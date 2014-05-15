@@ -8,4 +8,5 @@ Enviromental variables
 
 .. automodule:: env
    :members:
+   :no-inherited-members:
 
