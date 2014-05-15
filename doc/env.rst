@@ -6,7 +6,5 @@
 Enviromental variables
 ================================
 
-.. automodule:: env
+.. automodule:: env-config
    :members:
-   :no-inherited-members:
-

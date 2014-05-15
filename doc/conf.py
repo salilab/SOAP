@@ -28,8 +28,6 @@ sys.path.insert(0, os.path.abspath('..'))
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.intersphinx', 'sphinx.ext.todo', 'sphinx.ext.coverage', 'sphinx.ext.pngmath', 'sphinx.ext.mathjax', 'sphinx.ext.ifconfig', 'sphinx.ext.viewcode']
 
 
-# Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
 
 # The suffix of source filenames.
 source_suffix = '.rst'
@@ -233,6 +231,7 @@ texinfo_documents = [
    'Miscellaneous'),
 ]
 
+
 # Documents to append as an appendix to all manuals.
 #texinfo_appendices = []
 
@@ -245,3 +244,16 @@ texinfo_documents = [
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'http://docs.python.org/': None}
+
+
+# Add any paths that contain templates here, relative to this directory.
+templates_path = ['_templates']
+
+def autodoc_skip_member(app, what, name, obj, skip, options):
+    exclusions = ('random_number'
+                  )
+    exclude = name in exclusions
+    return skip or exclude
+
+def setup(app):
+    app.connect('autodoc-skip-member', autodoc_skip_member)

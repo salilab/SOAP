@@ -380,6 +380,7 @@ class sprefine(object):
         # Create a new class based on 'loopmodel' so that we can redefine
         # select_loop_atoms (necessary)
         if self.assess=='SOAP':
+            from modeller import soap_loop
             loop_assess_methods=(assess.DOPE, soap_loop.Scorer())
             energytrace=True
         else:
