@@ -613,7 +613,7 @@ class sprefine(object):
             ra[k,:,:]=np.array(result[key])[:mn,:]
             k+=1
         if self.assess=='SOAP':
-            self.averageRMSD=ra[:,:,0].min(axis=1)
+            self.averageRMSD=ra[:,:,0].min(axis=1).mean()
             print "min rmsd",self.averageRMSD
             minind=ra[:,:,1].argmin(axis=1)
             print "soap min rmsd",np.mean(ra[np.arange(ra.shape[0]),minind,np.zeros(ra.shape[0],dtype=np.int)])

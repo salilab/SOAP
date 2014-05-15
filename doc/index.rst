@@ -13,13 +13,20 @@ Installation
 
 Basic workflow for using SOAP to generate a statistical potential
 --------------------------
-An example is shown for calcuating SOAP poential for ranking peptides of MHC2 protein.
 
 1. Preprocess PDB if necessary and generate sequence files. 
 2. Prepare Decoys. 
 3. Run SOAP script to select models. 
 4. Run SOAP script to calculate the optimal statistical potential using the best model.
 5. Write out the optimial potential in hdf5 or lib formart for use in Modeller, IMP or other packages. 
+
+Examples:
+.. toctree::
+   :maxdepth: 2
+  
+   mhc2
+
+Additonal undocumented examples can be found at SOAP/examples
 
 Pre-calculated SOAP tables
 --------------------------
