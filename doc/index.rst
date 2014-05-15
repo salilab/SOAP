@@ -6,7 +6,27 @@
 Welcome to SOAP's documentation!
 ================================
 
-Contents:
+Installation
+------------------------
+1. Install required packages defined in env-config.py  
+2. Config env-config.py and rename it to env.py
+
+Basic workflow for using SOAP to generate a statistical potential
+--------------------------
+An example is shown for calcuating SOAP poential for ranking peptides of MHC2 protein.
+
+1. Preprocess PDB if necessary and generate sequence files. 
+2. Prepare Decoys. 
+3. Run SOAP script to select models. 
+4. Run SOAP script to calculate the optimal statistical potential using the best model.
+5. Write out the optimial potential in hdf5 or lib formart for use in Modeller, IMP or other packages. 
+
+Pre-calculated SOAP tables
+--------------------------
+Pre-calcualted SOAP statistical potentials for ranking peptides, loops, proteins, protein interfaces and ligands can be found at : `salialb.org/SOAP <http://salialb.org/SOAP>`_
+
+Modules:
+----------------
 
 .. toctree::
    :maxdepth: 2

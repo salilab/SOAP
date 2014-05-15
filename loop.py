@@ -133,7 +133,7 @@ class MyLoop(loopmodel):
         if self.energytrace:
             if not 'trace' in out:
                 out['trace']=[]
-            out['trace'].append((out['mcrmsd'],self.loop.assess_methods[0](atmsel)[1],self.loop.assess_methods[1](atmsel)[1]))                
+            out['trace'].append((out['mcrmsd'],self.loop.assess_methods[0](self.s2)[1],self.loop.assess_methods[1](self.s2)[1]))                
         print r.rms
         return r.rms
     
