@@ -1,0 +1,812 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>loop &mdash; SOAP 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="SOAP 0.1 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">SOAP 0.1 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for loop</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">   SOAP loop model.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">env</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">modeller</span> <span class="kn">import</span> <span class="n">physical</span>
+<span class="kn">from</span> <span class="nn">modeller.schedule</span> <span class="kn">import</span> <span class="n">schedule</span><span class="p">,</span> <span class="n">step</span>
+<span class="kn">from</span> <span class="nn">modeller.optimizers</span> <span class="kn">import</span> <span class="n">conjugate_gradients</span> <span class="k">as</span> <span class="n">CG</span>
+<span class="kn">from</span> <span class="nn">modeller.automodel.autosched</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">log</span><span class="o">.</span><span class="n">none</span><span class="p">()</span>
+
+<span class="k">class</span> <span class="nc">MyLoop</span><span class="p">(</span><span class="n">loopmodel</span><span class="p">):</span>
+    <span class="c"># This routine picks the residues to be refined by loop modeling</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="n">sequence</span><span class="p">,</span> <span class="n">alnfile</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">knowns</span><span class="o">=</span><span class="p">[],</span> <span class="n">inimodel</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">deviation</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">library_schedule</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">csrfile</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">inifile</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">assess_methods</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">loop_assess_methods</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">refinepot</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;$(LIB)/atmcls-mf.lib&#39;</span><span class="p">,</span><span class="s">&#39;$(LIB)/dist-mf.lib&#39;</span><span class="p">],</span>
+                 <span class="n">loops</span><span class="o">=</span><span class="p">[],</span><span class="n">calcrmsds</span><span class="o">=</span><span class="s">&#39;111&#39;</span><span class="p">,</span><span class="n">nonbond_spine</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span><span class="n">contact_shell</span><span class="o">=</span><span class="mf">12.0</span><span class="p">,</span><span class="n">deviations</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span><span class="n">energytrace</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="n">loopmodel</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="n">sequence</span><span class="p">,</span> <span class="n">alnfile</span><span class="p">,</span> <span class="n">knowns</span><span class="p">,</span> <span class="n">inimodel</span><span class="p">,</span>
+                 <span class="n">deviation</span><span class="p">,</span> <span class="n">library_schedule</span><span class="p">,</span> <span class="n">csrfile</span><span class="p">,</span>
+                 <span class="n">inifile</span><span class="p">,</span> <span class="n">assess_methods</span><span class="p">,</span> <span class="n">loop_assess_methods</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loops</span><span class="o">=</span><span class="n">loops</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refinepotential</span><span class="o">=</span><span class="n">refinepot</span>
+        <span class="c">#self.load_native_model()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calc_rmsds</span><span class="o">=</span><span class="n">calcrmsds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deviations</span><span class="o">=</span><span class="n">deviations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">energytrace</span><span class="o">=</span><span class="n">energytrace</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loop</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">schedule_scale</span> <span class="o">=</span> <span class="n">physical</span><span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+                                                       <span class="n">nonbond_spline</span><span class="o">=</span><span class="n">nonbond_spine</span><span class="p">)</span><span class="c">#0.6</span>
+        <span class="n">edat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loop</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">edat</span>
+        <span class="n">edat</span><span class="o">.</span><span class="n">contact_shell</span><span class="o">=</span><span class="n">contact_shell</span>
+        <span class="n">edat</span><span class="o">.</span><span class="n">dynamic_sphere</span><span class="o">=</span><span class="bp">True</span><span class="c">#True</span>
+        <span class="n">edat</span><span class="o">.</span><span class="n">dynamic_lennard</span><span class="o">=</span><span class="bp">False</span><span class="c">#False</span>
+        <span class="n">edat</span><span class="o">.</span><span class="n">dynamic_coulomb</span><span class="o">=</span><span class="bp">False</span><span class="c">#False</span>
+        <span class="n">edat</span><span class="o">.</span><span class="n">relative_dielectric</span><span class="o">=</span><span class="mf">1.0</span>
+        <span class="n">edat</span><span class="o">.</span><span class="n">dynamic_modeller</span><span class="o">=</span><span class="bp">True</span><span class="c">#True</span>
+        <span class="c">#self.loop.library_schedule</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loop</span><span class="o">.</span><span class="n">library_schedule</span><span class="o">=</span><span class="n">loopschedule</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rmsd_calc_initialized</span><span class="o">=</span><span class="bp">False</span>
+
+
+
+    <span class="k">def</span> <span class="nf">initilialize_rmsd_calcualtion</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ormdl</span><span class="o">=</span><span class="n">Mymodel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">)</span>
+        <span class="n">ormdl</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="nb">file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">inimodel</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ormdl</span><span class="o">=</span><span class="n">ormdl</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ors</span><span class="o">=</span><span class="n">ormdl</span><span class="o">.</span><span class="n">select_loop_atoms</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loops</span><span class="p">)</span>
+        <span class="c">#self.load_native_model()</span>
+        <span class="n">s2</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">select_loop_atoms</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">s2</span><span class="o">=</span><span class="n">s2</span>
+        <span class="n">aln</span><span class="o">=</span><span class="n">alignment</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">)</span>
+        <span class="n">aln</span><span class="o">.</span><span class="n">append_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ormdl</span><span class="p">,</span> <span class="n">align_codes</span><span class="o">=</span><span class="s">&#39;c1&#39;</span><span class="p">,</span> <span class="n">atom_files</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">inimodel</span><span class="p">)</span>
+        <span class="n">aln</span><span class="o">.</span><span class="n">append_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">align_codes</span><span class="o">=</span><span class="s">&#39;c2&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aln</span><span class="o">=</span><span class="n">aln</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rmsd_calc_initialized</span><span class="o">=</span><span class="bp">True</span>
+
+    <span class="k">def</span> <span class="nf">read_potential</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">group_restraints</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">refinepotential</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                <span class="n">parameters</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">refinepotential</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+
+    <span class="k">def</span> <span class="nf">loop_restraints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atmsel</span><span class="p">,</span> <span class="n">aln</span><span class="p">):</span>
+        <span class="n">dih_lib_only</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">mnch_lib</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">res_at</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">restraints</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">typ</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;bond&#39;</span><span class="p">,</span> <span class="s">&#39;angle&#39;</span><span class="p">,</span> <span class="s">&#39;improper&#39;</span><span class="p">,</span> <span class="s">&#39;dihedral&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">restraints</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="n">atmsel</span><span class="p">,</span> <span class="n">aln</span><span class="o">=</span><span class="n">aln</span><span class="p">,</span> <span class="n">restraint_type</span><span class="o">=</span><span class="n">typ</span><span class="p">,</span>
+                                 <span class="n">spline_on_site</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">spline_on_site</span><span class="p">,</span>
+                                 <span class="n">dih_lib_only</span><span class="o">=</span><span class="n">dih_lib_only</span><span class="p">,</span>
+                                 <span class="n">mnch_lib</span><span class="o">=</span><span class="n">mnch_lib</span><span class="p">,</span> <span class="n">restraint_sel_atoms</span><span class="o">=</span><span class="n">res_at</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">typ</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;omega&#39;</span><span class="p">,</span> <span class="s">&#39;chi1&#39;</span><span class="p">,</span> <span class="s">&#39;chi2&#39;</span><span class="p">,</span> <span class="s">&#39;chi3&#39;</span><span class="p">,</span> <span class="s">&#39;chi4&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">restraints</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="n">atmsel</span><span class="p">,</span> <span class="n">aln</span><span class="o">=</span><span class="n">aln</span><span class="p">,</span>
+                                 <span class="n">restraint_type</span><span class="o">=</span><span class="n">typ</span><span class="o">+</span><span class="s">&#39;_dihedral&#39;</span><span class="p">,</span>
+                                 <span class="n">spline_on_site</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">spline_on_site</span><span class="p">,</span>
+                                 <span class="n">dih_lib_only</span><span class="o">=</span><span class="n">dih_lib_only</span><span class="p">,</span> <span class="n">mnch_lib</span><span class="o">=</span><span class="n">mnch_lib</span><span class="p">,</span>
+                                 <span class="n">restraint_sel_atoms</span><span class="o">=</span><span class="n">res_at</span><span class="p">,</span> <span class="n">spline_range</span><span class="o">=</span><span class="mf">4.0</span><span class="p">,</span>
+                                 <span class="n">spline_dx</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">spline_min_points</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+        <span class="c"># Generate restraints on all non-standard residues:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nonstd_restraints</span><span class="p">(</span><span class="n">aln</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">special_restraints</span><span class="p">(</span><span class="n">aln</span><span class="p">)</span>        
+        
+    <span class="k">def</span> <span class="nf">select_loop_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span><span class="o">=</span><span class="n">selection</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loops</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="nb">list</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_loop2selection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loops</span><span class="p">,</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">loop</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">loops</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_loop2selection</span><span class="p">(</span><span class="n">loop</span><span class="p">,</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">s</span>
+   
+    <span class="k">def</span> <span class="nf">add_loop2selection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">loop</span><span class="p">,</span><span class="n">s</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">loop</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="s">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">loop</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">selection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">residue_range</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">loop</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">+</span><span class="s">&#39;:&#39;</span><span class="o">+</span><span class="n">loop</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="nb">str</span><span class="p">(</span><span class="n">loop</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span><span class="o">+</span><span class="s">&#39;:&#39;</span><span class="o">+</span><span class="n">loop</span><span class="p">[</span><span class="mi">0</span><span class="p">])))</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">lind</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">loop</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">+</span><span class="s">&#39;:&#39;</span><span class="o">+</span><span class="n">loop</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">index</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">selection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="n">lind</span><span class="p">:(</span><span class="n">lind</span><span class="o">+</span><span class="n">loop</span><span class="p">[</span><span class="mi">1</span><span class="p">])]))</span>
+    
+    <span class="k">def</span> <span class="nf">loop_model_analysis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atmsel</span><span class="p">,</span> <span class="n">ini_model</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">id1</span><span class="p">,</span> <span class="n">num</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Energy evaluation and assessment, and write out the loop model&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_after_single_loop_model</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">loop</span><span class="o">.</span><span class="n">write_selection_only</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">select_loop_atoms</span><span class="p">()</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">file</span><span class="o">=</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">file</span><span class="o">=</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">accelrys</span><span class="p">:</span>
+            <span class="c"># Accelrys wants their analysis *after* the model is written, so</span>
+            <span class="c"># that the written-out model keeps the original template-derived</span>
+            <span class="c"># Biso, rather than getting the energy profile Biso:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">loop_model_analysis_accelrys</span><span class="p">(</span><span class="n">ini_model</span><span class="p">,</span> <span class="n">id1</span><span class="p">,</span> <span class="n">num</span><span class="p">)</span>
+
+        <span class="c"># Do model assessment if requested</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assess</span><span class="p">(</span><span class="n">atmsel</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">loop</span><span class="o">.</span><span class="n">assess_methods</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">user_after_single_loop_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">out</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_rmsds</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmsd_calc_initialized</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">initilialize_rmsd_calcualtion</span><span class="p">()</span>        
+        <span class="c"># We can now use the calculated RMS, DRMS, etc. from the returned &#39;r&#39; object:</span>
+        <span class="n">rt</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calc_rmsds</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rt</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="s">&#39;1&#39;</span><span class="p">:</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ors</span><span class="o">.</span><span class="n">superpose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">aln</span><span class="p">,</span><span class="n">fit</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span><span class="n">refine_local</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+            <span class="n">out</span><span class="p">[</span><span class="s">&#39;rmsd&#39;</span><span class="p">]</span><span class="o">=</span><span class="nb">min</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">rms</span><span class="p">,</span><span class="n">out</span><span class="p">[</span><span class="s">&#39;rmsd&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rt</span><span class="p">)</span><span class="o">&gt;=</span><span class="mi">2</span> <span class="ow">and</span> <span class="n">rt</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">==</span><span class="s">&#39;1&#39;</span><span class="p">:</span>
+            <span class="n">r</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ors</span><span class="o">.</span><span class="n">only_mainchain</span><span class="p">()</span><span class="o">.</span><span class="n">superpose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">aln</span><span class="p">,</span><span class="n">fit</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span><span class="n">refine_local</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+            <span class="n">out</span><span class="p">[</span><span class="s">&#39;mcrmsd&#39;</span><span class="p">]</span><span class="o">=</span><span class="nb">min</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">rms</span><span class="p">,</span><span class="n">out</span><span class="p">[</span><span class="s">&#39;rmsd&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rt</span><span class="p">)</span><span class="o">&gt;=</span><span class="mi">3</span> <span class="ow">and</span> <span class="n">rt</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span><span class="o">==</span><span class="s">&#39;1&#39;</span><span class="p">:</span>
+            <span class="n">r</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ors</span><span class="o">.</span><span class="n">only_sidechain</span><span class="p">()</span><span class="o">.</span><span class="n">superpose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">aln</span><span class="p">,</span><span class="n">fit</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span><span class="n">refine_local</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+            <span class="n">out</span><span class="p">[</span><span class="s">&#39;scrmsd&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">rms</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">energytrace</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="s">&#39;trace&#39;</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
+                <span class="n">out</span><span class="p">[</span><span class="s">&#39;trace&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[]</span>
+            <span class="n">out</span><span class="p">[</span><span class="s">&#39;trace&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">out</span><span class="p">[</span><span class="s">&#39;mcrmsd&#39;</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">loop</span><span class="o">.</span><span class="n">assess_methods</span><span class="p">[</span><span class="mi">0</span><span class="p">](</span><span class="n">atmsel</span><span class="p">)[</span><span class="mi">1</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">loop</span><span class="o">.</span><span class="n">assess_methods</span><span class="p">[</span><span class="mi">1</span><span class="p">](</span><span class="n">atmsel</span><span class="p">)[</span><span class="mi">1</span><span class="p">]))</span>                
+        <span class="k">print</span> <span class="n">r</span><span class="o">.</span><span class="n">rms</span>
+        <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">rms</span>
+    
+    <span class="k">def</span> <span class="nf">load_native_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ormdl</span><span class="o">=</span><span class="n">Mymodel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">)</span>
+        <span class="n">ormdl</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="nb">file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">inimodel</span><span class="p">)</span>
+        <span class="n">ormdl</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="o">+</span><span class="s">&#39;.native.pdb&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ormdl</span><span class="o">=</span><span class="n">ormdl</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ors</span><span class="o">=</span><span class="n">ormdl</span><span class="o">.</span><span class="n">select_loop_atoms</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loops</span><span class="p">)</span>
+       
+    <span class="c">#def read_potential(self):    </span>
+    <span class="c">#    return group_restraints(self.env, classes=self.refinepotential[0],parameters=self.refinepotential[1])   </span>
+
+    <span class="k">def</span> <span class="nf">single_loop_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atmsel</span><span class="p">,</span> <span class="n">ini_model</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">id1</span><span class="p">,</span> <span class="n">sched</span><span class="p">,</span>
+                          <span class="n">parallel</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Build a single loop model&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tracefile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_loop_trace_file</span><span class="p">(</span><span class="n">id1</span><span class="p">,</span> <span class="n">num</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">parallel</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">read_top_par</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">read_ini_loop_model</span><span class="p">(</span><span class="n">ini_model</span><span class="p">)</span>
+            <span class="n">aln</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_loop_alignment</span><span class="p">(</span><span class="n">ini_model</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">create_loop_topology</span><span class="p">(</span><span class="n">aln</span><span class="p">,</span> <span class="n">ini_model</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">read_ini_loop_model</span><span class="p">(</span><span class="n">ini_model</span><span class="p">)</span>
+
+        <span class="n">atmsel</span><span class="o">.</span><span class="n">randomize_xyz</span><span class="p">(</span><span class="n">deviation</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">deviations</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">parallel</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">group_restraints</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_potential</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rd_restraints</span><span class="p">()</span>
+
+        <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_loop_model_filename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="p">,</span> <span class="n">id1</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">pdb_ext</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;loopnum&#39;</span><span class="p">:</span><span class="n">id1</span><span class="p">,</span> <span class="s">&#39;num&#39;</span><span class="p">:</span><span class="n">num</span><span class="p">,</span> <span class="s">&#39;failure&#39;</span><span class="p">:</span><span class="bp">None</span><span class="p">,</span><span class="s">&#39;mcrmsd&#39;</span><span class="p">:</span><span class="mf">999.0</span><span class="p">,</span><span class="s">&#39;rmsd&#39;</span><span class="p">:</span><span class="mf">999.0</span><span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">loop</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+
+        <span class="n">actions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_loop_actions</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c"># Refine without the rest of the protein:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">edat</span><span class="o">.</span><span class="n">nonbonded_sel_atoms</span> <span class="o">=</span> <span class="mi">2</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">optimize_loop</span><span class="p">(</span><span class="n">atmsel</span><span class="p">,</span> <span class="n">sched</span><span class="p">,</span> <span class="n">actions</span><span class="p">)</span>
+            <span class="c"># Refine in the context of the rest of the protein:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">edat</span><span class="o">.</span><span class="n">nonbonded_sel_atoms</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">optimize_loop</span><span class="p">(</span><span class="n">atmsel</span><span class="p">,</span> <span class="n">sched</span><span class="p">,</span> <span class="n">actions</span><span class="p">)</span>
+
+            <span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s">&#39;molpdf&#39;</span><span class="p">],</span> <span class="n">out</span><span class="p">[</span><span class="s">&#39;pdfterms&#39;</span><span class="p">])</span> <span class="o">=</span> <span class="n">atmsel</span><span class="o">.</span><span class="n">energy</span><span class="p">()</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">to_iupac</span><span class="p">()</span>
+        <span class="k">except</span> <span class="p">(</span><span class="n">ModellerError</span><span class="p">,</span> <span class="ne">OverflowError</span><span class="p">):</span>
+            <span class="n">detail</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">detail</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">out</span><span class="p">[</span><span class="s">&#39;failure&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">detail</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">out</span><span class="p">[</span><span class="s">&#39;failure&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;Optimization failed&#39;</span>
+            <span class="k">del</span> <span class="n">detail</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">loop_model_analysis</span><span class="p">(</span><span class="n">atmsel</span><span class="p">,</span> <span class="n">ini_model</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">id1</span><span class="p">,</span> <span class="n">num</span><span class="p">)</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">tracefile</span>
+        <span class="k">return</span> <span class="n">out</span>
+    
+    <span class="k">def</span> <span class="nf">get_loop_actions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get actions to carry out during loop optimization&quot;&quot;&quot;</span>
+        <span class="n">act</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">act</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">checkRMSD</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="bp">self</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">act</span>
+
+    <span class="k">def</span> <span class="nf">multiple_loop_models</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atmsel</span><span class="p">,</span> <span class="n">ini_model</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">sched</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Build all loop models for a given initial model&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">id1</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loop</span><span class="o">.</span><span class="n">starting_model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">loop</span><span class="o">.</span><span class="n">ending_model</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">single_loop_model</span><span class="p">(</span><span class="n">atmsel</span><span class="p">,</span> <span class="n">ini_model</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">id1</span><span class="p">,</span> <span class="n">sched</span><span class="p">)</span>
+            
+               
+<span class="k">class</span> <span class="nc">sprefine</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">dslist</span><span class="o">=</span><span class="s">&#39;101&#39;</span><span class="p">,</span><span class="n">bm</span><span class="o">=</span><span class="s">&#39;loop.100.8&#39;</span><span class="p">,</span><span class="n">criteria</span><span class="o">=</span><span class="s">&#39;bestrmsd&#39;</span><span class="p">,</span><span class="n">nonbond_spline</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span><span class="n">contact_shell</span><span class="o">=</span><span class="mf">12.0</span><span class="p">,</span><span class="n">deviations</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span><span class="n">assess</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span><span class="n">spmodel</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">refineProtocal</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">refineProtocal</span><span class="o">!=</span><span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">refineProtocal</span><span class="o">=</span><span class="n">refineProtocal</span>
+            <span class="n">dslist</span><span class="o">=</span><span class="n">refineProtocal</span><span class="p">[</span><span class="s">&#39;dslist&#39;</span><span class="p">]</span>
+            <span class="n">bm</span><span class="o">=</span><span class="n">refineProtocal</span><span class="p">[</span><span class="s">&#39;bm&#39;</span><span class="p">]</span>
+            <span class="n">nonbond_spline</span><span class="o">=</span><span class="n">refineProtocal</span><span class="p">[</span><span class="s">&#39;nonbond_spline&#39;</span><span class="p">]</span>
+            <span class="n">contact_shell</span><span class="o">=</span><span class="n">refineProtocal</span><span class="p">[</span><span class="s">&#39;contact_shell&#39;</span><span class="p">]</span>
+            <span class="n">deviations</span><span class="o">=</span><span class="n">refineProtocal</span><span class="p">[</span><span class="s">&#39;deviations&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s">&#39;assess&#39;</span> <span class="ow">in</span> <span class="n">refineProtocal</span><span class="p">:</span>
+                <span class="n">assess</span><span class="o">=</span><span class="n">refineProtocal</span><span class="p">[</span><span class="s">&#39;assess&#39;</span><span class="p">]</span>
+        <span class="c">#use statistical potential to refine loops/strutures, and analyze the refine results to judge the statistical potential.</span>
+        <span class="k">if</span> <span class="n">spmodel</span><span class="p">:</span> <span class="c">#needfix???</span>
+            <span class="k">if</span> <span class="n">spmodel</span><span class="p">[</span><span class="s">&#39;scoretype&#39;</span><span class="p">]</span><span class="o">!=</span><span class="s">&#39;sprefine&#39;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;You can not call sprefinescore with this type of model, wrong data type&#39;</span><span class="p">)</span>
+            <span class="n">bm</span><span class="o">=</span><span class="n">spmodel</span><span class="p">[</span><span class="s">&#39;bm&#39;</span><span class="p">]</span>
+            <span class="n">dslist</span><span class="o">=</span><span class="n">model</span><span class="p">[</span><span class="s">&#39;dslist&#39;</span><span class="p">]</span>
+            <span class="n">criteria</span><span class="o">=</span><span class="n">model</span><span class="p">[</span><span class="s">&#39;criteria&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bm</span><span class="o">=</span><span class="n">bm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dslist</span><span class="o">=</span><span class="n">dslist</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assess</span><span class="o">=</span><span class="n">assess</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">criteria</span><span class="o">=</span><span class="n">criteria</span>
+        <span class="c">#self.codelist=decoysets(self.dslist).get_nativelist()  not applicalbel for loops    </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refpot</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;$(LIB)/atmcls-mf.lib&#39;</span><span class="p">,</span><span class="s">&#39;$(LIB)/dist-mf.lib&#39;</span><span class="p">]</span>
+        <span class="n">bml</span><span class="o">=</span><span class="n">bm</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refinetype</span><span class="o">=</span><span class="n">bml</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refinemethod</span><span class="o">=</span><span class="n">bml</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="c"># [restratins,optimizationmethod,initialmodel,randomizem,numofmodelstobuild]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nofloops</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">bml</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">startNum</span><span class="o">=</span><span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">endNum</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nofloops</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">slavenumber</span><span class="o">=</span><span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">codedict</span><span class="o">=</span><span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pe</span><span class="o">=</span><span class="s">&#39;local&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calc_rmsds</span><span class="o">=</span><span class="bp">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">envinitialized</span><span class="o">=</span><span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">j</span><span class="o">=</span><span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nors</span><span class="o">=</span><span class="mi">3000</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cv</span><span class="o">=</span><span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nonbond_spline</span><span class="o">=</span><span class="n">nonbond_spline</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contact_shell</span><span class="o">=</span><span class="n">contact_shell</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deviations</span><span class="o">=</span><span class="n">deviations</span>
+        
+    <span class="k">def</span> <span class="nf">get_refine_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">refinetype</span><span class="o">==</span><span class="s">&#39;loop&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dslist</span><span class="p">,</span><span class="nb">str</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dslist</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;pickle&#39;</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">dslist</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dslist</span><span class="o">+</span><span class="s">&#39;.pickle&#39;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">initialize_dslist</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dslist</span><span class="p">,</span><span class="nb">list</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">codedict</span><span class="o">=</span><span class="n">decoysets</span><span class="p">(</span><span class="n">dslist</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dslist</span><span class="p">)</span><span class="o">.</span><span class="n">get_loopdict</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">refinetype</span><span class="o">==</span><span class="s">&#39;native&#39;</span><span class="p">:</span>
+            <span class="n">codelist</span><span class="o">=</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">decoysets</span><span class="p">(</span><span class="n">dslist</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dslist</span><span class="p">)</span><span class="o">.</span><span class="n">codelist</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">code</span> <span class="ow">in</span> <span class="n">codelist</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">codedict</span><span class="p">[</span><span class="n">code</span><span class="p">]</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;toberefined&#39;</span><span class="p">:[</span><span class="n">code</span><span class="p">]}</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">refinetype</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;decoys&#39;</span><span class="p">):</span>
+            <span class="n">rtr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">refinetype</span><span class="p">[</span><span class="mi">6</span><span class="p">:]</span>
+            <span class="n">rtrl</span><span class="o">=</span><span class="n">rtr</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;-&#39;</span><span class="p">)</span>
+            <span class="n">rmsd</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">rtrl</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">nofdecoy</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">rtrl</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">ds</span><span class="o">=</span><span class="n">decoysets</span><span class="p">(</span><span class="n">dslist</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dslist</span><span class="p">)</span>
+            <span class="n">codelist</span><span class="o">=</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">codelist</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">code</span><span class="p">,</span><span class="n">i</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">codelist</span><span class="p">,</span><span class="nb">range</span><span class="p">(</span><span class="n">codelist</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">codedict</span><span class="p">[</span><span class="n">code</span><span class="p">]</span><span class="o">=</span><span class="p">{}</span>
+                <span class="n">ssa</span><span class="o">=</span><span class="n">ds</span><span class="o">.</span><span class="n">sa</span><span class="p">[</span><span class="n">ds</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span><span class="n">ds</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]]</span>
+                <span class="n">ri</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">ssa</span><span class="p">[</span><span class="s">&#39;rmsd&#39;</span><span class="p">],</span><span class="n">rmsd</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ssa</span><span class="p">)</span><span class="o">&lt;=</span><span class="n">nofdecoy</span><span class="p">:</span>
+                    <span class="n">tsp</span><span class="o">=</span><span class="mi">0</span>
+                    <span class="n">tep</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">ssa</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">tsp</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">ri</span><span class="o">-</span><span class="n">nofdecoy</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+                    <span class="n">tep</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">ri</span><span class="o">+</span><span class="n">nofdecoy</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">tsp</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">:</span>
+                        <span class="n">tsp</span><span class="o">=</span><span class="mi">0</span>
+                        <span class="n">tep</span><span class="o">=</span><span class="n">nofdecoy</span>
+                    <span class="k">elif</span> <span class="n">tep</span><span class="o">&gt;</span><span class="nb">len</span><span class="p">(</span><span class="n">ssa</span><span class="p">):</span>
+                        <span class="n">tep</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">ssa</span><span class="p">)</span>
+                        <span class="n">tsp</span><span class="o">=</span><span class="n">tep</span><span class="o">-</span><span class="n">nofdecoy</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">codedict</span><span class="p">[</span><span class="n">code</span><span class="p">][</span><span class="s">&#39;sa&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">ssa</span><span class="p">[</span><span class="n">tsp</span><span class="p">:</span><span class="n">tep</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">codedict</span><span class="p">[</span><span class="n">code</span><span class="p">][</span><span class="s">&#39;toberefined&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">dnlist</span><span class="p">[</span><span class="n">tsp</span><span class="p">:</span><span class="n">tep</span><span class="p">])</span>
+        
+    <span class="k">def</span> <span class="nf">initialize_dslist</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">runenv</span><span class="o">.</span><span class="n">hostn</span><span class="p">:</span>
+            <span class="n">fh</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dslist</span><span class="o">+</span><span class="s">&#39;.pickle&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fh</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="n">runenv</span><span class="o">.</span><span class="n">basedir</span><span class="o">+</span><span class="s">&#39;loop/&#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">dslist</span><span class="o">+</span><span class="s">&#39;.pickle&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">codedict</span><span class="o">=</span><span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fh</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s">&#39;runenv&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">codedict</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">startNum</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">codedict</span><span class="p">[</span><span class="s">&#39;runenv&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">endNum</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">codedict</span><span class="p">[</span><span class="s">&#39;runenv&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">codedict</span><span class="p">[</span><span class="s">&#39;runenv&#39;</span><span class="p">]</span>
+        <span class="n">fh</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    
+    <span class="k">def</span> <span class="nf">get_ds_part</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">sample</span><span class="p">):</span>
+        <span class="n">newcodedict</span><span class="o">=</span><span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">codedict</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">:</span>
+                <span class="n">newcodedict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">codedict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="n">nlr</span><span class="o">=</span><span class="n">sprefine</span><span class="p">(</span><span class="n">dslist</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dslist</span><span class="p">,</span><span class="n">bm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bm</span><span class="p">,</span><span class="n">criteria</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">criteria</span><span class="p">)</span>
+        <span class="n">nlr</span><span class="o">.</span><span class="n">codedict</span><span class="o">=</span><span class="n">newcodedict</span>
+        <span class="k">return</span> <span class="n">nlr</span>
+
+    <span class="k">def</span> <span class="nf">initialize_runenv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pe</span><span class="o">==</span><span class="s">&#39;local&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">envinitialized</span><span class="o">=</span><span class="bp">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">j</span> <span class="o">=</span> <span class="n">job</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">slavenumber</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">j</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">local_slave</span><span class="p">())</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">pe</span><span class="o">==</span><span class="s">&#39;cluster&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">envinitialized</span><span class="o">=</span><span class="bp">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">j</span>  <span class="o">=</span> <span class="n">sge_qsub_job</span><span class="p">(</span><span class="n">maxslave</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">slavenumber</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="s">&quot;-l arch=lx24-amd64&quot;</span><span class="p">)</span>
+            <span class="c">#self.j.append(local_slave())</span>
+    
+    <span class="k">def</span> <span class="nf">refine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">codes</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">refinetype</span><span class="o">==</span><span class="s">&#39;loop&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model_loops_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">codedict</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">pass</span>
+    
+    <span class="k">def</span> <span class="nf">refine_single_code</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+      
+    <span class="k">def</span> <span class="nf">model_loops</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">none</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">input</span><span class="p">[</span><span class="o">-</span><span class="mi">7</span><span class="p">:]</span><span class="o">!=</span><span class="s">&#39;.pickle&#39;</span><span class="p">:</span>
+            <span class="nb">input</span><span class="o">=</span><span class="nb">input</span><span class="o">+</span><span class="s">&#39;.pickle&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input</span><span class="o">=</span><span class="nb">input</span><span class="p">[:</span><span class="o">-</span><span class="mi">7</span><span class="p">]</span>
+        <span class="k">print</span> <span class="nb">input</span>
+        <span class="k">print</span> <span class="nb">input</span><span class="p">[:</span><span class="o">-</span><span class="mi">7</span><span class="p">]</span>
+        <span class="n">fh</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span><span class="s">&#39;rb&#39;</span><span class="p">)</span>
+        <span class="n">loopdict</span><span class="o">=</span><span class="n">cPickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fh</span><span class="p">)</span>
+        <span class="n">fh</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_loops_list</span><span class="p">(</span><span class="n">loopdict</span><span class="p">)</span>
+        <span class="n">fl</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s">&#39;./&#39;</span><span class="p">)</span>
+        <span class="n">fl</span><span class="o">=</span><span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">fl</span> <span class="k">if</span> <span class="n">item</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span><span class="o">==</span><span class="s">&#39;pdb&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">fl</span><span class="p">:</span>
+            <span class="k">print</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&#39;mv &#39;</span><span class="o">+</span><span class="n">item</span><span class="o">+</span><span class="s">&#39; loop&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;.&#39;</span><span class="o">+</span><span class="n">item</span><span class="p">)</span>
+                        
+    <span class="k">def</span> <span class="nf">model_loops_list_old</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">loopdict</span><span class="p">):</span>
+        <span class="n">resultdict</span><span class="o">=</span><span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">loopdict</span><span class="p">:</span>
+            <span class="k">print</span> <span class="n">key</span>
+            <span class="n">loops</span><span class="o">=</span><span class="n">loopdict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">loop</span> <span class="ow">in</span> <span class="n">loops</span><span class="p">:</span>
+                <span class="k">print</span> <span class="n">loop</span>
+                <span class="n">loopname</span><span class="o">=</span><span class="n">key</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">loop</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">+</span><span class="n">loop</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">loop</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+                <span class="k">print</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&#39;rm -r &#39;</span><span class="o">+</span><span class="s">&#39;loop.&#39;</span><span class="o">+</span><span class="n">loopname</span><span class="p">)</span>
+                <span class="c">#print os.mkdir(&#39;loop.&#39;+loopname)</span>
+                <span class="c">#print os.chdir(&#39;loop.&#39;+loopname)                  </span>
+                <span class="k">try</span><span class="p">:</span>                  
+                    <span class="n">res</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">loop_model_single_protein</span><span class="p">(</span><span class="n">modelfile</span><span class="o">=</span><span class="s">&#39;pdb&#39;</span><span class="o">+</span><span class="n">key</span><span class="o">+</span><span class="s">&#39;.ent&#39;</span><span class="p">,</span><span class="n">loops</span><span class="o">=</span><span class="p">[</span><span class="n">loop</span><span class="p">],</span> <span class="n">modelname</span><span class="o">=</span><span class="n">loopname</span><span class="p">)</span>
+                    <span class="n">resultdict</span><span class="p">[</span><span class="n">loopname</span><span class="p">]</span><span class="o">=</span><span class="n">res</span>
+                    <span class="c">#print os.system(&#39;mv &#39;+loopname+&#39;.output.pickle loop&#39;+str(self.input)+&#39;.&#39;+loopname+&#39;.output.pickle&#39;)</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span><span class="n">e</span><span class="p">:</span>
+                    <span class="k">print</span> <span class="o">&gt;&gt;</span> <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span> <span class="n">e</span>
+                <span class="k">print</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&#39;rm &#39;</span><span class="o">+</span><span class="n">loopname</span><span class="o">+</span><span class="s">&#39;.lrsr&#39;</span><span class="p">)</span>
+                <span class="k">print</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&#39;rm &#39;</span><span class="o">+</span><span class="n">loopname</span><span class="o">+</span><span class="s">&#39;.DL*&#39;</span><span class="p">)</span>                    
+                <span class="c">#print os.chdir(&#39;..&#39;)</span>
+        <span class="k">return</span> <span class="n">resultdict</span>
+            
+    <span class="k">def</span> <span class="nf">loop_model_single_protein</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">modelfile</span><span class="p">,</span><span class="n">loops</span><span class="p">,</span><span class="n">modelname</span><span class="p">):</span>
+        <span class="n">numofmodels</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nofloops</span>
+        <span class="k">print</span> <span class="s">&quot;number of loops to be calculated: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">numofmodels</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">rs</span><span class="o">=-</span><span class="mi">2</span><span class="o">-</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dslist</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">rs</span><span class="o">=-</span><span class="mi">2</span>        <span class="c"># directories for input atom files</span>
+
+        <span class="n">env</span> <span class="o">=</span> <span class="n">environ</span><span class="p">(</span><span class="n">rand_seed</span><span class="o">=</span><span class="n">rs</span><span class="p">)</span>
+        <span class="n">env</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">atom_files_directory</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">runenv</span><span class="o">.</span><span class="n">loopStructurePath</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">dslist</span><span class="p">),</span><span class="n">scratchdir</span><span class="p">,</span><span class="n">runenv</span><span class="o">.</span><span class="n">opdbdir</span><span class="p">,</span><span class="s">&#39;.&#39;</span><span class="p">]</span>
+        <span class="c"># Create a new class based on &#39;loopmodel&#39; so that we can redefine</span>
+        <span class="c"># select_loop_atoms (necessary)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">assess</span><span class="o">==</span><span class="s">&#39;SOAP&#39;</span><span class="p">:</span>
+            <span class="n">loop_assess_methods</span><span class="o">=</span><span class="p">(</span><span class="n">assess</span><span class="o">.</span><span class="n">DOPE</span><span class="p">,</span> <span class="n">soap_loop</span><span class="o">.</span><span class="n">Scorer</span><span class="p">())</span>
+            <span class="n">energytrace</span><span class="o">=</span><span class="bp">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">loop_assess_methods</span><span class="o">=</span><span class="p">(</span><span class="n">assess</span><span class="o">.</span><span class="n">DOPE</span><span class="p">)</span>
+            <span class="n">energytrace</span><span class="o">=</span><span class="bp">False</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">MyLoop</span><span class="p">(</span><span class="n">env</span><span class="p">,</span>
+                   <span class="n">inimodel</span><span class="o">=</span><span class="n">modelfile</span><span class="p">,</span> <span class="c"># initial model of the target</span>
+                   <span class="n">sequence</span><span class="o">=</span><span class="n">modelname</span><span class="p">,</span><span class="n">loop_assess_methods</span><span class="o">=</span><span class="n">loop_assess_methods</span><span class="p">,</span>
+                   <span class="n">refinepot</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">refpot</span><span class="p">,</span><span class="n">loops</span><span class="o">=</span><span class="n">loops</span><span class="p">,</span> <span class="n">nonbond_spine</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nonbond_spline</span><span class="p">,</span><span class="n">contact_shell</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">contact_shell</span><span class="p">,</span><span class="n">deviations</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">deviations</span><span class="p">,</span><span class="n">energytrace</span><span class="o">=</span><span class="n">energytrace</span><span class="p">)</span>
+        <span class="c">#m.load_native_model()</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">loop</span><span class="o">.</span><span class="n">starting_model</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">startNum</span>           <span class="c"># index of the first loop model</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">loop</span><span class="o">.</span><span class="n">ending_model</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">endNum</span>
+        <span class="k">print</span> <span class="s">&quot;refine&quot;</span>
+        <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">refinemethod</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">refinemethod</span><span class="o">==</span><span class="s">&#39;fast&#39;</span><span class="p">:</span>
+            <span class="n">m</span><span class="o">.</span><span class="n">loop</span><span class="o">.</span><span class="n">md_level</span> <span class="o">=</span> <span class="n">refine</span><span class="o">.</span><span class="n">fast</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">refinemethod</span><span class="o">==</span><span class="s">&#39;none&#39;</span><span class="p">:</span>
+            <span class="n">m</span><span class="o">.</span><span class="n">loop</span><span class="o">.</span><span class="n">md_level</span><span class="o">=</span> <span class="bp">None</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">refinemethod</span><span class="o">==</span><span class="s">&#39;super&#39;</span><span class="p">:</span>
+            <span class="n">m</span><span class="o">.</span><span class="n">loop</span><span class="o">.</span><span class="n">md_level</span><span class="o">=</span> <span class="n">refine</span><span class="o">.</span><span class="n">very_fast</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">refinemethod</span><span class="o">==</span><span class="s">&#39;slow&#39;</span><span class="p">:</span>
+            <span class="n">m</span><span class="o">.</span><span class="n">loop</span><span class="o">.</span><span class="n">md_level</span><span class="o">=</span> <span class="n">refine</span><span class="o">.</span><span class="n">slow</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">refinemethod</span><span class="o">==</span><span class="s">&#39;sgmd&#39;</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;sgmd&quot;</span>
+            <span class="n">m</span><span class="o">.</span><span class="n">loop</span><span class="o">.</span><span class="n">md_lvel</span><span class="o">=</span><span class="n">sgmd</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">loop</span><span class="o">.</span><span class="n">write_selection_only</span><span class="o">=</span><span class="bp">True</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">j</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">m</span><span class="o">.</span><span class="n">use_parallel_job</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">j</span><span class="p">)</span>   
+        <span class="n">m</span><span class="o">.</span><span class="n">make</span><span class="p">()</span>
+        <span class="n">resultlist</span><span class="o">=</span><span class="p">[]</span>
+        <span class="n">nativescore</span><span class="o">=</span><span class="n">m</span><span class="o">.</span><span class="n">ors</span><span class="o">.</span><span class="n">assess_dope</span><span class="p">()</span>
+        <span class="n">loopoutput</span><span class="o">=</span><span class="n">m</span><span class="o">.</span><span class="n">loop</span><span class="o">.</span><span class="n">outputs</span>
+        <span class="c">#pdb.set_trace()</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">loopoutput</span><span class="p">)):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">lastone</span><span class="o">=</span><span class="s">&#39;trace&#39;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">assess</span><span class="o">==</span><span class="s">&#39;SOAP&#39;</span> <span class="k">else</span> <span class="s">&#39;DOPE score&#39;</span>
+                <span class="n">resultlist</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">loopoutput</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s">&#39;rmsd&#39;</span><span class="p">],</span><span class="n">loopoutput</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s">&#39;mcrmsd&#39;</span><span class="p">],</span><span class="n">loopoutput</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">lastone</span><span class="p">]))</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span><span class="n">e</span><span class="p">:</span>
+                <span class="k">print</span> <span class="o">&gt;&gt;</span> <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span> <span class="n">e</span> 
+                <span class="k">continue</span>
+        <span class="c">#rmsddict[modelname+&#39;.native.pdb&#39;]=0.0</span>
+        <span class="c">#dopedict[modelname+&#39;.native.pdb&#39;]=nativescore</span>
+        <span class="c">#fh=open(&#39;rmsd.pickle&#39;,&#39;wb&#39;)</span>
+        <span class="c">#pickle.dump(rmsddict,fh)</span>
+        <span class="c">#fh.close()</span>
+        <span class="c">#fh=open(&#39;dope.pickle&#39;,&#39;wb&#39;)</span>
+        <span class="c">#pickle.dump(dopedict,fh)</span>
+        <span class="c">#fh.close()</span>
+        <span class="c">#fh=open(modelname+&#39;.output.pickle&#39;,&#39;wb&#39;)</span>
+        <span class="c">#pickle.dump(m.loop.outputs,fh)</span>
+        <span class="c">#fh.close()</span>
+        <span class="k">return</span> <span class="n">resultlist</span>
+
+    <span class="k">def</span> <span class="nf">prepare_task_input</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cv</span><span class="o">!=</span><span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cv</span><span class="o">.</span><span class="n">generate_potential</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">refpot</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">runenv</span><span class="o">.</span><span class="n">serverUserPath</span><span class="p">,</span><span class="s">&#39;lib&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">cv</span><span class="o">.</span><span class="n">rundir</span><span class="o">+</span><span class="s">&#39;.lib&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initialize_dslist</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dir</span><span class="o">=</span><span class="n">runenv</span><span class="o">.</span><span class="n">runs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">task</span><span class="o">.</span><span class="n">get_tasksn</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rundir</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task</span><span class="o">.</span><span class="n">rsn</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">runpath</span><span class="o">=</span><span class="n">runenv</span><span class="o">.</span><span class="n">serverUserPath</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">rundir</span><span class="o">+</span><span class="s">&#39;/&#39;</span>
+        <span class="c">#self.task=task(&#39;&#39;,&#39;&#39;,afterprocessing=self,preparing=self)        </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">task</span><span class="o">.</span><span class="n">dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dir</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">rundir</span><span class="o">+</span><span class="s">&#39;/&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">task</span><span class="o">.</span><span class="n">rdirname</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rundir</span>
+        <span class="c">#return self.task</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dir</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&#39;rm -r &#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">rundir</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rundir</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dir</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">rundir</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">assess</span><span class="o">==</span><span class="s">&#39;SOAP&#39;</span><span class="p">:</span>
+            <span class="n">freememory</span><span class="o">=</span><span class="mi">2</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">freememory</span><span class="o">=</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">freememory</span><span class="o">=</span><span class="n">freememory</span>
+        <span class="n">loopdict</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">codedict</span>
+        <span class="c">#separate the dslist into individual small sets</span>
+        <span class="n">nors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nors</span>
+        <span class="n">dictlist</span><span class="o">=</span><span class="p">[]</span>
+        <span class="n">trl</span><span class="o">=</span><span class="mi">0</span>
+        <span class="n">looprtdict</span><span class="o">=</span><span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">loopdict</span><span class="p">:</span>
+            <span class="n">clrl</span><span class="o">=</span><span class="mi">0</span>
+            <span class="k">for</span> <span class="n">loop</span> <span class="ow">in</span> <span class="n">loopdict</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
+                <span class="n">clrl</span><span class="o">=</span><span class="n">clrl</span><span class="o">+</span><span class="n">loop</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span>
+            <span class="n">looprtdict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">=</span><span class="n">clrl</span>
+            <span class="n">trl</span><span class="o">=</span><span class="n">trl</span><span class="o">+</span><span class="n">clrl</span>
+        <span class="n">art</span><span class="o">=</span><span class="n">trl</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">nors</span><span class="p">)</span>
+        <span class="n">k</span><span class="o">=</span><span class="mi">0</span>
+        <span class="n">cl</span><span class="o">=</span><span class="mi">0</span>
+        <span class="n">ndict</span><span class="o">=</span><span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">loopdict</span><span class="p">:</span>
+            <span class="n">ndict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">=</span><span class="n">loopdict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="n">cl</span><span class="o">=</span><span class="n">cl</span><span class="o">+</span><span class="n">looprtdict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="c">#if cl&gt;art:</span>
+            <span class="n">dictlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ndict</span><span class="p">)</span>
+            <span class="n">ndict</span><span class="o">=</span><span class="p">{}</span>
+            <span class="n">cl</span><span class="o">=</span><span class="mi">0</span>
+            <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ndict</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">dictlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ndict</span><span class="p">)</span>    
+        <span class="k">print</span> <span class="n">k</span>
+        <span class="n">tnt</span><span class="o">=</span><span class="n">k</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">nofloops</span>
+        <span class="n">numofruns</span><span class="o">=</span><span class="nb">min</span><span class="p">(</span><span class="mi">3000</span><span class="p">,</span><span class="n">tnt</span><span class="o">/</span><span class="mi">20</span><span class="p">)</span>
+        <span class="n">nrpl</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">numofruns</span><span class="o">/</span><span class="n">k</span><span class="p">)</span>
+        <span class="n">nrpn</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nofloops</span><span class="o">/</span><span class="n">nrpl</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">k</span><span class="o">*</span><span class="n">nrpl</span><span class="p">):</span>
+            <span class="n">fh</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;.pickle&#39;</span><span class="p">,</span><span class="s">&#39;wb&#39;</span><span class="p">)</span>
+            <span class="n">cd</span><span class="o">=</span><span class="n">dictlist</span><span class="p">[</span><span class="n">i</span><span class="o">/</span><span class="n">nrpl</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">nrpl</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
+                <span class="n">cd</span><span class="p">[</span><span class="s">&#39;runenv&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">[(</span><span class="n">i</span><span class="o">%</span><span class="n">k</span><span class="p">)</span><span class="o">*</span><span class="n">nrpn</span><span class="p">,(</span><span class="n">i</span><span class="o">%</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">nrpn</span><span class="p">]</span>
+            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">cd</span><span class="p">,</span><span class="n">fh</span><span class="p">)</span>
+            <span class="n">fh</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nrpl</span><span class="o">=</span><span class="n">nrpl</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nors</span><span class="o">=</span><span class="n">k</span><span class="o">*</span><span class="n">nrpl</span>
+        <span class="n">nors</span><span class="o">=</span><span class="n">k</span><span class="o">*</span><span class="n">nrpl</span>
+        <span class="c">#write the input list for different runs</span>
+        <span class="n">inputlist</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="s">&#39;inputlist&#39;</span><span class="p">,</span><span class="s">&#39;w&#39;</span><span class="p">)</span>
+        <span class="n">inputlist</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;.pickle&#39;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">nors</span><span class="o">+</span><span class="mi">1</span><span class="p">)]))</span>
+        <span class="n">inputlist</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">makemdt</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="s">&#39;runme.py&#39;</span><span class="p">,</span><span class="s">&#39;w&#39;</span><span class="p">)</span><span class="c">#nonbond_spline=0.1,contact_shell=12.0,deviations=50</span>
+        <span class="n">makemdt</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;from SOAP.loop import *</span><span class="se">\n</span><span class="s">import sys </span><span class="se">\n</span><span class="s"> </span><span class="se">\n</span><span class="s">spopt=sprefine(sys.argv[1],&quot;&#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">bm</span><span class="o">+</span><span class="s">&#39;&quot;,&quot;&#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">criteria</span><span class="o">+</span><span class="s">&#39;&quot;,&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nonbond_spline</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;,&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">contact_shell</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;,&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">deviations</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;)</span><span class="se">\n</span><span class="s">spopt.runpath=</span><span class="se">\&#39;</span><span class="s">&#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">runpath</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\&#39;\n</span><span class="s">spopt.refpot[1]=&quot;&#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">refpot</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="s">&#39;&quot;</span><span class="se">\n\n</span><span class="s">spopt.assess=&quot;&#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">assess</span><span class="o">+</span><span class="s">&#39;&quot;</span><span class="se">\n\n</span><span class="s">spopt.initialize_dslist()&#39;</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">spopt.assess_cluster_node()</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">makemdt</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+        <span class="n">generate_job_submit_script</span><span class="p">(</span><span class="n">freememory</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">rundir</span><span class="p">,</span><span class="n">runtime</span><span class="p">,</span><span class="n">nors</span><span class="p">,</span><span class="n">parallel</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">slavenumber</span><span class="p">)</span>        
+        <span class="k">return</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">runtask_cluster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">nors</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nors</span><span class="o">=</span><span class="n">nors</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">,</span><span class="n">afterprocessing</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span><span class="n">preparing</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prepare_task_input</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">task</span><span class="o">.</span><span class="n">run_task_cluster</span><span class="p">()</span>    
+
+    <span class="k">def</span> <span class="nf">get_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">cv</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">cv</span><span class="o">!=</span><span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cv</span><span class="o">=</span><span class="n">cv</span>            
+            <span class="n">om</span><span class="o">=</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">cv</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
+            <span class="n">om</span><span class="p">[</span><span class="s">&#39;refineProtocal&#39;</span><span class="p">]</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">refineProtocal</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">=</span><span class="n">om</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cv</span><span class="o">.</span><span class="n">modelinlog</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">):</span>
+                <span class="k">return</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">,</span><span class="n">afterprocessing</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span><span class="n">preparing</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">task</span>
+    
+    <span class="k">def</span> <span class="nf">model_loops_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">loopdict</span><span class="p">):</span>
+        <span class="n">resultdict</span><span class="o">=</span><span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">loopdict</span><span class="p">:</span>
+            <span class="k">print</span> <span class="n">key</span>
+            <span class="n">loops</span><span class="o">=</span><span class="n">loopdict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">loop</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">loops</span><span class="p">):</span>
+                <span class="k">print</span> <span class="n">loop</span>
+                <span class="n">loopname</span><span class="o">=</span><span class="n">key</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                <span class="k">print</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&#39;rm -r &#39;</span><span class="o">+</span><span class="s">&#39;loop.&#39;</span><span class="o">+</span><span class="n">loopname</span><span class="p">)</span>                 
+                <span class="c">#try:</span>
+                <span class="k">if</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">res</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">loop_model_single_protein</span><span class="p">(</span><span class="n">modelfile</span><span class="o">=</span><span class="s">&#39;pdb&#39;</span><span class="o">+</span><span class="n">key</span><span class="o">+</span><span class="s">&#39;.ent&#39;</span><span class="p">,</span><span class="n">loops</span><span class="o">=</span><span class="n">loop</span><span class="p">,</span> <span class="n">modelname</span><span class="o">=</span><span class="n">loopname</span><span class="p">)</span>
+                    <span class="n">resultdict</span><span class="p">[</span><span class="n">loopname</span><span class="p">]</span><span class="o">=</span><span class="n">res</span>
+                <span class="c">#except Exception,e:</span>
+                <span class="c">#    print &gt;&gt; sys.stderr, e</span>
+                    <span class="c">#pdb.set_trace()</span>
+                <span class="k">print</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&#39;rm &#39;</span><span class="o">+</span><span class="n">loopname</span><span class="o">+</span><span class="s">&#39;.lrsr&#39;</span><span class="p">)</span>
+                <span class="k">print</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&#39;rm &#39;</span><span class="o">+</span><span class="n">loopname</span><span class="o">+</span><span class="s">&#39;.DL*&#39;</span><span class="p">)</span>                    
+        <span class="k">return</span> <span class="n">resultdict</span>          
+
+    <span class="k">def</span> <span class="nf">assess_cluster_node</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">scratchdir</span><span class="p">)</span>
+        <span class="n">result</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model_loops_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">codedict</span><span class="p">)</span>
+        <span class="c">#if self.criteria==&#39;bestrmsd&#39;:</span>
+        <span class="c">#    result=self.assess_bestrmsd(result)</span>
+        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">result</span><span class="p">,</span><span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dslist</span><span class="o">+</span><span class="s">&#39;.pickle&#39;</span><span class="p">,</span><span class="s">&#39;w&#39;</span><span class="p">))</span>
+        <span class="n">report_job_runstatus</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runpath</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dslist</span><span class="p">,</span> <span class="s">&#39;.pickle&#39;</span><span class="p">,</span><span class="n">inputname</span><span class="o">=</span><span class="s">&#39;runme.py&#39;</span><span class="p">,</span><span class="n">temppath</span><span class="o">=</span><span class="n">scratchdir</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">afterprocessing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dir</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">rundir</span><span class="p">)</span>
+        <span class="n">rd</span><span class="o">=</span><span class="p">{}</span>
+        <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">nrpl</span>
+        <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">nors</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nors</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;.pickle&#39;</span><span class="p">):</span>
+                <span class="n">fh</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;.pickle&#39;</span><span class="p">,</span><span class="s">&#39;rb&#39;</span><span class="p">)</span>
+                <span class="n">res</span><span class="o">=</span><span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fh</span><span class="p">)</span>
+                <span class="n">fh</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="o">.</span><span class="n">keys</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">rd</span><span class="p">:</span>
+                    <span class="n">rd</span><span class="p">[</span><span class="n">res</span><span class="o">.</span><span class="n">keys</span><span class="p">()[</span><span class="mi">0</span><span class="p">]]</span><span class="o">=</span><span class="p">[]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">assess</span><span class="o">==</span><span class="s">&#39;SOAP&#39;</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">values</span><span class="p">()[</span><span class="mi">0</span><span class="p">]:</span>
+                        <span class="n">rd</span><span class="p">[</span><span class="n">res</span><span class="o">.</span><span class="n">keys</span><span class="p">()[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">rd</span><span class="p">[</span><span class="n">res</span><span class="o">.</span><span class="n">keys</span><span class="p">()[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">values</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="c">#print os.system(&#39;rm -r &#39;+self.dir+self.rundir)</span>
+        <span class="c">#del self.clusters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">result</span><span class="o">=</span><span class="n">rd</span>
+        <span class="c">#pdb.set_trace()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">task</span>
+            <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyze_loop_modeling</span><span class="p">()</span>
+    
+    <span class="k">def</span> <span class="nf">assess</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">refpot</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="k">if</span> <span class="n">refpot</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">refpot</span><span class="o">=</span><span class="n">refpot</span>
+        <span class="k">if</span> <span class="n">runenv</span><span class="o">.</span><span class="n">hostn</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">runtask_cluster</span><span class="p">(</span><span class="mi">500</span><span class="p">)</span>
+            <span class="n">result</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">result</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model_loops_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">codedict</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">criteria</span><span class="o">==</span><span class="s">&#39;bestrmsd&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyze_loop_modeling_results</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+            <span class="c">#return self.assess_bestrmsd(result)</span>
+            
+    <span class="k">def</span> <span class="nf">assess_local</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">refpot</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="k">if</span> <span class="n">refpot</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">refpot</span><span class="o">=</span><span class="n">refpot</span>
+        <span class="n">result</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model_loops_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">codedict</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">criteria</span><span class="o">==</span><span class="s">&#39;bestrmsd&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyze_loop_modeling_results</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>        
+
+    <span class="k">def</span> <span class="nf">analyze_loop_modeling</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">mn</span><span class="o">=</span><span class="mi">9999999999</span>
+        <span class="n">result</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">result</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">])</span><span class="o">&lt;</span><span class="n">mn</span><span class="p">:</span>
+                <span class="n">mn</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+        <span class="k">print</span> <span class="s">&quot;min n &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">mn</span><span class="p">)</span>
+        <span class="c">#mn=1000</span>
+        <span class="n">ra</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span><span class="n">mn</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
+        <span class="n">k</span><span class="o">=</span><span class="mi">0</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+            <span class="n">ra</span><span class="p">[</span><span class="n">k</span><span class="p">,:,:]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">])[:</span><span class="n">mn</span><span class="p">,:]</span>
+            <span class="n">k</span><span class="o">+=</span><span class="mi">1</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">assess</span><span class="o">==</span><span class="s">&#39;SOAP&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">averageRMSD</span><span class="o">=</span><span class="n">ra</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">print</span> <span class="s">&quot;min rmsd&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">averageRMSD</span>
+            <span class="n">minind</span><span class="o">=</span><span class="n">ra</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">print</span> <span class="s">&quot;soap min rmsd&quot;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">ra</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">ra</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span><span class="n">minind</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">ra</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">)])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">averageRMSD</span><span class="o">=</span><span class="n">ra</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">+</span><span class="n">ra</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">averageRMSD</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cv</span><span class="o">!=</span><span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cv</span><span class="o">.</span><span class="n">resultsummary</span><span class="o">=-</span><span class="bp">self</span><span class="o">.</span><span class="n">averageRMSD</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cv</span><span class="o">.</span><span class="n">resultarray</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">=-</span><span class="bp">self</span><span class="o">.</span><span class="n">averageRMSD</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cv</span><span class="o">.</span><span class="n">write2logshelve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">averageRMSD</span>
+
+    <span class="k">def</span> <span class="nf">analyze_loop_modeling_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">result</span><span class="p">):</span>
+        <span class="n">mn</span><span class="o">=</span><span class="mi">9999999999</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">])</span><span class="o">&lt;</span><span class="n">mn</span><span class="p">:</span>
+                <span class="n">mn</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+        <span class="k">print</span> <span class="s">&quot;min n &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">mn</span><span class="p">)</span>
+        <span class="c">#mn=1000</span>
+        <span class="n">ra</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span><span class="n">mn</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
+        <span class="n">k</span><span class="o">=</span><span class="mi">0</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+            <span class="n">ra</span><span class="p">[</span><span class="n">k</span><span class="p">,:,:]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">])[:</span><span class="n">mn</span><span class="p">,:]</span>
+            <span class="n">k</span><span class="o">+=</span><span class="mi">1</span>
+        <span class="n">interval</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">mn</span><span class="o">/</span><span class="mi">1000</span><span class="p">)</span>
+        <span class="n">minrmsd</span><span class="o">=</span><span class="p">[]</span>
+        <span class="n">minmcrmsd</span><span class="o">=</span><span class="p">[]</span>
+        <span class="n">minscored</span><span class="o">=</span><span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">interval</span><span class="p">,</span><span class="n">mn</span><span class="p">,</span><span class="n">interval</span><span class="p">):</span>
+            <span class="k">print</span> <span class="n">i</span>
+            <span class="n">minrmsd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ra</span><span class="p">[:,:</span><span class="n">i</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+            <span class="n">minmcrmsd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ra</span><span class="p">[:,:</span><span class="n">i</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+            <span class="n">minind</span><span class="o">=</span><span class="n">ra</span><span class="p">[:,:</span><span class="n">i</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">minscored</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">ra</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">ra</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span><span class="n">minind</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">ra</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">)]))</span>
+            <span class="k">print</span> <span class="n">minrmsd</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">print</span> <span class="n">minmcrmsd</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">x</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="n">interval</span><span class="p">,</span><span class="n">mn</span><span class="p">,</span><span class="n">interval</span><span class="p">)</span>
+        <span class="n">phs</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">minrmsd</span><span class="p">)</span>
+        <span class="n">phs2</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">minmcrmsd</span><span class="p">)</span>
+        <span class="c">#phs3=plt.plot(x,minscored)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">&#39;Number of models&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">&#39;Average RMSD&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">((</span><span class="n">phs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">phs2</span><span class="p">[</span><span class="mi">0</span><span class="p">]),(</span><span class="s">&#39;All atom&#39;</span><span class="p">,</span><span class="s">&#39;Main chain&#39;</span><span class="p">),</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>        
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rundir</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">refinemethod</span><span class="o">+</span><span class="s">&#39;.eps&#39;</span><span class="p">)</span>
+        <span class="c">#return minrmsd[-1]</span>
+        
+    <span class="k">def</span> <span class="nf">assess_bestrmsd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">result</span><span class="p">):</span>
+        <span class="n">brmsdlist</span><span class="o">=</span><span class="p">[]</span>
+        <span class="k">for</span> <span class="n">code</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+            <span class="n">rmsddict</span><span class="o">=</span><span class="n">result</span><span class="p">[</span><span class="n">code</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">rmsdlist</span><span class="o">=</span><span class="p">[]</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">rmsddict</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">rmsddict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+                    <span class="n">rmsdlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rmsddict</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+            <span class="n">brmsdlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">rmsdlist</span><span class="p">)</span><span class="o">.</span><span class="n">min</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">brmsdlist</span>
+
+<div class="viewcode-block" id="sgmd"><a class="viewcode-back" href="../loop.html#loop.sgmd">[docs]</a><span class="k">def</span> <span class="nf">sgmd</span><span class="p">(</span><span class="n">atmsel</span><span class="p">,</span> <span class="n">actions</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Very slow MD annealing&quot;&quot;&quot;</span>
+    <span class="n">sgmdrefine</span><span class="p">(</span><span class="n">atmsel</span><span class="p">,</span> <span class="n">actions</span><span class="p">,</span> <span class="n">cap</span><span class="o">=</span><span class="mf">1.39</span><span class="p">,</span> <span class="n">timestep</span><span class="o">=</span><span class="mf">4.0</span><span class="p">,</span>
+           <span class="n">equil_its</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">equil_equil</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+           <span class="n">equil_temps</span><span class="o">=</span><span class="p">(</span><span class="mf">150.0</span><span class="p">,</span> <span class="mf">250.0</span><span class="p">,</span> <span class="mf">400.0</span><span class="p">,</span> <span class="mf">700.0</span><span class="p">,</span> <span class="mf">1000.0</span><span class="p">,</span> <span class="mf">1300.0</span><span class="p">),</span>
+           <span class="n">sampl_its</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">sampl_equil</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+           <span class="n">sampl_temps</span><span class="o">=</span><span class="p">(</span><span class="mf">1300.0</span><span class="p">,</span> <span class="mf">1000.0</span><span class="p">,</span> <span class="mf">800.0</span><span class="p">,</span> <span class="mf">600.0</span><span class="p">,</span> <span class="mf">500.0</span><span class="p">,</span> <span class="mf">430.0</span><span class="p">,</span> <span class="mf">370.0</span><span class="p">,</span>
+                        <span class="mf">320.0</span><span class="p">,</span> <span class="mf">300.0</span><span class="p">))</span>
+</div>
+<span class="k">def</span> <span class="nf">sgmdrefine</span><span class="p">(</span><span class="n">atmsel</span><span class="p">,</span> <span class="n">actions</span><span class="p">,</span> <span class="n">cap</span><span class="p">,</span> <span class="n">timestep</span><span class="p">,</span> <span class="n">equil_its</span><span class="p">,</span> <span class="n">equil_equil</span><span class="p">,</span>
+           <span class="n">equil_temps</span><span class="p">,</span> <span class="n">sampl_its</span><span class="p">,</span> <span class="n">sampl_equil</span><span class="p">,</span> <span class="n">sampl_temps</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">modeller.optimizers</span> <span class="kn">import</span> <span class="n">molecular_dynamics</span>
+
+    <span class="n">mdl</span> <span class="o">=</span> <span class="n">atmsel</span><span class="o">.</span><span class="n">get_model</span><span class="p">()</span>
+    <span class="n">md</span> <span class="o">=</span> <span class="n">molecular_dynamics</span><span class="p">(</span><span class="n">cap_atom_shift</span><span class="o">=</span><span class="n">cap</span><span class="p">,</span> <span class="n">md_time_step</span><span class="o">=</span><span class="n">timestep</span><span class="p">,</span>
+                            <span class="n">md_return</span><span class="o">=</span><span class="s">&#39;FINAL&#39;</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">mdl</span><span class="o">.</span><span class="n">optimize_output</span><span class="p">,</span>
+                            <span class="n">actions</span><span class="o">=</span><span class="n">actions</span><span class="p">,</span><span class="n">friction</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">guide_factor</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">guide_time</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">init_vel</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="c"># First run for equilibration, the second for sampling:</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">its</span><span class="p">,</span> <span class="n">equil</span><span class="p">,</span> <span class="n">temps</span><span class="p">)</span> <span class="ow">in</span> <span class="p">((</span><span class="n">equil_its</span><span class="p">,</span> <span class="n">equil_equil</span><span class="p">,</span> <span class="n">equil_temps</span><span class="p">),(</span><span class="n">sampl_its</span><span class="p">,</span> <span class="n">sampl_equil</span><span class="p">,</span> <span class="n">sampl_temps</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">temp</span> <span class="ow">in</span> <span class="n">temps</span><span class="p">:</span>
+            <span class="n">md</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">atmsel</span><span class="p">,</span> <span class="n">max_iterations</span><span class="o">=</span><span class="n">its</span><span class="p">,</span> <span class="n">equilibrate</span><span class="o">=</span><span class="n">equil</span><span class="p">,</span>
+                        <span class="n">temperature</span><span class="o">=</span><span class="n">temp</span><span class="p">,</span> <span class="n">init_velocities</span><span class="o">=</span><span class="n">init_vel</span><span class="p">)</span>
+            <span class="n">init_vel</span><span class="o">=</span><span class="bp">False</span>
+
+<span class="k">def</span> <span class="nf">loopschedule</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">schedule</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span>
+           <span class="p">[</span> <span class="n">step</span><span class="p">(</span><span class="n">CG</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">mk_scale</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">1.00</span><span class="p">,</span> <span class="n">nonbond</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">spline</span><span class="o">=</span><span class="mf">1.00</span><span class="p">)),</span>
+             <span class="n">step</span><span class="p">(</span><span class="n">CG</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">mk_scale</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">2.00</span><span class="p">,</span> <span class="n">nonbond</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">spline</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)),</span>
+             <span class="n">step</span><span class="p">(</span><span class="n">CG</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">mk_scale</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">1.00</span><span class="p">,</span> <span class="n">nonbond</span><span class="o">=</span><span class="mf">0.10</span><span class="p">,</span> <span class="n">spline</span><span class="o">=</span><span class="mf">0.10</span><span class="p">)),</span>
+             <span class="n">step</span><span class="p">(</span><span class="n">CG</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">mk_scale</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">1.00</span><span class="p">,</span> <span class="n">nonbond</span><span class="o">=</span><span class="mf">0.50</span><span class="p">,</span> <span class="n">spline</span><span class="o">=</span><span class="mf">0.50</span><span class="p">)),</span>
+             <span class="n">step</span><span class="p">(</span><span class="n">CG</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">physical</span><span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">4.00</span><span class="p">))</span> <span class="p">])</span>
+
+<div class="viewcode-block" id="checkRMSD"><a class="viewcode-back" href="../loop.html#loop.checkRMSD">[docs]</a><span class="k">class</span> <span class="nc">checkRMSD</span><span class="p">(</span><span class="n">actions</span><span class="o">.</span><span class="n">action</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;calcualte the RMSDs of intermediate loops&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">skip</span><span class="p">,</span> <span class="n">loopObj</span><span class="p">,</span><span class="n">first</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                 <span class="n">last</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="n">actions</span><span class="o">.</span><span class="n">action</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">skip</span><span class="p">,</span> <span class="n">first</span><span class="p">,</span> <span class="n">last</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num</span> <span class="o">=</span> <span class="n">start</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loopObj</span><span class="o">=</span><span class="n">loopObj</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opt</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loopObj</span><span class="o">.</span><span class="n">user_after_single_loop_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loopObj</span><span class="o">.</span><span class="n">loop</span><span class="o">.</span><span class="n">outputs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num</span> <span class="o">+</span> <span class="mi">1</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">SOAP 0.1 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Guangqiang Dong.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

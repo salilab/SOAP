@@ -1,0 +1,991 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>utility &mdash; SOAP 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="SOAP 0.1 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">SOAP 0.1 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for utility</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">   SOAP utility module</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">env</span> <span class="kn">import</span> <span class="o">*</span>
+
+
+
+<span class="k">def</span> <span class="nf">squeeze_dict</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+    <span class="n">nd</span><span class="o">=</span><span class="p">{}</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">d</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">d</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
+            <span class="n">nd</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">=</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">nd</span>
+
+<span class="k">def</span> <span class="nf">squeeze_list</span><span class="p">(</span><span class="n">dl</span><span class="p">):</span>
+    <span class="n">ndl</span><span class="o">=</span><span class="p">[]</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">dl</span><span class="p">:</span>
+        <span class="n">collect</span><span class="o">=</span><span class="bp">True</span>
+        <span class="k">for</span> <span class="n">item2</span> <span class="ow">in</span> <span class="n">ndl</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">item</span><span class="o">==</span><span class="n">item2</span><span class="p">:</span>
+                <span class="n">collect</span><span class="o">=</span><span class="bp">False</span>
+                <span class="k">break</span>
+        <span class="k">if</span> <span class="n">collect</span><span class="p">:</span>
+            <span class="n">ndl</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ndl</span>
+
+<span class="k">def</span> <span class="nf">get_array_mem</span><span class="p">(</span><span class="n">na</span><span class="p">):</span>
+    <span class="n">nas</span><span class="o">=</span><span class="n">na</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">ams</span><span class="o">=</span><span class="mi">8</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">nas</span><span class="p">:</span>
+        <span class="n">ams</span><span class="o">=</span><span class="n">ams</span><span class="o">*</span><span class="n">item</span>
+    <span class="k">return</span> <span class="n">ams</span>
+
+<span class="k">def</span> <span class="nf">get_residues_atoms</span><span class="p">():</span>
+    <span class="n">fh</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="n">runenv</span><span class="o">.</span><span class="n">basedir</span><span class="o">+</span><span class="s">&#39;lib/atmcls-mf.lib&#39;</span><span class="p">)</span>
+    <span class="n">fhc</span><span class="o">=</span><span class="n">fh</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">fh</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">resname1</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;A&#39;</span><span class="p">,</span><span class="s">&#39;R&#39;</span><span class="p">,</span><span class="s">&#39;N&#39;</span><span class="p">,</span><span class="s">&#39;D&#39;</span><span class="p">,</span><span class="s">&#39;C&#39;</span><span class="p">,</span><span class="s">&#39;Q&#39;</span><span class="p">,</span><span class="s">&#39;E&#39;</span><span class="p">,</span><span class="s">&#39;G&#39;</span><span class="p">,</span><span class="s">&#39;H&#39;</span><span class="p">,</span><span class="s">&#39;I&#39;</span><span class="p">,</span><span class="s">&#39;L&#39;</span><span class="p">,</span><span class="s">&#39;K&#39;</span><span class="p">,</span><span class="s">&#39;M&#39;</span><span class="p">,</span><span class="s">&#39;F&#39;</span><span class="p">,</span><span class="s">&#39;P&#39;</span><span class="p">,</span><span class="s">&#39;S&#39;</span><span class="p">,</span><span class="s">&#39;T&#39;</span><span class="p">,</span><span class="s">&#39;W&#39;</span><span class="p">,</span><span class="s">&#39;Y&#39;</span><span class="p">,</span><span class="s">&#39;V&#39;</span><span class="p">]</span>
+    <span class="n">resname3</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">resatomdict</span><span class="o">=</span><span class="p">{}</span>
+    <span class="n">atoms</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">allresidues</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\\</span><span class="s">n\s*ATOM\s*</span><span class="se">\&#39;</span><span class="s">([A-Z]{3})</span><span class="se">\&#39;</span><span class="s">\s*</span><span class="se">\&#39;</span><span class="s">([A-Z0-9]+)</span><span class="se">\&#39;</span><span class="s">&#39;</span><span class="p">,</span><span class="n">fhc</span><span class="p">)</span>
+    <span class="n">resatoms</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">allatoms</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">cr</span><span class="o">=</span><span class="s">&#39;&#39;</span>
+    <span class="n">k</span><span class="o">=-</span><span class="mi">1</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">allresidues</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="s">&#39;HSD&#39;</span> <span class="ow">or</span> <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="s">&#39;CSS&#39;</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="n">cr</span><span class="p">:</span>
+            <span class="n">resatoms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">allatoms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span>
+            <span class="k">if</span> <span class="n">resatoms</span><span class="p">:</span>
+                <span class="n">atoms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">resatoms</span><span class="p">)</span>
+                <span class="k">print</span> <span class="n">k</span>
+                <span class="n">resatomdict</span><span class="p">[</span><span class="n">cr</span><span class="p">]</span><span class="o">=</span><span class="n">resatoms</span>
+            <span class="n">resatoms</span><span class="o">=</span><span class="p">[</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+            <span class="n">allatoms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">resname3</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">cr</span><span class="o">=</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">print</span> <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">atoms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">resatoms</span><span class="p">)</span>
+    <span class="n">resatomdict</span><span class="p">[</span><span class="n">cr</span><span class="p">]</span><span class="o">=</span><span class="n">resatoms</span>
+    <span class="n">resname3</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;HSD&#39;</span><span class="p">)</span>
+    <span class="n">resname3</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;CSS&#39;</span><span class="p">)</span>
+    <span class="n">resatomdict</span><span class="p">[</span><span class="s">&#39;HSD&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">resatomdict</span><span class="p">[</span><span class="s">&#39;HIS&#39;</span><span class="p">]</span>
+    <span class="n">resatomdict</span><span class="p">[</span><span class="s">&#39;CSS&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">resatomdict</span><span class="p">[</span><span class="s">&#39;CYS&#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s">&#39;resname1&#39;</span><span class="p">:</span><span class="n">resname1</span><span class="p">,</span><span class="s">&#39;resname3&#39;</span><span class="p">:</span><span class="n">resname3</span><span class="p">,</span><span class="s">&#39;resatoms&#39;</span><span class="p">:</span><span class="n">atoms</span><span class="p">,</span><span class="s">&#39;atomset&#39;</span><span class="p">:</span><span class="nb">set</span><span class="p">(</span><span class="n">allatoms</span><span class="p">),</span><span class="s">&#39;resatomdict&#39;</span><span class="p">:</span><span class="n">resatomdict</span><span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">get_sidechainatom_index</span><span class="p">():</span>
+    <span class="n">fh</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="n">runenv</span><span class="o">.</span><span class="n">basedir</span><span class="o">+</span><span class="s">&#39;lib/atmcls-mf.lib&#39;</span><span class="p">)</span>
+    <span class="n">fhc</span><span class="o">=</span><span class="n">fh</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">fh</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">na</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">158</span><span class="p">)</span>
+    <span class="n">gl</span><span class="o">=</span><span class="n">fhc</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;ATMGRP&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">158</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s">&#39;</span><span class="se">\&#39;</span><span class="s">N</span><span class="se">\&#39;</span><span class="s">&#39;</span> <span class="ow">in</span> <span class="n">gl</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="ow">or</span> <span class="s">&#39;</span><span class="se">\&#39;</span><span class="s">C</span><span class="se">\&#39;</span><span class="s">&#39;</span> <span class="ow">in</span> <span class="n">gl</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="ow">or</span> <span class="s">&#39;</span><span class="se">\&#39;</span><span class="s">CA</span><span class="se">\&#39;</span><span class="s">&#39;</span> <span class="ow">in</span> <span class="n">gl</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="ow">or</span> <span class="s">&#39;</span><span class="se">\&#39;</span><span class="s">O</span><span class="se">\&#39;</span><span class="s">&#39;</span> <span class="ow">in</span> <span class="n">gl</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">na</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="mi">0</span> <span class="c">#mainchain</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">na</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="mi">1</span> <span class="c">#sidechain</span>
+    <span class="k">return</span> <span class="n">na</span>
+                    
+<span class="k">def</span> <span class="nf">get_ph</span><span class="p">(</span><span class="n">code</span><span class="p">):</span>
+    <span class="n">bdir</span><span class="o">=</span><span class="s">&#39;/salilab/park2/database/pdb/divided/&#39;</span>
+    <span class="n">fh</span><span class="o">=</span><span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">bdir</span><span class="o">+</span><span class="n">code</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span><span class="o">+</span><span class="s">&#39;/pdb&#39;</span><span class="o">+</span><span class="n">code</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span><span class="o">+</span><span class="s">&#39;.ent.gz&#39;</span><span class="p">)</span>
+    <span class="n">fc</span><span class="o">=</span><span class="n">fh</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">fh</span><span class="o">.</span><span class="n">close</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">phr</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">&#39;REMARK 200\s+PH\s+\:\s*([0-9\.]+)&#39;</span><span class="p">,</span><span class="n">fc</span><span class="p">)</span>
+        <span class="n">ph</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">phr</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">ph</span>
+
+<span class="k">def</span> <span class="nf">float2int</span><span class="p">(</span><span class="n">tbca</span><span class="p">):</span>
+    <span class="n">amax</span><span class="o">=</span><span class="n">tbca</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+    <span class="k">print</span> <span class="s">&#39;array max &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">amax</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">amax</span><span class="o">&lt;=</span><span class="mi">255</span><span class="p">:</span>
+        <span class="n">na</span><span class="o">=</span><span class="n">tbca</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">amax</span><span class="o">&lt;=</span><span class="mi">65535</span><span class="p">:</span>
+        <span class="n">na</span><span class="o">=</span><span class="n">tbca</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint16</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">amax</span><span class="o">&lt;=</span><span class="mi">4294967295</span><span class="p">:</span>
+        <span class="n">na</span><span class="o">=</span><span class="n">tbca</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&#39;the data is too large to be converted to int to save memory&#39;</span>
+        <span class="n">na</span><span class="o">=</span><span class="n">tbca</span>
+    <span class="k">return</span> <span class="n">na</span>
+
+<span class="k">def</span> <span class="nf">metalions</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">[</span><span class="s">&#39;K&#39;</span> <span class="p">,</span> <span class="s">&#39;Y&#39;</span> <span class="p">,</span> <span class="s">&#39;ZN&#39;</span><span class="p">,</span> <span class="s">&#39;CD&#39;</span><span class="p">,</span> <span class="s">&#39;PA&#39;</span><span class="p">,</span> <span class="s">&#39;GD&#39;</span><span class="p">,</span> <span class="s">&#39;PR&#39;</span><span class="p">,</span> <span class="s">&#39;NA&#39;</span><span class="p">,</span> <span class="s">&#39;MO&#39;</span><span class="p">,</span> <span class="s">&#39;RB&#39;</span> <span class="p">,</span><span class="s">&#39;YB&#39;</span>   <span class="p">,</span> <span class="s">&#39;MN&#39;</span>   <span class="p">,</span> <span class="s">&#39;RE&#39;</span>  <span class="p">,</span> <span class="s">&#39;HO&#39;</span>   <span class="p">,</span> <span class="s">&#39;AU&#39;</span>   <span class="p">,</span> <span class="s">&#39;PU&#39;</span>   <span class="p">,</span> <span class="s">&#39;AL&#39;</span>   <span class="p">,</span> <span class="s">&#39;BE&#39;</span>   <span class="p">,</span> <span class="s">&#39;IR&#39;</span>   <span class="p">,</span> <span class="s">&#39;PT&#39;</span> <span class="p">,</span><span class="s">&#39;FE&#39;</span>   <span class="p">,</span> <span class="s">&#39;CA&#39;</span>   <span class="p">,</span> <span class="s">&#39;AG&#39;</span>   <span class="p">,</span> <span class="s">&#39;CM&#39;</span>   <span class="p">,</span> <span class="s">&#39;HG&#39;</span>   <span class="p">,</span> <span class="s">&#39;SI&#39;</span>   <span class="p">,</span> <span class="s">&#39;CO&#39;</span>   <span class="p">,</span> <span class="s">&#39;SR&#39;</span>   <span class="p">,</span><span class="s">&#39;MG&#39;</span>   <span class="p">,</span> <span class="s">&#39;PB&#39;</span> <span class="p">,</span><span class="s">&#39;GA&#39;</span>   <span class="p">,</span> <span class="s">&#39;SM&#39;</span>   <span class="p">,</span> <span class="s">&#39;BA&#39;</span>   <span class="p">,</span> <span class="s">&#39;CU&#39;</span>   <span class="p">,</span> <span class="s">&#39;NI&#39;</span>   <span class="p">,</span> <span class="s">&#39;TE&#39;</span>   <span class="p">,</span> <span class="s">&#39;CR&#39;</span>   <span class="p">,</span> <span class="s">&#39;TB&#39;</span>   <span class="p">,</span> <span class="s">&#39;PD&#39;</span>   <span class="p">,</span> <span class="s">&#39;OS&#39;</span> <span class="p">,</span><span class="s">&#39;EU&#39;</span>   <span class="p">,</span> <span class="s">&#39;W&#39;</span>   <span class="p">,</span> <span class="s">&#39;B&#39;</span>   <span class="p">,</span> <span class="s">&#39;TL&#39;</span>   <span class="p">,</span> <span class="s">&#39;LI&#39;</span>   <span class="p">,</span> <span class="s">&#39;U&#39;</span>   <span class="p">,</span> <span class="s">&#39;V&#39;</span>   <span class="p">,</span> <span class="s">&#39;RU&#39;</span>   <span class="p">,</span> <span class="s">&#39;AS&#39;</span>   <span class="p">,</span> <span class="s">&#39;LU&#39;</span> <span class="p">,</span><span class="s">&#39;CS&#39;</span> <span class="p">]</span>    
+
+<span class="k">def</span> <span class="nf">isfirstlowest</span><span class="p">(</span><span class="n">array1</span><span class="p">):</span>
+    <span class="n">al</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">array1</span><span class="p">)</span>
+    <span class="k">print</span> <span class="n">al</span>
+    <span class="n">re</span><span class="o">=</span><span class="mi">1</span>
+    <span class="n">c2</span><span class="o">=</span><span class="n">array1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">print</span> <span class="n">c2</span>
+    <span class="n">code</span><span class="o">=</span><span class="s">&quot;&quot;&quot;</span>
+<span class="s">         int i;</span>
+<span class="s">         for(i=0;i&lt;al;i++){</span>
+<span class="s">            if (array1(i)&lt;=c2){</span>
+<span class="s">                re=0;</span>
+<span class="s">                break;</span>
+<span class="s">            }</span>
+<span class="s">         }</span>
+<span class="s">         &quot;&quot;&quot;</span>
+    <span class="n">weave</span><span class="o">.</span><span class="n">inline</span><span class="p">(</span><span class="n">code</span><span class="p">,[</span><span class="s">&#39;array1&#39;</span><span class="p">,</span><span class="s">&#39;al&#39;</span><span class="p">,</span><span class="s">&#39;re&#39;</span><span class="p">,</span><span class="s">&#39;c2&#39;</span><span class="p">],</span><span class="n">type_converters</span><span class="o">=</span><span class="n">converters</span><span class="o">.</span><span class="n">blitz</span><span class="p">,</span> <span class="n">compiler</span><span class="o">=</span><span class="s">&#39;gcc&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">re</span>
+
+<span class="k">def</span> <span class="nf">filter_lib</span><span class="p">(</span><span class="n">atomtype</span><span class="o">=</span><span class="s">&#39;CA&#39;</span><span class="p">,</span><span class="n">ofp</span><span class="o">=</span><span class="s">&#39;atmcls-mf.lib&#39;</span><span class="p">,</span><span class="n">ffp</span><span class="o">=</span><span class="s">&#39;caatm.lib&#39;</span><span class="p">):</span>
+    <span class="n">fh</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="n">ofp</span><span class="p">)</span>
+    <span class="n">fc</span><span class="o">=</span><span class="n">fh</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">fh</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">fcl</span><span class="o">=</span><span class="n">fc</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;ATMGRP&#39;</span><span class="p">)</span>
+    <span class="n">nfcl</span><span class="o">=</span><span class="p">[]</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">fcl</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">item</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span><span class="o">==</span><span class="s">&#39;CA&#39;</span><span class="p">:</span>
+            <span class="n">nfcl</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+    <span class="n">fh</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="n">ffp</span><span class="p">,</span><span class="s">&#39;w&#39;</span><span class="p">)</span>
+    <span class="n">nls</span><span class="o">=</span><span class="s">&#39;ATMGRP&#39;</span><span class="o">+</span><span class="s">&#39;ATMGRP&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">nfcl</span><span class="p">)</span>
+    <span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">nls</span><span class="p">)</span>
+    <span class="n">fh</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    
+<span class="k">def</span> <span class="nf">extendsum</span><span class="p">(</span><span class="n">array1</span><span class="p">,</span><span class="n">array2</span><span class="p">):</span>
+    <span class="n">ref</span><span class="o">=</span><span class="n">array1</span>
+    <span class="n">reft</span><span class="o">=</span><span class="n">array2</span>
+    <span class="n">ref</span><span class="o">=</span><span class="n">ref</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">ref</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="o">+</span><span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">reft</span><span class="o">.</span><span class="n">shape</span><span class="p">))))</span><span class="o">+</span><span class="p">(</span><span class="n">reft</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ref</span><span class="o">.</span><span class="n">shape</span><span class="p">)))</span><span class="o">+</span><span class="nb">list</span><span class="p">(</span><span class="n">reft</span><span class="o">.</span><span class="n">shape</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">ref</span>
+
+<span class="k">def</span> <span class="nf">read_bndgrp</span><span class="p">(</span><span class="n">libpath</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">libpath</span><span class="p">:</span>
+        <span class="n">libpath</span><span class="o">=</span><span class="s">&#39;bndgrp.lib&#39;</span>
+    <span class="n">fh</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="n">libpath</span><span class="p">)</span>
+    <span class="n">fhc</span><span class="o">=</span><span class="n">fh</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">fh</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">bndgrps</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s">&#39;BOND </span><span class="se">\&#39;</span><span class="s">([A-Z0-9]+)</span><span class="se">\&#39;</span><span class="s"> </span><span class="se">\&#39;</span><span class="s">([A-Z0-9]+)</span><span class="se">\&#39;</span><span class="s"> </span><span class="se">\&#39;</span><span class="s">([A-Z0-9]+)</span><span class="se">\&#39;</span><span class="s">&#39;</span><span class="p">,</span><span class="n">fhc</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">bndgrps</span>
+
+<span class="k">class</span> <span class="nc">bndsep</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_bndsepdict</span><span class="p">()</span>
+        
+    <span class="k">def</span> <span class="nf">load_bndsepdict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">fh</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="n">runenv</span><span class="o">.</span><span class="n">libdir</span><span class="o">+</span><span class="s">&#39;bndsep.pickle&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bndsepdict</span><span class="o">=</span><span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fh</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">get_bndsep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">atm1n</span><span class="p">,</span><span class="n">atm2n</span><span class="p">,</span><span class="n">res1</span><span class="p">,</span> <span class="n">res2</span><span class="p">,</span><span class="n">ss</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">ss</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">ss</span><span class="o">=-</span><span class="n">ss</span>
+            <span class="n">temp</span><span class="o">=</span><span class="n">atm1n</span>
+            <span class="n">atm1n</span><span class="o">=</span><span class="n">atm2n</span>
+            <span class="n">atm2n</span><span class="o">=</span><span class="n">temp</span>
+            <span class="n">temp</span><span class="o">=</span><span class="n">res1</span>
+            <span class="n">res1</span><span class="o">=</span><span class="n">res2</span>
+            <span class="n">res2</span><span class="o">=</span><span class="n">temp</span>
+        <span class="k">if</span> <span class="n">ss</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bndsepdict</span><span class="p">[</span><span class="n">res1</span><span class="p">][</span><span class="n">atm1n</span><span class="o">+</span><span class="n">atm2n</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">bs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bndsepdict</span><span class="p">[</span><span class="n">res1</span><span class="p">][</span><span class="n">atm1n</span><span class="o">+</span><span class="s">&#39;C&#39;</span><span class="p">]</span>
+            <span class="n">bs</span><span class="o">=</span><span class="n">bs</span><span class="o">+</span><span class="p">(</span><span class="n">ss</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="mi">3</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">bndsepdict</span><span class="p">[</span><span class="n">res2</span><span class="p">][</span><span class="n">atm2n</span><span class="o">+</span><span class="s">&#39;N&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span>
+            <span class="k">return</span> <span class="n">bs</span>
+    
+<span class="k">class</span> <span class="nc">mypickle</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="c"># this class will save the numpy array seperately when pickling the object to speed up performance and avoid pickle problems with large array, /////old version: only works when the numpy array is a varialbe of an object. WILL NOT WORK if you have a list of numpy arrays.</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">npyobjlist</span><span class="o">=</span><span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">npyobjidlist</span><span class="o">=</span><span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">npyobjnamelist</span><span class="o">=</span><span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">classidlist</span><span class="o">=</span><span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">arraysize</span><span class="o">=</span><span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indexlen</span><span class="o">=</span><span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indexlist</span><span class="o">=</span><span class="p">[]</span>
+    
+    <span class="k">def</span> <span class="nf">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">obj</span><span class="p">,</span><span class="n">nameprefix</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">arraysize</span><span class="o">=</span><span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dumpnparray</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span><span class="n">nameprefix</span><span class="p">)</span>
+        <span class="n">fh</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="n">nameprefix</span><span class="o">+</span><span class="s">&#39;.pickle&#39;</span><span class="p">,</span><span class="s">&#39;wb&#39;</span><span class="p">)</span>
+        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span><span class="n">fh</span><span class="p">)</span>
+        <span class="n">fh</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">print</span> <span class="s">&quot;dump finished&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_array_size</span><span class="p">(</span><span class="n">nameprefix</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">arraysize</span>
+        
+    <span class="k">def</span> <span class="nf">dumpnparray</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">obj</span><span class="p">,</span><span class="n">nameprefix</span><span class="p">):</span>
+        <span class="c">#print &quot;checking object &quot;+obj.__repr__</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span><span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span><span class="nb">tuple</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">3000</span><span class="p">:</span>
+                <span class="k">return</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dumpkeys</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="p">)),</span><span class="n">nameprefix</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span><span class="nb">dict</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">3000</span><span class="p">:</span>
+                <span class="k">return</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dumpkeys</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span><span class="n">obj</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span><span class="n">nameprefix</span><span class="p">)</span>          
+        <span class="k">elif</span> <span class="s">&#39;__dict__&#39;</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;&lt;class&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dumpkeys</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">__dict__</span><span class="p">,</span><span class="n">obj</span><span class="o">.</span><span class="n">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span><span class="n">nameprefix</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">dumpkeys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">od</span><span class="p">,</span><span class="n">keys</span><span class="p">,</span><span class="n">nameprefix</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">id</span><span class="p">(</span><span class="n">od</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">classidlist</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">classidlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">od</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+            <span class="n">item</span><span class="o">=</span><span class="n">od</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+                <span class="n">ns</span><span class="o">=</span><span class="n">item</span><span class="o">.</span><span class="n">shape</span>
+                <span class="n">nl</span><span class="o">=</span><span class="mi">1</span>
+                <span class="k">for</span> <span class="n">nsi</span> <span class="ow">in</span> <span class="n">ns</span><span class="p">:</span>
+                    <span class="n">nl</span><span class="o">=</span><span class="n">nl</span><span class="o">*</span><span class="n">nsi</span>
+                <span class="k">if</span> <span class="n">nl</span><span class="o">&lt;</span><span class="mi">1000</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">savesinglearray</span><span class="p">(</span><span class="n">od</span><span class="p">,</span><span class="n">key</span><span class="p">,</span><span class="n">nameprefix</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dumpnparray</span><span class="p">(</span><span class="n">item</span><span class="p">,</span><span class="n">nameprefix</span><span class="p">)</span>
+                
+    <span class="k">def</span> <span class="nf">savesinglearray</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">obj</span><span class="p">,</span><span class="n">key</span><span class="p">,</span><span class="n">nameprefix</span><span class="p">):</span>
+        <span class="n">dtype</span><span class="o">=</span><span class="n">obj</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">obj</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">flags</span><span class="p">[</span><span class="s">&#39;OWNDATA&#39;</span><span class="p">]:</span>
+            <span class="n">obj</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">=</span><span class="bp">None</span><span class="c">#you should relink the array afterwords</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">elif</span> <span class="nb">id</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="n">key</span><span class="p">])</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">npyobjidlist</span><span class="p">:</span>
+            <span class="n">cid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">npyobjidlist</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="n">key</span><span class="p">]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cid</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">npyobjidlist</span><span class="p">)</span>
+            <span class="k">print</span> <span class="s">&#39;saving numpy array to hdf5&#39;</span><span class="o">+</span><span class="s">&#39; &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="o">+</span><span class="s">&#39; shape &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+            <span class="n">tf</span><span class="o">=</span><span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">nameprefix</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">cid</span><span class="p">),</span><span class="s">&#39;w&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">arraysize</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">arraysize</span><span class="o">+</span><span class="n">obj</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">nbytes</span>
+            <span class="n">na</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s">&#39;na&#39;</span><span class="p">,</span><span class="n">data</span><span class="o">=</span><span class="n">obj</span><span class="p">[</span><span class="n">key</span><span class="p">],</span><span class="n">compression</span><span class="o">=</span><span class="s">&#39;lzf&#39;</span><span class="p">)</span>
+            <span class="c">#np.save(nameprefix+str(cid),obj[key])</span>
+            <span class="n">tf</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">npyobjidlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="n">key</span><span class="p">]))</span>
+        <span class="n">obj</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">=</span><span class="n">savednpy</span><span class="p">(</span><span class="n">nameprefix</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">cid</span><span class="p">))</span>
+        <span class="n">obj</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span>
+                
+    <span class="k">def</span> <span class="nf">loadnparray</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">obj</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span><span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span><span class="nb">tuple</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">1000</span><span class="p">:</span>
+                <span class="k">return</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">loadkeys</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="p">)))</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span><span class="nb">dict</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">1000</span><span class="p">:</span>
+                <span class="k">return</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">loadkeys</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span><span class="n">obj</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">elif</span> <span class="s">&#39;__dict__&#39;</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;&lt;class&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">loadkeys</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">__dict__</span><span class="p">,</span><span class="n">obj</span><span class="o">.</span><span class="n">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">loadkeys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">od</span><span class="p">,</span><span class="n">keys</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">id</span><span class="p">(</span><span class="n">od</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">classidlist</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">classidlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">od</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+            <span class="n">item</span><span class="o">=</span><span class="n">od</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s">&#39;savednpy&#39;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">item</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">loadsinglearray</span><span class="p">(</span><span class="n">od</span><span class="p">,</span><span class="n">key</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">loadnparray</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+                
+    <span class="k">def</span> <span class="nf">loadsinglearray</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">obj</span><span class="p">,</span><span class="n">key</span><span class="p">):</span>
+        <span class="n">sao</span><span class="o">=</span><span class="n">obj</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">sao</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">npyobjnamelist</span><span class="p">:</span>
+            <span class="n">ind</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">npyobjnamelist</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">sao</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">npyobjnamelist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sao</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">print</span> <span class="s">&quot;loading numpy array&quot;</span><span class="o">+</span><span class="n">sao</span><span class="o">.</span><span class="n">name</span>
+            <span class="k">if</span> <span class="n">sao</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;npy&#39;</span><span class="p">):</span>
+                <span class="n">na</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">sao</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">tf</span><span class="o">=</span><span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">sao</span><span class="o">.</span><span class="n">name</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">indexlist</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">indexlen</span> <span class="ow">in</span> <span class="n">tf</span><span class="p">[</span><span class="s">&#39;na&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+                    <span class="n">na</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">tf</span><span class="p">[</span><span class="s">&#39;na&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">sao</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+                    <span class="n">tf</span><span class="p">[</span><span class="s">&#39;na&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">read_direct</span><span class="p">(</span><span class="n">na</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">na</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">load_part_indexlist</span><span class="p">(</span><span class="n">tf</span><span class="p">,</span><span class="n">sao</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+                <span class="n">tf</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">npyobjlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">na</span><span class="p">)</span>
+            <span class="n">ind</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">npyobjlist</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span>
+        <span class="n">obj</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">npyobjlist</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span>
+                
+    <span class="k">def</span> <span class="nf">load_part_indexlist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">tf</span><span class="p">,</span><span class="n">dtype</span><span class="p">):</span>
+        <span class="n">nindexlist</span><span class="o">=</span><span class="n">squeeze_indexlist</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">indexlist</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">tf</span><span class="p">[</span><span class="s">&#39;na&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="bp">self</span><span class="o">.</span><span class="n">indexlen</span><span class="p">:</span>
+            <span class="n">nashape</span><span class="o">=</span><span class="p">[</span><span class="n">nindexlist</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span><span class="o">+</span><span class="nb">list</span><span class="p">(</span><span class="n">tf</span><span class="p">[</span><span class="s">&#39;na&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="n">na</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nashape</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">ind</span><span class="p">,</span> <span class="n">nind</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">indexlist</span><span class="p">,</span><span class="n">nindexlist</span><span class="p">):</span>
+                <span class="n">na</span><span class="p">[</span><span class="n">nind</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">nind</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="o">...</span><span class="p">]</span><span class="o">=</span><span class="n">tf</span><span class="p">[</span><span class="s">&#39;na&#39;</span><span class="p">][</span><span class="n">ind</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">ind</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="k">elif</span> <span class="n">tf</span><span class="p">[</span><span class="s">&#39;na&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="bp">self</span><span class="o">.</span><span class="n">indexlen</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">tf</span><span class="p">[</span><span class="s">&#39;na&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="o">==</span><span class="mi">2</span><span class="p">:</span>
+            <span class="n">nashape</span><span class="o">=</span><span class="p">[</span><span class="n">tf</span><span class="p">[</span><span class="s">&#39;na&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">nindexlist</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+            <span class="n">na</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nashape</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">ind</span><span class="p">,</span> <span class="n">nind</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">indexlist</span><span class="p">,</span><span class="n">nindexlist</span><span class="p">):</span>
+                <span class="n">na</span><span class="p">[:,</span><span class="n">nind</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">nind</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">=</span><span class="n">tf</span><span class="p">[</span><span class="s">&#39;na&#39;</span><span class="p">][:,</span><span class="n">ind</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">ind</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;can not load_part_index in mypickle&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">na</span>
+                
+    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">nameprefix</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">&quot;loading pickle file&quot;</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">nameprefix</span> <span class="k">if</span> <span class="n">nameprefix</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;.pickle&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="n">nameprefix</span><span class="o">+</span><span class="s">&#39;.pickle&#39;</span>
+        <span class="n">fh</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="s">&#39;rb&#39;</span><span class="p">)</span>
+        <span class="n">obj</span><span class="o">=</span><span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fh</span><span class="p">)</span>
+        <span class="n">fh</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">print</span> <span class="s">&quot;finished loading pickle file&quot;</span>
+        <span class="c">#fl=os.listdir(&#39;./&#39;)</span>
+        <span class="c">#fl=[item for item in fl if item.startswith(nameprefix) and item.endswith(&#39;npy&#39;)]</span>
+        <span class="c">#if len(fl)&gt;0:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loadnparray</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="k">print</span> <span class="s">&quot;load finished&quot;</span>
+        <span class="k">return</span> <span class="n">obj</span>
+    
+    <span class="k">def</span> <span class="nf">loadpickleonly</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">nameprefix</span><span class="p">):</span>
+        <span class="n">fh</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="n">nameprefix</span><span class="o">+</span><span class="s">&#39;.pickle&#39;</span><span class="p">,</span><span class="s">&#39;rb&#39;</span><span class="p">)</span>
+        <span class="n">obj</span><span class="o">=</span><span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fh</span><span class="p">)</span>
+        <span class="n">fh</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">obj</span>
+    
+    <span class="k">def</span> <span class="nf">get_array_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">nameprefix</span><span class="p">):</span>
+        <span class="n">fl</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s">&#39;./&#39;</span><span class="p">)</span>
+        <span class="n">fl</span><span class="o">=</span><span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">fl</span> <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">nameprefix</span><span class="p">)</span> <span class="ow">and</span> <span class="n">item</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;pickle&#39;</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fl</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">arraysize</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">arraysize</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">st_size</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">arraysize</span>
+
+<span class="k">class</span> <span class="nc">savednpy</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">=</span><span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="o">=</span><span class="p">[]</span>
+        <span class="c">#if not self.name.endswith(&#39;.npy&#39;):</span>
+        <span class="c">#    self.name=self.name+&#39;.npy&#39;</span>
+<span class="k">def</span> <span class="nf">calc_zscore</span><span class="p">(</span><span class="n">sl</span><span class="p">):</span>
+    <span class="n">std</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">sl</span><span class="p">)</span>
+    <span class="n">mean</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">sl</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">sl</span><span class="o">-</span><span class="n">mean</span><span class="p">)</span><span class="o">/</span><span class="n">std</span>
+    
+<span class="k">def</span> <span class="nf">decode_genmethod</span><span class="p">(</span><span class="n">genmethod</span><span class="p">):</span>
+    <span class="n">csmin</span><span class="o">=</span><span class="mi">0</span>
+    <span class="n">csmax</span><span class="o">=</span><span class="mi">99</span>
+    <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">&#39;cs([0-1]+)&#39;</span><span class="p">,</span><span class="n">genmethod</span><span class="p">):</span>
+         <span class="n">errsre</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">&#39;cs([0-1]+)&#39;</span><span class="p">,</span><span class="n">genmethod</span><span class="p">)</span>
+         <span class="n">csv</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">errsre</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+         <span class="k">if</span> <span class="n">csv</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+             <span class="n">csmax</span><span class="o">=</span><span class="mi">0</span>
+         <span class="k">elif</span> <span class="n">csv</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+             <span class="n">csmin</span><span class="o">=</span><span class="mi">1</span>
+    <span class="n">bs</span><span class="o">=-</span><span class="mi">1</span>
+    <span class="n">bsm</span><span class="o">=-</span><span class="mi">1</span>
+    <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">&#39;bs([0-9]+)&#39;</span><span class="p">,</span><span class="n">genmethod</span><span class="p">):</span>
+        <span class="n">bs</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">&#39;bs([0-9]+)&#39;</span><span class="p">,</span><span class="n">genmethod</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">bsm</span><span class="o">=</span><span class="mi">99999999</span>
+    <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">&#39;bsm([0-9]+)&#39;</span><span class="p">,</span><span class="n">genmethod</span><span class="p">):</span>
+        <span class="n">bsm</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">&#39;bsm([0-9]+)&#39;</span><span class="p">,</span><span class="n">genmethod</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">bs</span><span class="o">==-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">bs</span><span class="o">=</span><span class="mi">0</span>
+    <span class="n">kcut</span><span class="o">=</span><span class="mi">0</span>
+    <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">&#39;ss([0-9]*)&#39;</span><span class="p">,</span><span class="n">genmethod</span><span class="p">):</span>
+        <span class="n">kcs</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">&#39;ss([0-9]*)&#39;</span><span class="p">,</span><span class="n">genmethod</span><span class="p">)</span>
+        <span class="n">kcs</span><span class="o">=</span><span class="n">kcs</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">kcut</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">kcs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">&#39;ssm([0-9]*)&#39;</span><span class="p">,</span><span class="n">genmethod</span><span class="p">):</span>
+        <span class="n">kcsm</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">&#39;ssm([0-9]*)&#39;</span><span class="p">,</span><span class="n">genmethod</span><span class="p">)</span>
+        <span class="n">kcsm</span><span class="o">=</span><span class="n">kcsm</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">kcut1</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">kcsm</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">kcut1</span><span class="o">=</span><span class="mi">9999</span>
+    <span class="n">errsv</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>
+    <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">&#39;err([0-9\.]*)&#39;</span><span class="p">,</span><span class="n">genmethod</span><span class="p">):</span>
+        <span class="n">errsre</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">&#39;err([0-9\.]*)&#39;</span><span class="p">,</span><span class="n">genmethod</span><span class="p">)</span>
+        <span class="n">errs</span><span class="o">=</span><span class="n">errsre</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">errsv</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">errs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">&#39;dsp&#39;</span><span class="p">,</span><span class="n">genmethod</span><span class="p">):</span>
+        <span class="n">ssp</span><span class="o">=</span><span class="bp">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ssp</span><span class="o">=</span><span class="bp">False</span>
+    <span class="k">return</span> <span class="n">csmin</span><span class="p">,</span> <span class="n">csmax</span><span class="p">,</span><span class="n">kcut</span><span class="p">,</span> <span class="n">kcut1</span><span class="p">,</span> <span class="n">bs</span><span class="p">,</span><span class="n">bsm</span><span class="p">,</span> <span class="n">errsv</span><span class="p">,</span> <span class="n">ssp</span>
+
+<span class="k">def</span> <span class="nf">check_remote_file_exist</span><span class="p">(</span><span class="n">rs</span><span class="p">,</span><span class="n">rd</span><span class="p">,</span><span class="n">rfl</span><span class="p">):</span>
+    <span class="n">proc1</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="s">&#39;ssh &#39;</span><span class="o">+</span><span class="n">rs</span><span class="o">+</span><span class="s">&#39; &#39;</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\&#39;</span><span class="s">cd &#39;</span><span class="o">+</span><span class="n">rd</span><span class="o">+</span><span class="s">&#39;; ls </span><span class="se">\&#39;</span><span class="s">&#39;</span><span class="p">,</span><span class="n">shell</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span><span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span>
+    <span class="n">runstats</span><span class="o">=</span><span class="n">proc1</span><span class="o">.</span><span class="n">communicate</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">fl</span><span class="o">=</span><span class="n">runstats</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+    <span class="n">fl</span><span class="o">=</span><span class="p">[</span><span class="n">item</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">fl</span><span class="p">]</span>
+    <span class="n">efl</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">nefl</span><span class="o">=</span><span class="p">[]</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">rfl</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;*&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">f</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span><span class="n">runstats</span><span class="p">):</span>
+                <span class="n">efl</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">nefl</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">in</span> <span class="n">fl</span><span class="p">:</span>
+                <span class="n">efl</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">nefl</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">efl</span><span class="p">,</span><span class="n">nefl</span>
+    
+<span class="k">def</span> <span class="nf">list2array</span><span class="p">(</span><span class="n">tl</span><span class="p">):</span>
+    <span class="c">#This only works if all the element of list have the same length except the most inner list.</span>
+    <span class="n">ldim</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">le</span><span class="o">=</span><span class="n">tl</span>
+    <span class="n">lastflat</span><span class="o">=</span><span class="bp">True</span>
+    <span class="k">while</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">le</span><span class="p">,</span><span class="nb">list</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">le</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="nb">list</span><span class="p">):</span>
+            <span class="n">ldim</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">le</span><span class="p">))</span>
+            <span class="n">ole</span><span class="o">=</span><span class="n">le</span>
+            <span class="n">le</span><span class="o">=</span><span class="n">le</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ll</span><span class="o">=</span><span class="mi">0</span>
+            <span class="k">for</span> <span class="n">stl</span> <span class="ow">in</span> <span class="n">ole</span><span class="p">:</span>
+                <span class="n">ll</span><span class="o">=</span><span class="n">ll</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="n">stl</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">stl</span><span class="p">)</span><span class="o">!=</span><span class="nb">len</span><span class="p">(</span><span class="n">ole</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                    <span class="n">lastflat</span><span class="o">=</span><span class="bp">False</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">lastflat</span><span class="p">:</span>
+                <span class="n">ldim</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="n">ll</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ldim</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">stl</span><span class="p">))</span>
+            <span class="k">break</span>
+    <span class="n">npa</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">ldim</span><span class="p">)</span>
+    <span class="n">list2array_recursive</span><span class="p">(</span><span class="n">lastflat</span><span class="p">,[],</span><span class="n">tl</span><span class="p">,</span><span class="n">npa</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">npa</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+         
+<span class="k">def</span> <span class="nf">list2array_recursive</span><span class="p">(</span><span class="n">lastflat</span><span class="p">,</span><span class="n">cil</span><span class="p">,</span><span class="n">cl0</span><span class="p">,</span><span class="n">npa</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cl0</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="nb">list</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">cl0</span><span class="p">)):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">npa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">cil</span><span class="o">+</span><span class="p">[</span><span class="n">i</span><span class="p">])]</span><span class="o">=</span><span class="n">cl0</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">pdb</span><span class="o">.</span><span class="n">set_trace</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cl0</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="nb">list</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">lastflat</span><span class="p">):</span>
+        <span class="n">li</span><span class="o">=</span><span class="mi">0</span>
+        <span class="k">for</span> <span class="n">cl1</span> <span class="ow">in</span> <span class="n">cl0</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">cl2</span> <span class="ow">in</span> <span class="n">cl1</span><span class="p">:</span>
+                <span class="n">npa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">cil</span><span class="o">+</span><span class="p">[</span><span class="n">li</span><span class="p">])]</span><span class="o">=</span><span class="n">cl2</span>
+                <span class="n">li</span><span class="o">=</span><span class="n">li</span><span class="o">+</span><span class="mi">1</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">cl0</span><span class="p">)):</span>
+            <span class="n">ncil</span><span class="o">=</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">cil</span><span class="p">)</span>
+            <span class="n">ncil</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">list2array_recursive</span><span class="p">(</span><span class="n">lastflat</span><span class="p">,</span><span class="n">ncil</span><span class="p">,</span><span class="n">cl0</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">npa</span><span class="p">)</span>
+             
+
+<span class="k">def</span> <span class="nf">make_tmpdir</span><span class="p">():</span>
+    <span class="n">rp</span><span class="o">=</span><span class="s">&#39;/scratch/gqd&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">rp</span><span class="p">)</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">rp</span><span class="p">):</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+        <span class="n">rp</span><span class="o">=</span><span class="s">&#39;/scratch/gqd&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">rp</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">rp</span><span class="o">+</span><span class="s">&#39;/&#39;</span>
+        
+<span class="k">def</span> <span class="nf">get_scaledhsv_colormap_inverted</span><span class="p">(</span><span class="n">cscale</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+    <span class="n">cscale</span><span class="o">=</span><span class="mf">0.1</span><span class="o">/</span><span class="mf">0.84127</span>
+    <span class="n">cdict</span><span class="o">=</span> <span class="p">{</span><span class="s">&#39;blue&#39;</span><span class="p">:</span> <span class="p">((</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+                    <span class="p">(</span><span class="mf">0.333333</span><span class="o">*</span><span class="n">cscale</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+                    <span class="p">(</span><span class="mf">0.349206</span><span class="o">*</span><span class="n">cscale</span><span class="p">,</span> <span class="mf">0.0625</span><span class="p">,</span> <span class="mf">0.0625</span><span class="p">),</span>
+                    <span class="p">(</span><span class="mf">0.507937</span><span class="o">*</span><span class="n">cscale</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+                    <span class="p">(</span><span class="mf">0.84127</span><span class="o">*</span><span class="n">cscale</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
+                    <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)),</span>
+            <span class="s">&#39;green&#39;</span><span class="p">:</span> <span class="p">((</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+                    <span class="p">(</span><span class="mf">0.15873</span><span class="o">*</span><span class="n">cscale</span><span class="p">,</span> <span class="mf">0.9375</span><span class="p">,</span> <span class="mf">0.9375</span><span class="p">),</span>
+                    <span class="p">(</span><span class="mf">0.174603</span><span class="o">*</span><span class="n">cscale</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+                    <span class="p">(</span><span class="mf">0.507937</span><span class="o">*</span><span class="n">cscale</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+                    <span class="p">(</span><span class="mf">0.666667</span><span class="o">*</span><span class="n">cscale</span><span class="p">,</span> <span class="mf">0.0625</span><span class="p">,</span> <span class="mf">0.0625</span><span class="p">),</span>
+                    <span class="p">(</span><span class="mf">0.68254</span><span class="o">*</span><span class="n">cscale</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+                    <span class="p">(</span><span class="mf">0.84127</span><span class="o">*</span><span class="n">cscale</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>                        
+                    <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)),</span>
+            <span class="s">&#39;red&#39;</span><span class="p">:</span> <span class="p">((</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+                    <span class="p">(</span><span class="mf">0.15873</span><span class="o">*</span><span class="n">cscale</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+                    <span class="p">(</span><span class="mf">0.174603</span><span class="o">*</span><span class="n">cscale</span><span class="p">,</span> <span class="mf">0.96875</span><span class="p">,</span> <span class="mf">0.96875</span><span class="p">),</span>
+                    <span class="p">(</span><span class="mf">0.333333</span><span class="o">*</span><span class="n">cscale</span><span class="p">,</span> <span class="mf">0.03125</span><span class="p">,</span> <span class="mf">0.03125</span><span class="p">),</span>
+                    <span class="p">(</span><span class="mf">0.349206</span><span class="o">*</span><span class="n">cscale</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+                    <span class="p">(</span><span class="mf">0.666667</span><span class="o">*</span><span class="n">cscale</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+                    <span class="p">(</span><span class="mf">0.68254</span><span class="o">*</span><span class="n">cscale</span><span class="p">,</span> <span class="mf">0.03125</span><span class="p">,</span> <span class="mf">0.03125</span><span class="p">),</span>
+                    <span class="p">(</span><span class="mf">0.84127</span><span class="o">*</span><span class="n">cscale</span><span class="p">,</span> <span class="mf">0.96875</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
+                    <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))}</span>
+    <span class="n">my_cmap</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">LinearSegmentedColormap</span><span class="p">(</span><span class="s">&#39;my_colormap&#39;</span><span class="p">,</span><span class="n">cdict</span><span class="p">,</span><span class="mi">256</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">my_cmap</span>
+        
+<span class="k">def</span> <span class="nf">get_scaledhsv_colormap</span><span class="p">(</span><span class="n">cscale</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+    <span class="n">s</span><span class="o">=</span><span class="n">cscale</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="mf">0.31745999999999996</span><span class="p">)</span>
+    <span class="n">b</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">cscale</span><span class="o">-</span><span class="mf">0.31745999999999996</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="mf">0.31745999999999996</span><span class="p">)</span>
+    <span class="n">cdict</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;blue&#39;</span><span class="p">:</span> <span class="p">[(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
+                    <span class="p">(</span><span class="n">s</span><span class="o">*</span><span class="mf">0.31745999999999996</span><span class="o">+</span><span class="n">b</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+                    <span class="p">(</span><span class="n">s</span><span class="o">*</span><span class="mf">0.49206300000000003</span><span class="o">+</span><span class="n">b</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+                    <span class="p">(</span><span class="n">s</span><span class="o">*</span><span class="mf">0.650794</span><span class="o">+</span><span class="n">b</span><span class="p">,</span> <span class="mf">0.0625</span><span class="p">,</span> <span class="mf">0.0625</span><span class="p">),</span>
+                    <span class="p">(</span><span class="n">s</span><span class="o">*</span><span class="mf">0.666667</span><span class="o">+</span><span class="n">b</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+                    <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)],</span>
+            <span class="s">&#39;green&#39;</span><span class="p">:</span> <span class="p">[(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
+                    <span class="p">(</span><span class="n">s</span><span class="o">*</span><span class="mf">0.31745999999999996</span><span class="o">+</span><span class="n">b</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+                    <span class="p">(</span><span class="n">s</span><span class="o">*</span><span class="mf">0.333333</span><span class="o">+</span><span class="n">b</span><span class="p">,</span> <span class="mf">0.0625</span><span class="p">,</span> <span class="mf">0.0625</span><span class="p">),</span>
+                    <span class="p">(</span><span class="n">s</span><span class="o">*</span><span class="mf">0.49206300000000003</span><span class="o">+</span><span class="n">b</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+                    <span class="p">(</span><span class="n">s</span><span class="o">*</span><span class="mf">0.8253969999999999</span><span class="o">+</span><span class="n">b</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+                    <span class="p">(</span><span class="n">s</span><span class="o">*</span><span class="mf">0.84127</span><span class="o">+</span><span class="n">b</span><span class="p">,</span> <span class="mf">0.9375</span><span class="p">,</span> <span class="mf">0.9375</span><span class="p">),</span>
+                    <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)],</span>
+            <span class="s">&#39;red&#39;</span><span class="p">:</span> <span class="p">[(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
+                    <span class="p">(</span><span class="n">s</span><span class="o">*</span><span class="mf">0.31745999999999996</span><span class="o">+</span><span class="n">b</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.03125</span><span class="p">),</span>
+                    <span class="p">(</span><span class="n">s</span><span class="o">*</span><span class="mf">0.333333</span><span class="o">+</span><span class="n">b</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+                    <span class="p">(</span><span class="n">s</span><span class="o">*</span><span class="mf">0.650794</span><span class="o">+</span><span class="n">b</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+                    <span class="p">(</span><span class="n">s</span><span class="o">*</span><span class="mf">0.666667</span><span class="o">+</span><span class="n">b</span><span class="p">,</span> <span class="mf">0.03125</span><span class="p">,</span> <span class="mf">0.03125</span><span class="p">),</span>
+                    <span class="p">(</span><span class="n">s</span><span class="o">*</span><span class="mf">0.8253969999999999</span><span class="o">+</span><span class="n">b</span><span class="p">,</span> <span class="mf">0.96875</span><span class="p">,</span> <span class="mf">0.96875</span><span class="p">),</span>
+                    <span class="p">(</span><span class="n">s</span><span class="o">*</span><span class="mf">0.84127</span><span class="o">+</span><span class="n">b</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+                    <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)]}</span>
+    <span class="n">my_cmap</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">LinearSegmentedColormap</span><span class="p">(</span><span class="s">&#39;my_colormap&#39;</span><span class="p">,</span><span class="n">cdict</span><span class="p">,</span><span class="mi">256</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">my_cmap</span>        
+
+<span class="k">def</span> <span class="nf">convert2ndarray</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">values</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">long</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">values</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;Don</span><span class="se">\&#39;</span><span class="s">t know how to convert &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">values</span><span class="p">)</span><span class="o">+</span><span class="s">&#39; to numpy array&#39;</span><span class="p">)</span>
+            
+<span class="k">def</span> <span class="nf">dummy</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+<span class="k">def</span> <span class="nf">any2str</span><span class="p">(</span><span class="n">anything</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">anything</span><span class="p">,</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="nb">float</span><span class="p">,</span><span class="nb">int</span><span class="p">,</span><span class="nb">str</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">anything</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">anything</span><span class="o">==</span><span class="bp">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s">&#39;None&#39;</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">anything</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span><span class="nb">tuple</span><span class="p">)):</span>
+        <span class="n">nl</span><span class="o">=</span><span class="p">[]</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">anything</span><span class="p">:</span>
+            <span class="n">nl</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">any2str</span><span class="p">(</span><span class="n">item</span><span class="p">))</span>
+        <span class="k">return</span> <span class="s">&#39;[&#39;</span><span class="o">+</span><span class="s">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">nl</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;]&#39;</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">anything</span><span class="p">,</span><span class="nb">dict</span><span class="p">):</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="n">anything</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="n">keys</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="n">dl</span><span class="o">=</span><span class="p">[</span><span class="n">any2str</span><span class="p">(</span><span class="n">anything</span><span class="p">[</span><span class="n">key</span><span class="p">])</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">]</span>
+        <span class="n">dls</span><span class="o">=</span><span class="n">any2str</span><span class="p">(</span><span class="n">dl</span><span class="p">)</span>
+        <span class="n">nds</span><span class="o">=</span><span class="p">[]</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span><span class="n">value</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span><span class="n">dl</span><span class="p">):</span>
+            <span class="c">#if key==&#39;searches&#39;:</span>
+            <span class="c">#    pdb.set_trace()</span>
+            <span class="n">nds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;:&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+        <span class="k">return</span> <span class="s">&#39;{&#39;</span><span class="o">+</span><span class="s">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">nds</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;}&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">pdb</span><span class="o">.</span><span class="n">set_trace</span><span class="p">()</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;Donot how to convert anything to string: &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">anything</span><span class="p">))</span>
+        
+<span class="k">def</span> <span class="nf">build_scorer</span><span class="p">(</span><span class="n">scorerpath</span><span class="o">=</span><span class="s">&#39;./&#39;</span><span class="p">):</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">scorerpath</span><span class="p">)</span>
+    <span class="n">fh</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="n">scorerpath</span><span class="o">+</span><span class="s">&#39;bestmodel.pickle&#39;</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fh</span><span class="p">)</span>
+    <span class="n">fh</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">scorer</span> <span class="ow">in</span> <span class="n">model</span><span class="p">[</span><span class="s">&#39;scorers&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">scorer</span><span class="p">[</span><span class="s">&#39;type&#39;</span><span class="p">]</span><span class="o">==</span><span class="s">&#39;scaledsp&#39;</span><span class="p">:</span>
+            <span class="n">ssp</span><span class="o">=</span><span class="n">scaledsp</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">scorer</span><span class="p">)</span>
+            <span class="k">print</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&#39;ln -s &#39;</span><span class="o">+</span><span class="n">ssp</span><span class="o">.</span><span class="n">ssppath</span><span class="o">+</span><span class="s">&#39;.hdf5 &#39;</span><span class="o">+</span><span class="n">ssp</span><span class="o">.</span><span class="n">sspname</span><span class="o">+</span><span class="s">&#39;.hdf5&#39;</span><span class="p">)</span>
+    <span class="k">print</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&#39;cp ~/Dropbox/Code/calc_score.py ./&#39;</span><span class="p">)</span>
+    
+
+
+    
+<span class="k">def</span> <span class="nf">sameobjectIn2list</span><span class="p">(</span><span class="n">list1</span><span class="p">,</span><span class="n">list2</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">item1</span> <span class="ow">in</span> <span class="n">list1</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">item2</span> <span class="ow">in</span> <span class="n">list2</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">item1</span> <span class="ow">is</span> <span class="n">item2</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">return</span> <span class="bp">False</span>
+    
+<span class="k">def</span> <span class="nf">findsameobjectkeys</span><span class="p">(</span><span class="n">d</span><span class="p">,</span><span class="n">list2</span><span class="p">):</span>
+    <span class="c"># find the keys in d, whose values are the same objects in list2</span>
+    <span class="n">kl</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">il</span><span class="o">=</span><span class="p">[]</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">d</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">list2</span><span class="p">)):</span>
+            <span class="n">item2</span><span class="o">=</span><span class="n">list2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">d</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="ow">is</span> <span class="n">item2</span><span class="p">:</span>
+                <span class="c">#print &quot;same key &quot; +str(key)+&#39; value &#39;+str(d[key])</span>
+                <span class="n">kl</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+                <span class="n">il</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">kl</span><span class="p">,</span><span class="n">il</span><span class="p">]</span>
+    
+<span class="k">def</span> <span class="nf">convert2float</span><span class="p">(</span><span class="n">l</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">)):</span>
+        <span class="n">l</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        
+<span class="k">def</span> <span class="nf">checknodememory</span><span class="p">(</span><span class="n">taskid</span><span class="p">):</span>
+    <span class="n">fl</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s">&#39;./&#39;</span><span class="p">)</span>
+    <span class="n">fl</span><span class="o">=</span><span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fl</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;s.&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">taskid</span><span class="p">))]</span>
+    <span class="n">runsonsamenode</span>
+    
+<span class="k">def</span> <span class="nf">get_system_freemem</span><span class="p">():</span>
+    <span class="n">process</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="s">&quot;free -m | grep buffers/cache&quot;</span><span class="p">,</span>
+                                        <span class="n">shell</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                                        <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                                        <span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">process</span><span class="o">.</span><span class="n">communicate</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">3</span><span class="p">]</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+    
+<span class="k">def</span> <span class="nf">get_starting_jobs</span><span class="p">():</span>
+    <span class="n">fl</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">runenv</span><span class="o">.</span><span class="n">serverUserPath</span><span class="o">+</span><span class="s">&#39;runstatus/&#39;</span><span class="p">)</span>
+    <span class="n">fl</span><span class="o">=</span><span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fl</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">hcn</span><span class="o">+</span><span class="s">&#39;#&#39;</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">fl</span>
+
+<span class="k">def</span> <span class="nf">squeeze_indexlist</span><span class="p">(</span><span class="n">indexlist</span><span class="p">):</span>
+    <span class="n">nindexlist</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">cp</span><span class="o">=</span><span class="mi">0</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">indexlist</span><span class="p">:</span>
+        <span class="n">nindexlist</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">cp</span><span class="p">,</span><span class="n">cp</span><span class="o">+</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+        <span class="n">cp</span><span class="o">=</span><span class="n">nindexlist</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">nindexlist</span>
+
+<span class="k">def</span> <span class="nf">load_scorer</span><span class="p">(</span><span class="n">originalscorer</span><span class="p">,</span><span class="n">indexlen</span><span class="p">):</span>
+    <span class="k">print</span> <span class="s">&quot;loading scorer&quot;</span>
+    <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+    <span class="n">mp</span><span class="o">=</span><span class="n">mypickle</span><span class="p">()</span>
+    <span class="n">scorer</span><span class="o">=</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">originalscorer</span><span class="p">)</span>
+    <span class="n">mp</span><span class="o">.</span><span class="n">indexlen</span><span class="o">=</span><span class="n">indexlen</span>
+    <span class="n">mp</span><span class="o">.</span><span class="n">indexlist</span><span class="o">=</span><span class="n">scorer</span><span class="o">.</span><span class="n">dsss</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">indexlist</span>
+    <span class="n">mp</span><span class="o">.</span><span class="n">loadnparray</span><span class="p">(</span><span class="n">scorer</span><span class="p">)</span> <span class="c">#load only revelent part of the array</span>
+    <span class="n">scorer</span><span class="o">.</span><span class="n">relink_scorearray</span><span class="p">()</span>
+    <span class="n">scorer</span><span class="o">.</span><span class="n">dsss</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">indexlist</span><span class="o">=</span><span class="n">squeeze_indexlist</span><span class="p">(</span><span class="n">originalscorer</span><span class="o">.</span><span class="n">dsss</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">indexlist</span><span class="p">)</span>
+    <span class="c">#intialize the scorer for parallel job if specified. Get scorer list.</span>
+    <span class="n">scorer</span><span class="o">.</span><span class="n">singlescorerlist</span><span class="o">=</span><span class="n">scorer</span><span class="o">.</span><span class="n">get_ds_list</span><span class="p">()</span>
+    <span class="c">#pdb.set_trace()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">scorer</span><span class="o">.</span><span class="n">loadfilter</span><span class="o">!=</span><span class="bp">None</span><span class="p">:</span>
+            <span class="n">scorer</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">scorer</span><span class="o">.</span><span class="n">loadfilter</span><span class="p">)</span>
+        <span class="n">scorer</span><span class="o">.</span><span class="n">loadfilter</span><span class="o">=</span><span class="bp">None</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">return</span> <span class="n">scorer</span>
+
+<span class="k">class</span> <span class="nc">Mymodel</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">select_loop_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">loops</span><span class="p">):</span>
+        <span class="n">s</span><span class="o">=</span><span class="n">selection</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">loops</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="nb">list</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_loop2selection</span><span class="p">(</span><span class="n">loops</span><span class="p">,</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">loop</span> <span class="ow">in</span> <span class="n">loops</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_loop2selection</span><span class="p">(</span><span class="n">loop</span><span class="p">,</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">s</span>
+   
+    <span class="k">def</span> <span class="nf">add_loop2selection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">loop</span><span class="p">,</span><span class="n">s</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">loop</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="s">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">loop</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">selection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">residue_range</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">loop</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">+</span><span class="s">&#39;:&#39;</span><span class="o">+</span><span class="n">loop</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="nb">str</span><span class="p">(</span><span class="n">loop</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span><span class="o">+</span><span class="s">&#39;:&#39;</span><span class="o">+</span><span class="n">loop</span><span class="p">[</span><span class="mi">0</span><span class="p">])))</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">lind</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">loop</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">+</span><span class="s">&#39;:&#39;</span><span class="o">+</span><span class="n">loop</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">index</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">selection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="n">lind</span><span class="p">:(</span><span class="n">lind</span><span class="o">+</span><span class="n">loop</span><span class="p">[</span><span class="mi">1</span><span class="p">])]))</span>    
+    
+    <span class="k">def</span> <span class="nf">load_model_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">nativef</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">nativef</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span><span class="o">==</span><span class="s">&#39;gz&#39;</span><span class="p">:</span>
+            <span class="n">fh</span><span class="o">=</span><span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">nativef</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fh</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="n">nativef</span><span class="p">)</span>
+        <span class="n">fhc</span><span class="o">=</span><span class="n">fh</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fname</span><span class="o">=</span><span class="n">nativef</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atomlines</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\\</span><span class="s">n(ATOM.*)&#39;</span><span class="p">,</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">+</span><span class="n">fhc</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hetatomlines</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\\</span><span class="s">n(HETATM.*)&#39;</span><span class="p">,</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">+</span><span class="n">fhc</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gen_atomlist</span><span class="p">()</span>
+        
+    <span class="k">def</span> <span class="nf">gen_atomlist</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span><span class="c">#[chainname,residue number,residue name,atom name, alternative indicator, x,y,x,occupancy, B-factor, elem symbol, charge,index]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atomlist</span><span class="o">=</span><span class="p">[]</span>
+        <span class="n">k</span><span class="o">=-</span><span class="mi">1</span>
+        <span class="k">for</span> <span class="n">atomline</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atomlines</span><span class="p">:</span>
+            <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span>
+            <span class="n">atompars</span><span class="o">=</span><span class="p">[</span><span class="n">atomline</span><span class="p">[</span><span class="mi">21</span><span class="p">],</span><span class="nb">int</span><span class="p">(</span><span class="n">atomline</span><span class="p">[</span><span class="mi">22</span><span class="p">:</span><span class="mi">26</span><span class="p">]),</span><span class="n">atomline</span><span class="p">[</span><span class="mi">17</span><span class="p">:</span><span class="mi">20</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span><span class="n">atomline</span><span class="p">[</span><span class="mi">12</span><span class="p">:</span><span class="mi">16</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span><span class="n">atomline</span><span class="p">[</span><span class="mi">16</span><span class="p">],</span> <span class="nb">float</span><span class="p">(</span><span class="n">atomline</span><span class="p">[</span><span class="mi">30</span><span class="p">:</span><span class="mi">38</span><span class="p">]),</span><span class="nb">float</span><span class="p">(</span><span class="n">atomline</span><span class="p">[</span><span class="mi">38</span><span class="p">:</span><span class="mi">46</span><span class="p">]),</span><span class="nb">float</span><span class="p">(</span><span class="n">atomline</span><span class="p">[</span><span class="mi">46</span><span class="p">:</span><span class="mi">54</span><span class="p">]),</span><span class="nb">float</span><span class="p">(</span><span class="n">atomline</span><span class="p">[</span><span class="mi">54</span><span class="p">:</span><span class="mi">60</span><span class="p">]),</span><span class="nb">float</span><span class="p">(</span><span class="n">atomline</span><span class="p">[</span><span class="mi">60</span><span class="p">:</span><span class="mi">66</span><span class="p">]),</span><span class="n">k</span><span class="p">]</span>
+            <span class="c">#if len(atomline)&gt;=80:</span>
+            <span class="c">#        atompars.append(atomline[76:78].strip())</span>
+            <span class="c">#        atompars.append((atomline[78:80]))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">atomlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atompars</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atomlist</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span> <span class="c">#sort the atom file by the chainids and the residue numbers, because some of the pdb files is messed up.</span>
+        <span class="n">newatomlines</span><span class="o">=</span><span class="p">[]</span>
+        <span class="k">for</span> <span class="n">atompars</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atomlist</span><span class="p">:</span>
+            <span class="n">newatomlines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atomlines</span><span class="p">[</span><span class="n">atompars</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atomlines</span><span class="o">=</span><span class="n">newatomlines</span>
+    
+    <span class="k">def</span> <span class="nf">gen_chainlist</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="c">#get the chain name and pos [chain name, chainstartpos,chainendpos, [[residuename,residue num, residue startpos, residue endpos]...]]</span>
+        <span class="n">currentchain</span><span class="o">=</span><span class="s">&#39;&#39;</span>
+        <span class="n">chainlist</span><span class="o">=</span><span class="p">[]</span>
+        <span class="n">currentresidue</span><span class="o">=</span><span class="s">&#39;&#39;</span>
+        <span class="n">residuelist</span><span class="o">=</span><span class="p">[]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">k</span><span class="o">=-</span><span class="mi">1</span>
+            <span class="k">for</span> <span class="n">atompars</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atomlist</span><span class="p">:</span>
+                <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span>
+                <span class="k">if</span> <span class="n">atompars</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">!=</span><span class="n">currentchain</span><span class="p">:</span>
+                    <span class="n">currentchain</span><span class="o">=</span><span class="n">atompars</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">chainlist</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">atompars</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">k</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">chainlist</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
+                        <span class="n">chainlist</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+                        <span class="n">chainlist</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">residuelist</span><span class="p">)</span>
+                        <span class="n">chainlist</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">][</span><span class="mi">3</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+                        <span class="n">residuelist</span><span class="o">=</span><span class="p">[]</span>
+                <span class="k">if</span> <span class="n">atompars</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">!=</span><span class="n">currentresidue</span><span class="p">:</span>
+                    <span class="n">currentresidue</span><span class="o">=</span><span class="n">atompars</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">residuelist</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">atompars</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="n">atompars</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">k</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">residuelist</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
+                        <span class="n">residuelist</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">chainlist</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+            <span class="n">chainlist</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">residuelist</span><span class="p">)</span>
+            <span class="n">chainlist</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">3</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span><span class="n">e</span><span class="p">:</span>
+            <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
+            <span class="n">pdb</span><span class="o">.</span><span class="n">set_trace</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chainlist</span><span class="o">=</span><span class="n">chainlist</span>
+                
+    <span class="k">def</span> <span class="nf">gen_atomindexdict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">atomindexdict</span><span class="o">=</span><span class="p">{}</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atomlist</span><span class="p">)):</span>
+            <span class="n">atompars</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">atomlist</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+            <span class="n">atomid</span><span class="o">=</span><span class="n">atompars</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">atompars</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">+</span><span class="n">atompars</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">+</span><span class="n">atompars</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+            <span class="n">atomindexdict</span><span class="p">[</span><span class="n">atompars</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">atompars</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">+</span><span class="n">atompars</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">+</span><span class="n">atompars</span><span class="p">[</span><span class="mi">3</span><span class="p">]]</span><span class="o">=</span><span class="n">k</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atomindexdict</span><span class="o">=</span><span class="n">atomindexdict</span>
+            
+    <span class="k">def</span> <span class="nf">only_std_residue_heavy_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">resatoms</span><span class="o">=</span><span class="n">get_residues_atoms</span><span class="p">()</span>
+        <span class="n">atomlines</span><span class="o">=</span><span class="p">[]</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atomlist</span><span class="p">)):</span>
+            <span class="n">atompars</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">atomlist</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">atompars</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">resatoms</span><span class="p">[</span><span class="s">&#39;resname3&#39;</span><span class="p">])</span> <span class="ow">and</span> <span class="n">atompars</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">resatoms</span><span class="p">[</span><span class="s">&#39;resatomdict&#39;</span><span class="p">][</span><span class="n">atompars</span><span class="p">[</span><span class="mi">2</span><span class="p">]]):</span>
+                <span class="n">atomlines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atomlines</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atomlines</span><span class="o">=</span><span class="n">atomlines</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gen_atomlist</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gen_chainlist</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gen_atomindexdict</span><span class="p">()</span>
+    
+    <span class="k">def</span> <span class="nf">transfer_model_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">mdl2</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gen_atomindexdict</span><span class="p">()</span>
+        <span class="n">mdl2</span><span class="o">.</span><span class="n">gen_atomindexdict</span><span class="p">()</span>
+        <span class="c">#copy mdl2 atoms into model 1</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">mdl2</span><span class="o">.</span><span class="n">atomindexdict</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">atomlines</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">atomindexdict</span><span class="p">[</span><span class="n">key</span><span class="p">]]</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">atomlines</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">atomindexdict</span><span class="p">[</span><span class="n">key</span><span class="p">]][</span><span class="mi">0</span><span class="p">:</span><span class="mi">11</span><span class="p">]</span><span class="o">+</span><span class="n">mdl2</span><span class="o">.</span><span class="n">atomlines</span><span class="p">[</span><span class="n">mdl2</span><span class="o">.</span><span class="n">atomindexdict</span><span class="p">[</span><span class="n">key</span><span class="p">]][</span><span class="mi">11</span><span class="p">:]</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">pdb</span><span class="o">.</span><span class="n">set_trace</span><span class="p">()</span>
+        
+    <span class="k">def</span> <span class="nf">transfer_residues</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mdl2</span><span class="p">,</span><span class="n">chain</span><span class="p">,</span> <span class="n">residuerange</span><span class="p">):</span>
+        <span class="c">#copy coordinates in the residuerange from mdl2 to current model</span>
+        <span class="n">selfstartpos</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_residue_index</span><span class="p">(</span><span class="n">chain</span><span class="p">,</span><span class="n">residuerange</span><span class="p">[</span><span class="mi">0</span><span class="p">])[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">selfendpos</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_residue_index</span><span class="p">(</span><span class="n">chain</span><span class="p">,</span><span class="n">residuerange</span><span class="p">[</span><span class="mi">1</span><span class="p">])[</span><span class="mi">3</span><span class="p">]</span>
+        <span class="n">mdl2startpos</span><span class="o">=</span><span class="n">mdl2</span><span class="o">.</span><span class="n">get_residue_index</span><span class="p">(</span><span class="n">chain</span><span class="p">,</span><span class="n">residuerange</span><span class="p">[</span><span class="mi">0</span><span class="p">])[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">mdl2endpos</span><span class="o">=</span><span class="n">mdl2</span><span class="o">.</span><span class="n">get_residue_index</span><span class="p">(</span><span class="n">chain</span><span class="p">,</span><span class="n">residuerange</span><span class="p">[</span><span class="mi">1</span><span class="p">])[</span><span class="mi">3</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atomlines</span><span class="p">[</span><span class="n">selfstartpos</span><span class="p">:</span><span class="n">selfendpos</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="n">mdl2</span><span class="o">.</span><span class="n">atomlines</span><span class="p">[</span><span class="n">mdl2startpos</span><span class="p">:</span><span class="n">mdl2endpos</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gen_atomlist</span><span class="p">()</span>
+        
+    <span class="k">def</span> <span class="nf">save_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">filename</span><span class="p">):</span>
+        <span class="n">fh</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="s">&#39;w&#39;</span><span class="p">)</span>
+        <span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atomlines</span><span class="p">))</span>
+        <span class="n">fh</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    
+    <span class="k">def</span> <span class="nf">get_residue_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">chainid</span><span class="p">,</span><span class="n">residuenum</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chainlist</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">!=</span><span class="n">chainid</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">item</span><span class="p">[</span><span class="mi">3</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">residuenum</span><span class="o">==</span><span class="n">res</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                    <span class="k">return</span> <span class="n">res</span>
+
+    <span class="k">def</span> <span class="nf">copy_native</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">code</span><span class="p">,</span><span class="n">tdir</span><span class="p">):</span>
+        <span class="n">code</span><span class="o">=</span><span class="n">code</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">print</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&#39;cp &#39;</span><span class="o">+</span><span class="n">runenv</span><span class="o">.</span><span class="n">opdbdir</span><span class="o">+</span><span class="n">code</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span><span class="o">+</span><span class="s">&#39;/pdb&#39;</span><span class="o">+</span><span class="n">code</span><span class="o">+</span><span class="s">&#39;.ent.gz &#39;</span><span class="o">+</span><span class="n">tdir</span><span class="p">)</span>
+        <span class="k">print</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&#39;gunzip &#39;</span><span class="o">+</span><span class="n">tdir</span><span class="o">+</span><span class="s">&#39;pdb&#39;</span><span class="o">+</span><span class="n">code</span><span class="o">+</span><span class="s">&#39;.ent.gz &#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">clash_contact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">code</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="s">&#39;clashtemp&#39;</span><span class="p">):</span>
+            <span class="k">print</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&#39;rm -r clashtemp&#39;</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="s">&#39;clashtemp&#39;</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="s">&#39;clashtemp&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">copy_native</span><span class="p">(</span><span class="n">code</span><span class="p">,</span><span class="s">&#39;./&#39;</span><span class="p">)</span>
+        <span class="k">print</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&#39;cp ~/Dropbox/Code/crystal_contacts.py ./&#39;</span><span class="p">)</span>
+        <span class="k">print</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&#39;chimera --nogui crystal_contacts.py&#39;</span><span class="p">)</span>
+        <span class="n">fh</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="s">&#39;selfclash&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">scs</span><span class="o">=</span><span class="n">fh</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">fh</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">fh</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="s">&#39;otherclash&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">ocs</span><span class="o">=</span><span class="n">fh</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">fh</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">fh</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="s">&#39;othercontact&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">octs</span><span class="o">=</span><span class="n">fh</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">fh</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">clashlist</span><span class="o">=</span><span class="p">[]</span>
+        <span class="n">contactlist</span><span class="o">=</span><span class="p">[]</span>
+        <span class="n">rep</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&#39;#([0-9]+) ([A-Z]{3}) ([0-9]+)\.([A-Z]{1}) ([A-Z0-9\.</span><span class="se">\&#39;</span><span class="s">]+)\s* #([0-9]+) ([A-Z]{3}) ([0-9]+)\.([A-Z]{1}) ([A-Z0-9\.</span><span class="se">\&#39;</span><span class="s">]+)\s* ([0-9\-\.]+)\s* ([0-9\-\.]+)&#39;</span><span class="p">)</span>
+        <span class="n">allcontacts</span><span class="o">=</span><span class="n">rep</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">octs</span><span class="p">)</span>
+        <span class="n">allclashes</span><span class="o">=</span><span class="n">rep</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">scs</span><span class="p">)</span><span class="o">+</span><span class="n">rep</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">ocs</span><span class="p">)</span>
+        <span class="n">clashlist</span><span class="o">=</span><span class="p">[]</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">allclashes</span><span class="p">:</span>
+            <span class="n">clashlist</span><span class="o">.</span><span class="n">append</span><span class="p">([[</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">item</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span><span class="n">item</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">item</span><span class="p">[</span><span class="mi">4</span><span class="p">]],[</span><span class="n">item</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span><span class="n">item</span><span class="p">[</span><span class="mi">8</span><span class="p">],</span><span class="n">item</span><span class="p">[</span><span class="mi">7</span><span class="p">],</span><span class="n">item</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span><span class="n">item</span><span class="p">[</span><span class="mi">9</span><span class="p">]],</span><span class="n">item</span><span class="p">[</span><span class="mi">10</span><span class="p">],</span><span class="n">item</span><span class="p">[</span><span class="mi">11</span><span class="p">]])</span>
+        <span class="n">contactlist</span><span class="o">=</span><span class="p">[]</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">allcontacts</span><span class="p">:</span>
+            <span class="n">contactlist</span><span class="o">.</span><span class="n">append</span><span class="p">([[</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">item</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span><span class="n">item</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">item</span><span class="p">[</span><span class="mi">4</span><span class="p">]],[</span><span class="n">item</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span><span class="n">item</span><span class="p">[</span><span class="mi">8</span><span class="p">],</span><span class="n">item</span><span class="p">[</span><span class="mi">7</span><span class="p">],</span><span class="n">item</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span><span class="n">item</span><span class="p">[</span><span class="mi">9</span><span class="p">]],</span><span class="n">item</span><span class="p">[</span><span class="mi">10</span><span class="p">],</span><span class="n">item</span><span class="p">[</span><span class="mi">11</span><span class="p">]])</span> 
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="s">&#39;..&#39;</span><span class="p">)</span>
+        <span class="k">print</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&#39;rm -r clashtemp&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">clashlist</span><span class="p">,</span><span class="n">contactlist</span>
+
+    <span class="k">def</span> <span class="nf">select</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">loops</span><span class="p">):</span>
+        <span class="n">s</span><span class="o">=</span><span class="n">selection</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">loop</span> <span class="ow">in</span> <span class="n">loops</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">selection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">residue_range</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">loop</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">+</span><span class="s">&#39;:&#39;</span><span class="o">+</span><span class="n">loop</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="nb">str</span><span class="p">(</span><span class="n">loop</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span><span class="o">+</span><span class="s">&#39;:&#39;</span><span class="o">+</span><span class="n">loop</span><span class="p">[</span><span class="mi">0</span><span class="p">])))</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">lind</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">loop</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">+</span><span class="s">&#39;:&#39;</span><span class="o">+</span><span class="n">loop</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">index</span>
+                <span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">selection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="n">lind</span><span class="p">:(</span><span class="n">lind</span><span class="o">+</span><span class="n">loop</span><span class="p">[</span><span class="mi">1</span><span class="p">])]))</span>
+        <span class="k">return</span> <span class="n">s</span>
+    
+    <span class="k">def</span> <span class="nf">get_residues</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">loops</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">loop</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">lnum</span><span class="p">)</span> <span class="k">for</span> <span class="n">loop</span> <span class="ow">in</span> <span class="n">loops</span> <span class="k">for</span> <span class="n">lnum</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">loop</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="n">loop</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span>
+    
+    <span class="k">def</span> <span class="nf">has_nonstd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">loops</span><span class="p">):</span>
+        <span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">loops</span><span class="p">)</span>
+        <span class="n">l</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_residues</span><span class="p">(</span><span class="n">loops</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">residue</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">s</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">has_clash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">loops</span><span class="p">,</span><span class="n">code</span><span class="p">):</span>
+        <span class="n">clash</span><span class="p">,</span><span class="n">_</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">clash_contact</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+        <span class="n">loopres</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_residues</span><span class="p">(</span><span class="n">loops</span><span class="p">)</span>
+        <span class="n">clashlist</span><span class="o">=</span><span class="p">[]</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">clash</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="s">&#39;0&#39;</span><span class="p">:</span>
+                <span class="n">clashlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="s">&#39;0&#39;</span><span class="p">:</span>
+                <span class="n">clashlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">rl</span><span class="o">=</span><span class="p">[]</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">clashlist</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">loopres</span><span class="p">:</span>
+                <span class="k">print</span> <span class="s">&#39;clash with &#39;</span><span class="o">+</span><span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">item</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;  &#39;</span>
+                <span class="n">rl</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;clash with &#39;</span><span class="o">+</span><span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">item</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;  &#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">rl</span>
+    
+     
+
+    <span class="k">def</span> <span class="nf">gen_base_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">chain</span><span class="p">,</span><span class="n">residuerange</span><span class="p">,</span><span class="n">basefilename</span><span class="p">,</span><span class="n">othername</span><span class="p">):</span>
+        <span class="n">selfstartpos</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_residue_index</span><span class="p">(</span><span class="n">chain</span><span class="p">,</span><span class="n">residuerange</span><span class="p">[</span><span class="mi">0</span><span class="p">])[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">selfendpos</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_residue_index</span><span class="p">(</span><span class="n">chain</span><span class="p">,</span><span class="n">residuerange</span><span class="p">[</span><span class="mi">1</span><span class="p">])[</span><span class="mi">3</span><span class="p">]</span>
+        <span class="n">otheratomlines</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">atomlines</span><span class="p">[</span><span class="n">selfstartpos</span><span class="p">:</span><span class="n">selfendpos</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atomlines</span><span class="p">[</span><span class="n">selfstartpos</span><span class="p">]</span><span class="o">=</span><span class="s">&#39;replacethis&#39;</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">selfendpos</span><span class="p">,</span><span class="n">selfstartpos</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">atomlines</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_model</span><span class="p">(</span><span class="n">basefilename</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atomlines</span><span class="o">=</span><span class="n">otheratomlines</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_model</span><span class="p">(</span><span class="n">othername</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gen_atomlist</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">load_pickle</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+
+
+
+<span class="k">class</span> <span class="nc">MemoryMonitor</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create new MemoryMonitor instance.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mul</span><span class="o">=</span><span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">usage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return int containing memory used by user&#39;s processes.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="s">&quot;ps -aux | grep &quot;</span><span class="o">+</span><span class="n">name</span><span class="p">,</span>
+                                        <span class="n">shell</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                                        <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                                        <span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">mm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">communicate</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">5</span><span class="p">]</span>
+        <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">mm</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mm</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">monitor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="n">fn</span><span class="o">=</span><span class="s">&#39;mlog&#39;</span><span class="p">):</span>
+        <span class="n">fh</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span><span class="s">&#39;a+&#39;</span><span class="p">)</span>
+        <span class="n">mu</span><span class="o">=</span><span class="mi">11</span>
+        <span class="k">while</span> <span class="n">mu</span><span class="o">&gt;</span><span class="mi">10</span><span class="p">:</span>
+            <span class="n">mu</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">usage</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mul</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mu</span><span class="p">)</span>
+            <span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">mu</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+            <span class="n">fh</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+        <span class="n">fh</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">SOAP 0.1 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Guangqiang Dong.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,455 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>refineScores &mdash; SOAP 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="SOAP 0.1 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">SOAP 0.1 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for refineScores</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">   SOAP RefineScore module </span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">env</span> <span class="kn">import</span> <span class="o">*</span>
+
+    
+<span class="k">class</span> <span class="nc">sprefinescore</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">dslist</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span><span class="n">bm</span><span class="o">=</span><span class="s">&#39;fast&#39;</span><span class="p">,</span><span class="n">criteria</span><span class="o">=</span><span class="s">&#39;bestrmsd&#39;</span><span class="p">,</span><span class="n">pn</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="k">if</span> <span class="n">spmodel</span><span class="p">:</span> <span class="c">#needfix???</span>
+            <span class="k">if</span> <span class="n">spmodel</span><span class="p">[</span><span class="s">&#39;scoretype&#39;</span><span class="p">]</span><span class="o">!=</span><span class="s">&#39;sprefine&#39;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;You can not call sprefinescore with this type of model, wrong data type&#39;</span><span class="p">)</span>
+            <span class="n">bm</span><span class="o">=</span><span class="n">spmodel</span><span class="p">[</span><span class="s">&#39;bm&#39;</span><span class="p">]</span>
+            <span class="n">dslist</span><span class="o">=</span><span class="n">model</span><span class="p">[</span><span class="s">&#39;dslist&#39;</span><span class="p">]</span>
+            <span class="n">criteria</span><span class="o">=</span><span class="n">model</span><span class="p">[</span><span class="s">&#39;criteria&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bm</span><span class="o">=</span><span class="n">bm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dslist</span><span class="o">=</span><span class="n">dslist</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">criteria</span><span class="o">=</span><span class="n">criteria</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">codelist</span><span class="o">=</span><span class="n">decoysets</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dslist</span><span class="p">)</span><span class="o">.</span><span class="n">get_nativelist</span><span class="p">()</span>
+        
+    <span class="k">def</span> <span class="nf">get_refprotein_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+    
+    <span class="k">def</span> <span class="nf">get_ds_part</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+    
+    <span class="k">def</span> <span class="nf">prepare_task_input</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dir</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&#39;rm -r &#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">scorename</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scorename</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dir</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">scorename</span><span class="p">)</span>
+        <span class="n">nors</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">codelist</span><span class="p">)</span>
+        <span class="c">#write the input list for different runs</span>
+        <span class="n">inputlist</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="s">&#39;inputlist&#39;</span><span class="p">,</span><span class="s">&#39;w&#39;</span><span class="p">)</span>
+        <span class="n">inputlist</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;runme.py&#39;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">nors</span><span class="o">+</span><span class="mi">1</span><span class="p">)]))</span>
+        <span class="n">inputlist</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="c">#copy scripts to this rundir</span>
+        <span class="c">#generate the lib file for modeller refinement</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ssp</span><span class="o">.</span><span class="n">write_lib_dist150</span><span class="p">()</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&#39;cp &#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">ssppath</span><span class="o">+</span><span class="s">&#39;.lib ./&#39;</span><span class="p">)</span>
+        <span class="c">#write the run python script file</span>
+        <span class="n">makemdt</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="s">&#39;runme.py&#39;</span><span class="p">,</span><span class="s">&#39;w&#39;</span><span class="p">)</span>
+        <span class="n">makemdt</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;from SOAP import *</span><span class="se">\n</span><span class="s">import sys </span><span class="se">\n</span><span class="s"> </span><span class="se">\n</span><span class="s">rsp=rawsp(e,</span><span class="se">\&#39;</span><span class="s">&#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">pdbset</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\&#39;</span><span class="s">,</span><span class="se">\&#39;</span><span class="s">&#39;</span>
+                      <span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\&#39;</span><span class="s">,</span><span class="se">\&#39;</span><span class="s">&#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">genmethod</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\&#39;</span><span class="s">)</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">+</span><span class="s">&#39;ssp=scaledsp(e,</span><span class="se">\&#39;</span><span class="s">&#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">pm</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\&#39;</span><span class="s">,rsp)</span><span class="se">\n</span><span class="s">&#39;</span>
+                      <span class="o">+</span><span class="s">&#39;so=sprefinescore(e,</span><span class="se">\&#39;</span><span class="s">&#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">refinem</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\&#39;</span><span class="s">,ssp,dslist=&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dslist</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;)</span><span class="se">\n</span><span class="s">&#39;</span>
+                      <span class="o">+</span><span class="s">&#39;so.refine(sys.argv[1])&#39;</span><span class="p">)</span>
+        <span class="n">makemdt</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+        <span class="c">#write the job submission script</span>
+        <span class="n">runmdt</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="s">&#39;runme.sh&#39;</span><span class="p">,</span><span class="s">&#39;w&#39;</span><span class="p">)</span>
+        <span class="n">submdt</span><span class="o">=</span><span class="nb">file</span><span class="p">(</span><span class="n">runenv</span><span class="o">.</span><span class="n">scriptdir</span><span class="o">+</span><span class="s">&#39;md_refine.sh&#39;</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">submdtf</span><span class="o">=</span><span class="n">submdt</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">submdtf</span><span class="o">=</span><span class="n">submdtf</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;undefinedrundir&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">scorename</span><span class="p">)</span>
+        <span class="n">submdtf</span><span class="o">=</span><span class="n">submdtf</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;tundefined&#39;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;-&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">nors</span><span class="p">))</span>
+        <span class="n">submdtf</span><span class="o">=</span><span class="n">submdtf</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;undefinedlist&#39;</span><span class="p">,</span><span class="s">&#39;(&#39;</span><span class="o">+</span><span class="s">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">codelist</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;)&#39;</span><span class="p">)</span>
+        <span class="n">runmdt</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">submdtf</span><span class="p">)</span>
+        <span class="n">runmdt</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+    
+    <span class="k">def</span> <span class="nf">process_task_output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dir</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">scorename</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">codelist</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="p">[(</span><span class="s">&#39;codeposn&#39;</span><span class="p">,</span><span class="s">&#39;i2&#39;</span><span class="p">),(</span><span class="s">&#39;nativetotalscore&#39;</span><span class="p">,</span><span class="s">&#39;f4&#39;</span><span class="p">),(</span><span class="s">&#39;nativescscore&#39;</span><span class="p">,</span><span class="s">&#39;f4&#39;</span><span class="p">)</span>
+                                              <span class="p">,(</span><span class="s">&#39;nativespscore&#39;</span><span class="p">,</span><span class="s">&#39;f4&#39;</span><span class="p">),(</span><span class="s">&#39;decoytotalscore&#39;</span><span class="p">,</span><span class="s">&#39;f4&#39;</span><span class="p">),(</span><span class="s">&#39;decoyscscore&#39;</span><span class="p">,</span><span class="s">&#39;f4&#39;</span><span class="p">)</span>
+                                              <span class="p">,(</span><span class="s">&#39;decoyspscore&#39;</span><span class="p">,</span><span class="s">&#39;f4&#39;</span><span class="p">),(</span><span class="s">&#39;rmsd&#39;</span><span class="p">,</span><span class="s">&#39;f4&#39;</span><span class="p">)])</span>
+        <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">score</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">codelist</span><span class="p">)):</span>
+            <span class="n">code</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">codelist</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scorepath</span><span class="o">+</span><span class="s">&#39;/&#39;</span><span class="o">+</span><span class="n">code</span><span class="o">+</span><span class="s">&#39;.refine.score&#39;</span><span class="p">):</span>
+                <span class="n">fh</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scorepath</span><span class="o">+</span><span class="s">&#39;/&#39;</span><span class="o">+</span><span class="n">code</span><span class="o">+</span><span class="s">&#39;.refine.score&#39;</span><span class="p">)</span>
+                <span class="n">fc</span><span class="o">=</span><span class="n">fh</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="p">[</span><span class="s">&#39;codeposn&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="n">i</span>
+                <span class="n">rer</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">code</span><span class="o">+</span><span class="s">&#39; score: ([0-9.-]*),([0-9.-]*),([0-9.-]*)&#39;</span><span class="p">,</span><span class="n">fc</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="p">[</span><span class="s">&#39;nativetotalscore&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">rer</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="p">[</span><span class="s">&#39;nativescscore&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">rer</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="p">[</span><span class="s">&#39;nativespscore&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">rer</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+                <span class="n">rer</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">code</span><span class="o">+</span><span class="s">&#39;.refine.pdb score: ([0-9.-]*),([0-9.-]*),([0-9.-]*)&#39;</span><span class="p">,</span><span class="n">fc</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="p">[</span><span class="s">&#39;decoytotalscore&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">rer</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="p">[</span><span class="s">&#39;decoyscscore&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">rer</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="p">[</span><span class="s">&#39;decoyspscore&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">rer</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+                <span class="n">rer</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">&#39;armsd ([0-9.]*)&#39;</span><span class="p">,</span><span class="n">fc</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="p">[</span><span class="s">&#39;rmsd&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">rer</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scorestats</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="p">[(</span><span class="s">&#39;codeposn&#39;</span><span class="p">,</span><span class="s">&#39;i2&#39;</span><span class="p">),(</span><span class="s">&#39;nativetotalscore&#39;</span><span class="p">,</span><span class="s">&#39;f4&#39;</span><span class="p">),(</span><span class="s">&#39;nativescscore&#39;</span><span class="p">,</span><span class="s">&#39;f4&#39;</span><span class="p">)</span>
+                                              <span class="p">,(</span><span class="s">&#39;nativespscore&#39;</span><span class="p">,</span><span class="s">&#39;f4&#39;</span><span class="p">),(</span><span class="s">&#39;decoytotalscore&#39;</span><span class="p">,</span><span class="s">&#39;f4&#39;</span><span class="p">),(</span><span class="s">&#39;decoyscscore&#39;</span><span class="p">,</span><span class="s">&#39;f4&#39;</span><span class="p">)</span>
+                                              <span class="p">,(</span><span class="s">&#39;decoyspscore&#39;</span><span class="p">,</span><span class="s">&#39;f4&#39;</span><span class="p">),(</span><span class="s">&#39;rmsd&#39;</span><span class="p">,</span><span class="s">&#39;f4&#39;</span><span class="p">)])</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;nativetotalscore&#39;</span><span class="p">,</span><span class="s">&#39;nativescscore&#39;</span><span class="p">,</span><span class="s">&#39;nativespscore&#39;</span><span class="p">,</span><span class="s">&#39;decoytotalscore&#39;</span><span class="p">,</span><span class="s">&#39;decoyscscore&#39;</span><span class="p">,</span><span class="s">&#39;decoyspscore&#39;</span><span class="p">,</span><span class="s">&#39;rmsd&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scorestats</span><span class="p">[</span><span class="n">item</span><span class="p">]</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="p">[</span><span class="n">item</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scorestats</span><span class="p">[</span><span class="s">&#39;codeposn&#39;</span><span class="p">]</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">codelist</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">start_get_score</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prepare_task_input</span><span class="p">()</span>
+        <span class="n">sj</span><span class="o">=</span><span class="n">task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scorepath</span><span class="o">+</span><span class="s">&#39;/&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">scorename</span><span class="p">)</span>
+        <span class="n">sj</span><span class="o">.</span><span class="n">run_task_cluster</span><span class="p">()</span>
+     
+    <span class="k">def</span> <span class="nf">calc_score_cluster</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prepare_task_input</span><span class="p">()</span>
+        <span class="n">sj</span><span class="o">=</span><span class="n">task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scorepath</span><span class="o">+</span><span class="s">&#39;/&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">scorename</span><span class="p">)</span>
+        <span class="n">sj</span><span class="o">.</span><span class="n">run_task_cluster</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process_task_output</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        
+    <span class="k">def</span> <span class="nf">calc_score_local</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prepare_task_input</span><span class="p">()</span>
+        <span class="n">sj</span><span class="o">=</span><span class="n">task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scorepath</span><span class="o">+</span><span class="s">&#39;/&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">scorename</span><span class="p">)</span>
+        <span class="n">sj</span><span class="o">.</span><span class="n">run_task_local</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">refine</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">codelist</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">refine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">code</span><span class="p">):</span>
+        <span class="n">rer</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">&#39;md([0-9]+)&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">refinem</span><span class="p">)</span>
+        <span class="n">genrn</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">rer</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">genrn</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mdrefine</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">genrn</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">temps</span><span class="o">=</span><span class="p">[</span><span class="mf">300.0</span><span class="p">]</span>
+            <span class="n">samplits</span><span class="o">=</span><span class="mi">20000</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mdrefine</span><span class="p">(</span><span class="n">code</span><span class="p">,</span><span class="n">templ</span><span class="o">=</span><span class="n">temps</span><span class="p">,</span><span class="n">samplits</span><span class="o">=</span><span class="n">samplits</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">genrn</span><span class="o">==</span><span class="mi">2</span><span class="p">:</span>
+            <span class="k">print</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">mdrefine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">code</span><span class="p">,</span><span class="n">templ</span><span class="o">=</span><span class="p">[],</span><span class="n">samplits</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+	<span class="n">log</span><span class="o">.</span><span class="n">verbose</span><span class="p">()</span>	
+	<span class="n">env</span> <span class="o">=</span> <span class="n">environ</span><span class="p">()</span>
+	<span class="n">env</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">atom_files_directory</span> <span class="o">=</span> <span class="p">[</span><span class="n">runenv</span><span class="o">.</span><span class="n">ddbdir</span><span class="p">,</span><span class="s">&#39;./&#39;</span><span class="p">]</span>
+	<span class="n">env</span><span class="o">.</span><span class="n">libs</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="nb">file</span><span class="o">=</span><span class="s">&#39;$(LIB)/top_heav.lib&#39;</span><span class="p">)</span>
+	<span class="n">env</span><span class="o">.</span><span class="n">libs</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="nb">file</span><span class="o">=</span><span class="s">&#39;$(LIB)/par.lib&#39;</span><span class="p">)</span>
+	<span class="n">env</span><span class="o">.</span><span class="n">edat</span><span class="o">.</span><span class="n">contact_shell</span> <span class="o">=</span> <span class="mf">15.0</span> 
+	<span class="n">env</span><span class="o">.</span><span class="n">edat</span><span class="o">.</span><span class="n">excl_local</span><span class="o">=</span><span class="p">(</span><span class="bp">True</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+	<span class="n">env</span><span class="o">.</span><span class="n">edat</span><span class="o">.</span><span class="n">dynamic_coulomb</span> <span class="o">=</span>  <span class="bp">False</span> 
+	<span class="n">env</span><span class="o">.</span><span class="n">edat</span><span class="o">.</span><span class="n">dynamic_lennard</span> <span class="o">=</span> <span class="bp">False</span> 
+	<span class="n">env</span><span class="o">.</span><span class="n">edat</span><span class="o">.</span><span class="n">dynamic_sphere</span> <span class="o">=</span> <span class="bp">False</span>   
+	<span class="n">env</span><span class="o">.</span><span class="n">edat</span><span class="o">.</span><span class="n">dynamic_modeller</span> <span class="o">=</span> <span class="bp">True</span>	
+	<span class="n">aln</span><span class="o">=</span><span class="n">alignment</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+        <span class="n">pir</span><span class="p">(</span> <span class="n">code</span><span class="p">)</span><span class="o">.</span><span class="n">make_pir_single_forautomodel</span><span class="p">()</span>
+	<span class="n">aln</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">file</span><span class="o">=</span> <span class="n">code</span><span class="o">+</span><span class="s">&#39;.pir&#39;</span><span class="p">)</span>
+	<span class="n">mdl</span><span class="o">=</span><span class="n">automodel</span><span class="o">.</span><span class="n">automodel</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">alnfile</span><span class="o">=</span><span class="n">code</span><span class="o">+</span><span class="s">&#39;.pir&#39;</span><span class="p">,</span> <span class="n">knowns</span><span class="o">=</span><span class="n">code</span><span class="p">,</span> <span class="n">sequence</span><span class="o">=</span><span class="n">code</span><span class="o">+</span><span class="s">&#39;.refine.ini&#39;</span><span class="p">)</span>
+        <span class="n">mdl</span><span class="o">.</span><span class="n">clear_topology</span><span class="p">()</span>
+	<span class="n">mdl</span><span class="o">.</span><span class="n">generate_topology</span><span class="p">(</span><span class="n">aln</span><span class="p">[</span><span class="n">code</span><span class="o">+</span><span class="s">&#39;decoys&#39;</span><span class="p">],</span><span class="n">patch_default</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+	<span class="k">print</span> <span class="s">&quot;generating topology finished&quot;</span>
+	<span class="n">mdl</span><span class="o">.</span><span class="n">patch_ss_templates</span><span class="p">(</span><span class="n">aln</span><span class="p">)</span>
+        <span class="n">mdl</span><span class="o">.</span><span class="n">transfer_xyz</span><span class="p">(</span><span class="n">aln</span><span class="p">,</span> <span class="n">cluster_cut</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">)</span>
+	<span class="n">mdl</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="n">initialize_xyz</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">build_method</span><span class="o">=</span><span class="s">&#39;INTERNAL_COORDINATES&#39;</span><span class="p">)</span>
+        <span class="n">mdl</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">code</span><span class="o">+</span><span class="s">&#39;.refine.native.pdb&#39;</span><span class="p">)</span>
+	<span class="n">atmsel</span> <span class="o">=</span> <span class="n">selection</span><span class="p">(</span><span class="n">mdl</span><span class="p">)</span>
+	<span class="n">rsr</span> <span class="o">=</span> <span class="n">mdl</span><span class="o">.</span><span class="n">restraints</span>
+	<span class="n">rsr</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+	<span class="c">#charm restraint</span>
+	<span class="n">rsr</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="n">atmsel</span><span class="p">,</span> <span class="n">restraint_type</span><span class="o">=</span><span class="s">&#39;stereo&#39;</span><span class="p">,</span><span class="n">spline_on_site</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+	<span class="n">gprsr</span> <span class="o">=</span> <span class="n">group_restraints</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="s">&#39;$(LIB)/atmcls-mf.lib&#39;</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sspname</span><span class="o">+</span><span class="s">&#39;.lib&#39;</span><span class="p">)</span>
+	<span class="n">mdl</span><span class="o">.</span><span class="n">group_restraints</span> <span class="o">=</span> <span class="n">gprsr</span>
+	<span class="c"># Generate restraints on non standard residues:</span>
+	<span class="n">mdl</span><span class="o">.</span><span class="n">nonstd_restraints</span><span class="p">(</span><span class="n">aln</span><span class="p">)</span>	
+	<span class="c"># save restraints</span>
+	<span class="n">mdl</span><span class="o">.</span><span class="n">restraints</span><span class="o">.</span><span class="n">condense</span><span class="p">()</span>
+	<span class="n">scoref</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="n">code</span><span class="o">+</span><span class="s">&#39;.refine.score&#39;</span><span class="p">,</span><span class="s">&#39;w&#39;</span><span class="p">)</span>
+	<span class="p">(</span><span class="n">totalscore</span><span class="p">,</span><span class="n">terms</span><span class="p">)</span> <span class="o">=</span> <span class="n">atmsel</span><span class="o">.</span><span class="n">energy</span><span class="p">()</span>
+        <span class="n">stereoscore</span><span class="o">=</span><span class="n">terms</span><span class="p">[</span><span class="n">physical</span><span class="o">.</span><span class="n">bond</span><span class="p">]</span><span class="o">+</span><span class="n">terms</span><span class="p">[</span><span class="n">physical</span><span class="o">.</span><span class="n">angle</span><span class="p">]</span><span class="o">+</span><span class="n">terms</span><span class="p">[</span><span class="n">physical</span><span class="o">.</span><span class="n">dihedral</span><span class="p">]</span><span class="o">+</span><span class="n">terms</span><span class="p">[</span><span class="n">physical</span><span class="o">.</span><span class="n">improper</span><span class="p">]</span>
+	<span class="n">scoref</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">code</span><span class="o">+</span><span class="s">&#39; score: &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">totalscore</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;,&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">stereoscore</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;,&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">terms</span><span class="p">[</span><span class="n">physical</span><span class="o">.</span><span class="n">nonbond_spline</span><span class="p">])</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">timestep</span><span class="o">=</span><span class="mf">10.0</span>           
+        <span class="n">equil_its</span><span class="o">=</span><span class="mi">200</span>
+        <span class="n">equil_equil</span><span class="o">=</span><span class="mi">20</span>
+        <span class="n">equil_temps</span><span class="o">=</span><span class="p">(</span><span class="mf">150.0</span><span class="p">,</span> <span class="mf">250.0</span><span class="p">,</span> <span class="mf">400.0</span><span class="p">,</span> <span class="mf">700.0</span><span class="p">,</span> <span class="mf">1000.0</span><span class="p">,</span><span class="mf">1500.0</span><span class="p">)</span>
+        <span class="n">sampl_its</span><span class="o">=</span><span class="mi">2000</span>
+        <span class="n">sampl_equil</span><span class="o">=</span><span class="mi">200</span>
+        <span class="n">sampl_temps</span><span class="o">=</span><span class="p">(</span><span class="mf">1500.0</span><span class="p">,</span><span class="mf">1000.0</span><span class="p">,</span> <span class="mf">800.0</span><span class="p">,</span> <span class="mf">600.0</span><span class="p">,</span> <span class="mf">500.0</span><span class="p">,</span> <span class="mf">430.0</span><span class="p">,</span> <span class="mf">370.0</span><span class="p">,</span> <span class="mf">320.0</span><span class="p">,</span> <span class="mf">300.0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">timestep</span><span class="p">:</span>
+            <span class="n">teimstep</span><span class="o">=</span><span class="n">step</span>
+        <span class="k">if</span> <span class="n">templ</span><span class="p">:</span>
+            <span class="n">equil_temps</span><span class="o">=</span><span class="n">templ</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+            <span class="n">sampl_temps</span><span class="o">=</span><span class="n">templ</span>
+        <span class="k">if</span> <span class="n">samplits</span><span class="p">:</span>
+            <span class="n">sampl_its</span><span class="o">=</span><span class="n">samplits</span>
+        <span class="n">md</span> <span class="o">=</span> <span class="n">optimizers</span><span class="o">.</span><span class="n">molecular_dynamics</span><span class="p">(</span><span class="n">cap_atom_shift</span><span class="o">=</span><span class="mf">0.39</span><span class="p">,</span> <span class="n">md_time_step</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span><span class="n">md_return</span><span class="o">=</span><span class="s">&#39;FINAL&#39;</span><span class="p">)</span>
+        <span class="n">init_vel</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="c"># First run for equilibration, the second for sampling:</span>
+        <span class="k">print</span> <span class="s">&#39;starting refinement&#39;</span>
+        <span class="n">k</span><span class="o">=</span><span class="mi">0</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">its</span><span class="p">,</span> <span class="n">equil</span><span class="p">,</span> <span class="n">temps</span><span class="p">)</span> <span class="ow">in</span> <span class="p">((</span><span class="n">equil_its</span><span class="p">,</span> <span class="n">equil_equil</span><span class="p">,</span> <span class="n">equil_temps</span><span class="p">),(</span><span class="n">sampl_its</span><span class="p">,</span> <span class="n">sampl_equil</span><span class="p">,</span> <span class="n">sampl_temps</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">temp</span> <span class="ow">in</span> <span class="n">temps</span><span class="p">:</span>
+                <span class="k">print</span> <span class="n">temp</span>
+                <span class="n">md</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">atmsel</span><span class="p">,</span> <span class="n">max_iterations</span><span class="o">=</span><span class="n">its</span><span class="p">,</span> <span class="n">equilibrate</span><span class="o">=</span><span class="n">equil</span><span class="p">,</span><span class="n">temperature</span><span class="o">=</span><span class="n">temp</span><span class="p">,</span> <span class="n">init_velocities</span><span class="o">=</span><span class="n">init_vel</span><span class="p">,</span>
+                            <span class="n">actions</span><span class="o">=</span><span class="p">[</span><span class="n">optimizers</span><span class="o">.</span><span class="n">actions</span><span class="o">.</span><span class="n">write_structure</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="s">&#39;md&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;.</span><span class="si">%05d</span><span class="s">.pdb&#39;</span><span class="p">,</span><span class="n">last</span><span class="o">=</span><span class="bp">True</span><span class="p">)])</span>
+                <span class="n">init_vel</span><span class="o">=</span><span class="bp">False</span>
+                <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span>
+        <span class="n">filelist</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s">&#39;./&#39;</span><span class="p">)</span>
+        <span class="n">mdfilelist</span><span class="o">=</span><span class="p">[]</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">filelist</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">item</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span><span class="o">==</span><span class="s">&#39;md&#39;</span> <span class="ow">and</span> <span class="n">item</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span><span class="o">==</span><span class="s">&#39;pdb&#39;</span><span class="p">:</span>
+                <span class="n">mdfilelist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cluster_models</span><span class="p">(</span><span class="n">mdfilelist</span><span class="p">,</span><span class="n">mdl</span><span class="p">,</span><span class="n">env</span><span class="p">,</span><span class="n">cluster_cut</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
+        <span class="n">mdl</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">code</span><span class="o">+</span><span class="s">&#39;.refine.pdb&#39;</span><span class="p">)</span>
+        <span class="n">atmstl</span><span class="o">=</span><span class="n">selection</span><span class="p">(</span><span class="n">mdl</span><span class="p">)</span>
+        <span class="p">(</span><span class="n">totalscore</span><span class="p">,</span><span class="n">terms</span><span class="p">)</span> <span class="o">=</span> <span class="n">atmsel</span><span class="o">.</span><span class="n">energy</span><span class="p">()</span>
+        <span class="n">stereoscore</span><span class="o">=</span><span class="n">terms</span><span class="p">[</span><span class="n">physical</span><span class="o">.</span><span class="n">bond</span><span class="p">]</span><span class="o">+</span><span class="n">terms</span><span class="p">[</span><span class="n">physical</span><span class="o">.</span><span class="n">angle</span><span class="p">]</span><span class="o">+</span><span class="n">terms</span><span class="p">[</span><span class="n">physical</span><span class="o">.</span><span class="n">dihedral</span><span class="p">]</span><span class="o">+</span><span class="n">terms</span><span class="p">[</span><span class="n">physical</span><span class="o">.</span><span class="n">improper</span><span class="p">]</span>
+	<span class="n">scoref</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">code</span><span class="o">+</span><span class="s">&#39;.refine.pdb score: &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">totalscore</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;,&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">stereoscore</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;,&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">terms</span><span class="p">[</span><span class="n">physical</span><span class="o">.</span><span class="n">nonbond_spline</span><span class="p">])</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+        <span class="n">mdl2</span><span class="o">=</span><span class="n">model</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+        <span class="n">mdl2</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">atmsel</span><span class="o">.</span><span class="n">superpose</span><span class="p">(</span><span class="n">mdl2</span><span class="p">,</span> <span class="n">aln</span><span class="p">)</span>
+        <span class="n">scoref</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;armsd &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">rms</span><span class="p">))</span>
+        <span class="n">scoref</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">cluster_models</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">mdfilelist</span><span class="p">,</span><span class="n">mdl</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span><span class="n">cluster_cut</span><span class="o">=</span><span class="mf">1.5</span><span class="p">):</span>
+        <span class="n">aln</span><span class="o">=</span><span class="n">alignment</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">=</span><span class="n">model</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">mf</span> <span class="ow">in</span> <span class="n">mdfilelist</span><span class="p">:</span>
+            <span class="n">m</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">mf</span><span class="p">)</span>
+            <span class="n">aln</span><span class="o">.</span><span class="n">append_model</span><span class="p">(</span><span class="n">mdl</span><span class="o">=</span><span class="n">m</span><span class="p">,</span><span class="n">align_codes</span><span class="o">=</span><span class="n">mf</span><span class="p">[:</span><span class="o">-</span><span class="mi">4</span><span class="p">],</span><span class="n">atom_files</span><span class="o">=</span><span class="n">mf</span><span class="p">[:</span><span class="o">-</span><span class="mi">4</span><span class="p">])</span>  
+        <span class="n">aln</span><span class="o">.</span><span class="n">malign3d</span><span class="p">(</span><span class="n">gap_penalties_3d</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">fit</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="n">aln</span><span class="o">.</span><span class="n">append_model</span><span class="p">(</span><span class="n">mdl</span><span class="p">,</span> <span class="n">align_codes</span><span class="o">=</span><span class="s">&#39;cluster&#39;</span><span class="p">,</span>
+                         <span class="n">atom_files</span><span class="o">=</span><span class="s">&#39;cluster.opt&#39;</span><span class="p">)</span>
+        <span class="n">mdl</span><span class="o">.</span><span class="n">transfer_xyz</span><span class="p">(</span><span class="n">aln</span><span class="p">,</span><span class="n">cluster_cut</span><span class="o">=</span><span class="n">cluster_cut</span><span class="p">)</span>
+        <span class="n">mdl</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">file</span><span class="o">=</span><span class="s">&#39;cluster.ini&#39;</span><span class="p">)</span>
+        <span class="n">atmsel</span><span class="o">=</span><span class="n">selection</span><span class="p">(</span><span class="n">mdl</span><span class="p">)</span>
+        <span class="n">cg</span> <span class="o">=</span> <span class="n">optimizers</span><span class="o">.</span><span class="n">conjugate_gradients</span><span class="p">()</span>            
+        <span class="n">cg</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">atmsel</span><span class="p">,</span> <span class="n">max_iterations</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">mdl</span><span class="o">.</span><span class="n">optimize_output</span><span class="p">,</span> <span class="n">min_atom_shift</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">refinemodel</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">decode_refinem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">refinem</span><span class="p">):</span>
+        <span class="n">rsrm</span><span class="o">=</span><span class="n">refinem</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">optm</span><span class="o">=</span><span class="n">refinem</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initialm</span><span class="o">=</span><span class="n">refinem</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">randomm</span><span class="o">=</span><span class="n">refinem</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">starting_model</span><span class="o">=</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ending_model</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">refinem</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">get_cgschedule</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+    
+    <span class="k">def</span> <span class="nf">get_mdschedule</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+    
+    <span class="k">def</span> <span class="nf">select_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Select atoms to be optimized in the model building procedure. By</span>
+<span class="sd">           default, this selects all atoms, but you can redefine this routine</span>
+<span class="sd">           to select a subset instead.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">selection</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">homcsr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exit_stage</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Construct the initial model and restraints&quot;&quot;&quot;</span>
+        <span class="c"># Check the alignment</span>
+        <span class="n">aln</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_alignment</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_alignment</span><span class="p">(</span><span class="n">aln</span><span class="p">)</span>
+
+        <span class="c"># make topology and build/read the atom coordinates:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">make_initial_model</span><span class="p">(</span><span class="n">aln</span><span class="p">)</span>
+
+        <span class="c"># exit early?</span>
+        <span class="k">if</span> <span class="n">exit_stage</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c"># make and write the stereochemical, homology, and special restraints?</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_restraints</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mkhomcsr</span><span class="p">(</span><span class="n">selection</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="n">aln</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">restraints</span><span class="o">.</span><span class="n">condense</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">restraints</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">csrfile</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">mkhomcsr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atmsel</span><span class="p">,</span> <span class="n">aln</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Construct typical comparative modeling restraints&quot;&quot;&quot;</span>
+        <span class="n">rsr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">restraints</span>
+        <span class="n">rsr</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">library_restraints</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">build_library_restraints</span><span class="p">(</span><span class="n">atmsel</span><span class="p">,</span> <span class="n">rsr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">library_restraints</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">build_charmm_restraints</span><span class="p">(</span><span class="n">atmsel</span><span class="p">,</span> <span class="n">rsr</span><span class="p">,</span> <span class="n">aln</span><span class="p">)</span>
+
+        <span class="c"># Generate homology-derived distance restraints:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">distance_restraints</span><span class="p">(</span><span class="n">atmsel</span><span class="p">,</span> <span class="n">aln</span><span class="p">)</span>
+
+        <span class="c"># Generate restraints on non standard residues:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nonstd_restraints</span><span class="p">(</span><span class="n">aln</span><span class="p">)</span>
+
+        <span class="c"># Special restraints have to be called last so that possible cis-proline</span>
+        <span class="c"># changes are reflected in the current restraints:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">special_restraints</span><span class="p">(</span><span class="n">aln</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">make_initial_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aln</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Make initial model topology and build/read the atom coordinates&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">generate_method</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aln</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">inifile</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_model_hetatm_water</span><span class="p">()</span>    
+
+    <span class="k">def</span> <span class="nf">randomize_initial_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atmsel</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get and randomize the initial structure&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">read_initial_model</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rand_method</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rand_method</span><span class="p">(</span><span class="n">atmsel</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">single_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atmsel</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Build a single optimized model from the initial model&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tracefile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_trace_file</span><span class="p">(</span><span class="n">num</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">parallel</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">read_top_par</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">create_topology</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">read_alignment</span><span class="p">())</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">randomize_initial_structure</span><span class="p">(</span><span class="n">atmsel</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">parallel</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rd_restraints</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">library_schedule</span><span class="p">,</span> <span class="s">&quot;make_for_model&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&quot;&quot;&quot;</span>
+<span class="s">library_schedule should now be a schedule object, not an integer as in</span>
+<span class="s">older versions of Modeller&quot;&quot;&quot;</span><span class="p">)</span>
+        <span class="n">sched</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">library_schedule</span><span class="o">.</span><span class="n">make_for_model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">sched</span> <span class="o">=</span> <span class="n">sched</span> <span class="o">*</span> <span class="n">runenv</span><span class="o">.</span><span class="n">schedule_scale</span>
+        <span class="n">fh</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">schfile</span><span class="p">,</span> <span class="s">&quot;w&quot;</span><span class="p">)</span>
+        <span class="n">sched</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fh</span><span class="p">)</span>
+        <span class="n">fh</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                
+    <span class="k">def</span> <span class="nf">single_model_pass</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atmsel</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">sched</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Perform a single pass of model optimization&quot;&quot;&quot;</span>
+        <span class="n">actions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_optimize_actions</span><span class="p">()</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">numstep</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sched</span><span class="p">):</span> <span class="c">#slow, normal, fast, very_fast, fastest</span>
+            <span class="n">molpdf</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">atmsel</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">optimize_output</span><span class="p">,</span>
+                                   <span class="n">max_iterations</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_var_iterations</span><span class="p">,</span>
+                                   <span class="n">actions</span><span class="o">=</span><span class="n">actions</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write_int</span><span class="p">(</span><span class="n">numstep</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">num</span><span class="p">)</span>
+            <span class="c"># Also check for molpdf being NaN (depends on Python version; on 2.3</span>
+            <span class="c"># x86 it evaluates as equal to everything; with 2.4 x86 it is</span>
+            <span class="c"># not greater or smaller than anything)</span>
+            <span class="k">if</span> <span class="n">molpdf</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_molpdf</span> \
+               <span class="ow">or</span> <span class="p">(</span><span class="n">molpdf</span> <span class="o">==</span> <span class="mf">0.</span> <span class="ow">and</span> <span class="n">molpdf</span> <span class="o">==</span> <span class="mf">1.</span><span class="p">)</span> \
+               <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">molpdf</span> <span class="o">&gt;=</span> <span class="mf">0.</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">molpdf</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&#39;single_model&#39;</span><span class="p">,</span>
+                          <span class="s">&quot;Obj. func. (</span><span class="si">%.3f</span><span class="s">) exceeded max_molpdf (</span><span class="si">%.3f</span><span class="s">) &quot;</span> \
+                                      <span class="o">%</span> <span class="p">(</span><span class="n">molpdf</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_molpdf</span><span class="p">))</span>
+        <span class="n">actions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_refine_actions</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refine</span><span class="p">(</span><span class="n">atmsel</span><span class="p">,</span> <span class="n">actions</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">refine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atmsel</span><span class="p">,</span> <span class="n">actions</span><span class="p">):</span> <span class="c">#very_fast, fast,slow, very_slow, slow_large</span>
+        <span class="sd">&quot;&quot;&quot;Refine the optimized model with MD and CG&quot;&quot;&quot;</span>
+        <span class="c"># Save the current model:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit_in_refine</span> <span class="o">!=</span> <span class="s">&#39;NO_FIT&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">file</span><span class="o">=</span><span class="s">&#39;TO_BE_REFINED.TMP&#39;</span><span class="p">)</span>
+
+        <span class="c"># Possibly skip selecting hot atoms only and optimize all atoms:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">refine_hot_only</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">initial_refine_hot</span><span class="p">(</span><span class="n">atmsel</span><span class="p">)</span>
+
+        <span class="c"># Do simulated annealing MD:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">md_level</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">md_level</span><span class="p">(</span><span class="n">atmsel</span><span class="p">,</span> <span class="n">actions</span><span class="p">)</span>
+
+        <span class="c"># Possibly skip &#39;HOT CG&#39; after MD:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">refine_hot_only</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">final_refine_hot</span><span class="p">(</span><span class="n">atmsel</span><span class="p">)</span>
+
+        <span class="c"># Get a final conjugate gradients refined structure:</span>
+        <span class="n">cg</span> <span class="o">=</span> <span class="n">conjugate_gradients</span><span class="p">()</span>
+        <span class="n">cg</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">atmsel</span><span class="p">,</span> <span class="n">max_iterations</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">optimize_output</span><span class="p">,</span>
+                    <span class="n">actions</span><span class="o">=</span><span class="n">actions</span><span class="p">)</span>
+
+        <span class="c"># Evaluate gross changes between the initial and final refined model:</span>
+        <span class="k">if</span> <span class="s">&#39;NO_FIT&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit_in_refine</span><span class="p">:</span>
+            <span class="n">aln</span> <span class="o">=</span> <span class="n">alignment</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">)</span>
+            <span class="n">mdl2</span> <span class="o">=</span> <span class="n">read_model</span><span class="p">(</span><span class="nb">file</span><span class="o">=</span><span class="s">&#39;TO_BE_REFINED.TMP&#39;</span><span class="p">)</span>
+            <span class="n">casel</span> <span class="o">=</span> <span class="n">selection</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">only_atom_types</span><span class="p">(</span><span class="s">&#39;CA&#39;</span><span class="p">)</span>
+            <span class="n">casel</span><span class="o">.</span><span class="n">superpose</span><span class="p">(</span><span class="n">mdl2</span><span class="p">,</span> <span class="n">aln</span><span class="p">)</span>
+            <span class="n">casel</span> <span class="o">=</span> <span class="n">selection</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="n">casel</span><span class="o">.</span><span class="n">superpose</span><span class="p">(</span><span class="n">mdl2</span><span class="p">,</span> <span class="n">aln</span><span class="p">)</span>
+            <span class="n">modfile</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="s">&#39;TO_BE_REFINED.TMP&#39;</span><span class="p">)</span>
+ 
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">SOAP 0.1 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Guangqiang Dong.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
