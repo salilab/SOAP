@@ -8,7 +8,7 @@ import numpy as np
 #runenv.queues=' -q lab.q '
 
 ml=[]
-rfeature=[['d',0,6,0.2]]
+rfeature=[['d',0,15,0.5]]
 
 par={'object':rfeature, 'index1':0,'index2':2,'typelist':[['fixbin',0,1],['fixbin',1,2],['fixbin',1,3],['numafter',[1,3],2]],'parindex':0}
 
@@ -39,9 +39,7 @@ initvalues=list(np.arange(0,ni)/10.0+1)
 initvalues=np.array(initvalues)
 #,'zdock' 'top1000_rlrank__rmsd10ORirmsd4FIRST+top1000_rlrank__rmsd5ORirmsd2FIRST'
 #top10__nonempty_rmsd10ORirmsd4FIRST
-#bmtype={'type':'dsscore','dslist':['fpdb','fpdu'],'criteria':'3xtop1_rmsdallif_mean_+2xtop3_rmsdallif_mean_','combine':'scoresum','bm':'cs1'}
-bmtype={'type':'dsscore','dslist':['mhc2'],'criteria':'dcg','combine':'scoresum','bm':'cs1'}
-
+bmtype={'type':'dsscore','dslist':['DecoysRUS','casp58','baker1'],'criteria':'3xtop1_rmsd_mean_+10xNativeSelection+2xtop3_rmsd_mean_','combine':'scoresum','bm':'bs10dsp'}
 
 blocks=[]
 kk=0
@@ -53,10 +51,10 @@ for apn in [36]:#57
     searches=[]
     for i in range(noc):
         print i
-        sbm=['cs1','ap'+str(apn)+'n',str(i)]
+        sbm=['bs10dsp','ap'+str(apn)+'n',str(i)]
         ref1={'type':'sf','features':sfeature,'sftype':slo,'par':slo,'parvalue':slo,'ratio':[1.0+0.00001*i],'bm':sbm}
     
-        scaledsp1={'type':'scaledsp','pdbset':'X2_2.2A_0.25rfree_60','features':sfeature,'genmethod':'cs1','pm':pm,'refs':[ref1],'ratio':ref1['ratio'],'bm':sbm}
+        scaledsp1={'type':'scaledsp','pdbset':'X_2.2A_0.25rfree','features':sfeature,'genmethod':'bs10dsp','pm':pm,'refs':[ref1],'ratio':ref1['ratio'],'bm':sbm}
         
         search1={'object':ref1,'key':'parvalue','pos':[0,1,2,3,4,5,6],'InitialGenerator':{'type':'dfire','values':initvalues}}
         #search2={'object':ref1,'key':'par','pos':[0,1,2,3,4,5,6],'InitialGenerator':{'type':'dfire','values':initvalues}}
@@ -76,8 +74,8 @@ for apn in [36]:#57
 inner={'improved':2,'maxloop':10,'minloop':1}
 outer={'improved':4,'maxloop':200}
 
-#inner={'improved':1,'maxloop':2,'minloop':1}
-#outer={'improved':2,'maxloop':2}
+inner={'improved':1,'maxloop':2,'minloop':1}
+outer={'improved':2,'maxloop':2}
 
 td=list(np.sqrt(np.linspace(1,float(10)**2,ni)))
 td=np.array(td)
@@ -107,7 +105,7 @@ ssm1={'sm':'mca','reset_betweenruns':2,'blockupdate':True, 'using_globalbest':Tr
 
 
 sml=[ssm20,ssm2,ssm0,ssm,ssm0,ssm,ssm0,ssm, ssm1]
-#sml=[ssm1]
+sml=[ssm1]
 #sml=[ssm]
 
 dsearch6={'object':ssm,'key':'temperature_distribution','valueset':[np.sqrt(np.linspace(1,float(10)**2,ni)),
@@ -149,40 +147,7 @@ dsearch16={'object':[ssm2,ssm20],'key':['blockupdate','blockupdate'],
 dsearch17={'object':[ssm2,ssm20,ssm,ssm0,ssm1],'key':['blockupdate','blockupdate','blockupdate','blockupdate','blockupdate'],
     'valueset':[[True,True,True,True,True],[False,False,False,False,False],[True,True,False,False,False]]}
 
-dsearch21={'object':par,'key':'uniform','valueset':[8,5]}
-
-
-
-dsearch32={'object':rfeature[0],'key':2,'valueset':[15, 12,10,8,6]}#,10,8,7,6,5#15,12,10, 8,7,15,12,10, 8,7,6,
-
-dsearch34={'object':par,'key':'uniform','valueset':[7,5,4]} #7,6,5,4,3
-
-dsearch35={'object':rfeature[0],'key':3,'valueset':[0.05,0.1,0.5]}#0.025,0.05 #,0.25,0.1,0.05 #0.05,0.1,0.25,
-
-dsearch39={'object':[scaledsp1,scaledsp1],'key':['genmethod','pdbset'],'valueset':[['cs1','X2_2.2A_0.25rfree'],['bs20dsp','X_2.2A_0.25rfree'],['bs10dsp','X_2.2A_0.25rfree'],['bs2dsp','X_2.2A_0.25rfree'],['bs5dsp','X_2.2A_0.25rfree']]}#,,'cs1'['bs20dsp','X_2.2A_0.25rfree'],
-
-
-
-dsearch7={'object':pm,'key':0,'valueset':['','pp5','pp1','ks0.2']}#'gps0.6','gps0.3',,'ks0.2','ks0.4'
-
-dsearch8={'object':pm,'key':1,'valueset':['nbsum']}
-
-
-#dsearch2={'object':[rfeature[0],rrfeature[0],rrfeature[0]],'key':[2,2,3],'valueset':[[6,6,6],[8,8,8],[10,10,10],[12,12,12]]}#,[5.4,5.4,5.4],[4.4,4.4,4.4],10,8,7,6,5#15,12,10, 8,7,15,12,10, 8,7,6,
-#[6.4,6.4,6.4],[6.2,6.2,6.2],[5.6,5.6,5.6],,[5,5,5]
-
-
-
-
-#sampling and seaching parameters
-
-fd='/bell3/gqdong/statpot/results/ppd4s/top1000_rlrank__rmsd10ORirmsd4FIRST/runs/35122-nan,nan_nan+nan_nan+nan_1.723_0.000/'
-#fd='/bell3/gqdong/statpot/results/ppd4s/top1000_rlrank__rmsd10ORirmsd4FIRST/runs/35449-nan,nan_nan+nan_nan+nan_1.729_0.000/'
-
-bm=get_best_model(fd)
-#so=scorer(model=bm)
-#print so.assess_model()
-#pdb.set_trace()
+dsearch21={'object':par,'key':'uniform','valueset':[8,6,5,4,3]}
 
 
 scorerlist=ssl['full'][0]
@@ -212,11 +177,8 @@ blocks.append([kk,kk+1])
 
 
 model1={'scorers':scorerlist,'bmtype':bmtype,'searches':searchlist,#'thread':4,
-        'dsearches':[dsearch32,dsearch34,dsearch35,dsearch39],'sml':sml,'cvk':2,'fold':3,'repeat':1,'initialpars':'all','runsperscorer':40}
-            #'initialmodelpath':['/bell3/gqdong/statpot/results/ppd4s/top1000_rlrank__rmsd10ORirmsd4FIRST/runs/35512-nan,nan_nan+nan_nan+nan_1.781_0.000/']
+        'dsearches':[dsearch21],'sml':sml,'cvk':5,'fold':3,'repeat':1,'initialpars':'all','runsperscorer':40}
         #,'testperc':0.000}#,'testperc':0.0
-#'/bell3/gqdong/statpot/results/ppd4s/top1000_rlrank__rmsd10ORirmsd4FIRST/runs/35498-nan,nan_nan+nan_nan+nan_1.743_0.000/'
-#'/bell3/gqdong/statpot/results/ppd4s/top1000_rlrank__rmsd10ORirmsd4FIRST/runs/35494-nan,nan_nan+nan_nan+nan_1.739_0.000/'
 #dsearch1,searches,dsearch4,dsearch6,dsearch7,dsearch8, ,'testperc':0.333
 #'cvk':2,'fold':3,'repeat':10
 
@@ -244,79 +206,9 @@ elif 0:
     pdb.set_trace()
     spso.cv()#spl.eval_allpars()
     logpath=spso.cvlist[0].logpath
-elif 0:
+elif 1:
     spl=spss(model=model1)
     spl.eval_allpars()
     pdb.set_trace()
 
-spl=spss(model=model1) # set of statistical potentials/dicrete searches
 
-spl.currentcutoffpercinitial=0.0# no randomness on dicrete searches
-spl.currentcutoffpercratio=0.0
-spl.maximumround=10
-#spl.eval_allpars()
-spl.find_best_par()#find the best paramters on discrete and continuous vairables.
-spl.log()
-pdb.set_trace()                
-
-
-
-print logpath
-bm=pickle.load(open(logpath+'cvmodel.pickle'))
-bestpars=bm['allresult'][0]['repna']
-so=scorer(model=bm['model'])
-print so.assess(bm['allresult'][0]['bestpar'])
-print so.assess_model()
-
-pdb.set_trace()
-
-bm['model']['bmtype']['dslist']=['zdock']
-so=scorer(model=bm['model'])
-print so.assess(bm['allresult'][0]['bestpar']) 
-print so.assess_model()
-bm['model']['bmtype']['dslist']=['ppd4']
-so=scorer(model=bm['model'])
-print so.assess(bm['allresult'][0]['bestpar'])
-print so.assess_model()
-pdb.set_trace()
-
-
-blp='/bell3/gqdong/statpot/results/ppd4s_zdock_ppd4/top1000_rlrank__rmsd10ORirmsd4FIRST+top1000_rlrank__rmsd5ORirmsd2FIRST/runs/38772-nan,nan_nan+nan_nan+nan_2.836_0.000/'
-bm=pickle.load(open(blp+'cvmodel.pickle'))
-bestpars=bm['allresult'][0]['repna']
-so=scorer(model=bm['model'])
-bm['model']['bmtype']['dslist']=['ppd4s']
-print so.assess(bm['allresult'][0]['bestpar'])
-
-print so.assess_model()
-    
-
-logpath='/bell3/gqdong/statpot/results/ppd4s/top1000_rlrank__rmsd10ORirmsd4FIRST+top1000_rlrank__rmsd5ORirmsd2FIRST/runs//38888-nan,nan_nan+nan_nan+nan_2.727_0.000/'
-
-if 0:
-    for iii in range(3):
-        for block in blocks:
-            print block
-            nm['searches']=[]
-            if 'str' in nm:
-                del nm['str']
-            for i in block:
-                nm['searches'].append(allsearches[i])
-            spso=sps(modellist=[nm])
-            spso.cv()
-            if len(spso.logpathlist)>0:
-                logpath=spso.logpathlist[0][-1]
-            else:
-                logpath=spso.cvlist[0].logpath
-            bestmodel=pickle.load(open(os.path.join(logpath,'bestmodel.pickle')))
-            k=-1
-            for i in block:
-                k=k+1
-                try:
-                    for j in range(len(allsearches[i]['object'][allsearches[i]['key']])):
-                        allsearches[i]['object'][allsearches[i]['key']][j]=bestmodel['searches'][k]['object'][allsearches[i]['key']][j]
-                    #use previous run result as initial conditions
-                    #allsearches[i]['InitialGenerator']=[bestmodel['searches'][k]['object'][allsearches[i]['key']]]
-                except Exception,e:
-                    print e
-                    pdb.set_trace()

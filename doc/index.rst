@@ -25,12 +25,17 @@ Examples:
    :maxdepth: 2
   
    mhc2
+   soaplig
 
-Additonal undocumented examples can be found at SOAP/examples
+Additonal undocumented examples can be found at SOAP/examples.
 
 Pre-calculated SOAP tables
 --------------------------
 Pre-calcualted SOAP statistical potentials for ranking peptides, loops, proteins, protein interfaces and ligands can be found at : `salialb.org/SOAP <http://salialb.org/SOAP>`_
+
+Please cite:
+-------------------
+Dong GQ, Fan H, Schneidman-Duhovny D, Webb B, Sali A. Optimized atomic statistical potentials: assessment of protein interfaces and loops. Bioinformatics. 2013 Dec 15; 29(24):3158-66.
 
 Modules:
 ----------------
@@ -53,6 +58,8 @@ Modules:
    crossValidate
    loop
    utility
+   
+   
 
 Indices and tables
 ==================

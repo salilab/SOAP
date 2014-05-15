@@ -1,4 +1,4 @@
-from SOAP import *
+from sps import *
 import os
 import profile
 import sys
@@ -9,7 +9,7 @@ rfeature=[['dt',0,6,0.2]]
 rrfeature=[['dt',0,6,6]]
 
 runenv.otherrun=False
-par={'uniform':4,'featurebins':rfeature[0],'distribute':'lownumberpriority','firstpoint':2.25}
+par={'uniform':10,'featurebins':rfeature[0],'distribute':'lownumberpriority','firstpoint':2.25}
 slo={'key':'sacnfflex',
     'valueset':{
                     'sacnfflex':{'sftype':'sacnf','par':par,'parvalue':[1,1,1,1]},
@@ -37,7 +37,7 @@ ref4={'type':'sf','features':[rrfeature[0],'h12#180#-180'],'sftype':'spline','pa
 
 
 
-scaledsp1={'type':'scaledsp','pdbset':'X_2.2A_0.25rfree','features':sfeature,'genmethod':'bs20dsp','pm':pm,'refs':[ref1,ref2,ref3,ref4],'ratio':ratio1}
+scaledsp1={'type':'scaledsp','pdbset':'X2_2.2A_0.25rfree','features':sfeature,'genmethod':'cs1','pm':pm,'refs':[ref1,ref2,ref3,ref4],'ratio':ratio1}
 
 ratio2=[1.04]
 
@@ -118,13 +118,10 @@ dsearch8={'object':pm,'key':1,'valueset':['nbsum']}
 
 dsearch9={'object':[scaledsp1,scaledsp1],'key':['genmethod','pdbset'],'valueset':[['cs1','X2_2.2A_0.25rfree'],['bs20dsp','X_2.2A_0.25rfree']]}#,,'cs1'['bs20dsp','X_2.2A_0.25rfree'],
 
-dsearch9={'object':scaledsp1,'key':'genmethod','valueset':['bs20dsp','bs15dsp','bs10dsp','bs4dsp','bs2dsp']}#,,'cs1'['bs20dsp','X_2.2A_0.25rfree'],
-
-
 dsearch2={'object':[rfeature[0],rrfeature[0],rrfeature[0]],'key':[2,2,3],'valueset':[[6,6,6],[8,8,8]]}#,,[10,10,10],[12,12,12][5.4,5.4,5.4],[4.4,4.4,4.4],10,8,7,6,5#15,12,10, 8,7,15,12,10, 8,7,6,
 #[6.4,6.4,6.4],[6.2,6.2,6.2],[5.6,5.6,5.6],,[5,5,5]
 #dsearch3={'object':[rfeature[0],sfeature[0]],'key':[3,3],'valueset':[[0.025,0.025],[0.05,0.05],[0.1,0.1],[0.25,0.25],[0.5,0.5]]}
-dsearch4={'object':par,'key':'uniform','valueset':[12,8,6,4]} #7,6,5,4,3,[12,10,8,7,6,4]
+dsearch4={'object':par,'key':'uniform','valueset':[10]} #7,6,5,4,3,[12,10,8,7,6,4]
 
 dsearch5={'object':rfeature[0],'key':3,'valueset':[0.2]}#0.025,0.05 #,0.25,0.1,0.05 #0.05,0.1,0.25,
 
@@ -139,7 +136,7 @@ outer={'improved':4,'maxloop':2001}
 
 td=list(np.sqrt(np.linspace(1,float(10)**2,ni)))
 td=np.array(td)
-tune_interval=203
+tune_interval=202
 
 sampleschedule={'inner':inner,'outer':outer}
 ssm={'sm':'mcp','reset_betweenruns':2,'blockupdate':False, 'exchange_method':1,
@@ -174,73 +171,22 @@ dsearch99={'object':[ssm,ssm2],'key':['blockupdate','blockupdate'],'valueset':[[
 
 model1={'scorers':[scaledsp1,ref1,ref2,ref3,ref4,scaledsp2,ref21,ref22,ref23,ref24,ref31],'bmtype':bmtype,'searches':[search1,search2,search3,search4,search5,search21,search22,search23,search24,search25,search9,search31,search32], 'runsperscorer':ni,#number of replicas per scorers
     #'initialmodelpath':inipath,
-    'dsearches':[dsearch4,dsearch2,dsearch9],#[dsearch4,dsearch2,dsearch9],,dsearch2,dsearch9
+    'dsearches':[dsearch4],#[dsearch4,dsearch2,dsearch9],,dsearch2,dsearch9
 'sml':sml,#search schedule
-'cvk':2,#number of repeation of cross validation
-'repeat':1,#number of set of replicas
-'fold':4}#fold of cross validation
-#'testperc':0.00}#,dsearch2,dsearch5,dsearch6,dsearch7 #,'testperc':0.33
+'cvk':0,#number of repeation of cross validation
+'repeat':4,#number of set of replicas
+'fold':0,#fold of cross validation
+'testperc':0.00}#,dsearch2,dsearch5,dsearch6,dsearch7 #,'testperc':0.33
 #
 
-
-
-if 1:
-                    #sml=[ssm3,ssm1] 
-                    
-                    
-                    #dsearch6,dsearch1,dsearch2,dsearch7,dsearch9
-                    #define the final model
-                    #define the final model
-                    
-                    
-                    so=scorer(model=convert2old(model1))
-                    #opt=optimizer(scorer=so)
-                    #opt.get_initial_value()
-                    #optres=opt.optimize()
-                    #profile.run('opt.optimize()')
-                    so.assess_model()
-                    pdb.set_trace()
-                    
-                    spl=spss(model=model1)
-                    #spl.eval_allpars()
-                    pdb.set_trace()
-                    
-                    spl.currentcutoffpercinitial=0.0
-                    spl.currentcutoffpercratio=0.0
-                    spl.maximumround=30
-                    spl.find_best_par()
-                    spl.log()
-
-if 0:#load old result
-                logpath='/bell3/gqdong/statpot/results/mhc2/dcg/runs/57295-nan,nan_nan+nan_nan+nan_2312.403_0.000__nan+nan_nan+nan_0.000_0.000 /'
-                bestmodel=pickle.load(open(os.path.join(logpath,'bestmodel.pickle')))
-                for j in range(len(allsearches[i]['object'][allsearches[i]['key']])):
-                    allsearches[i]['object'][allsearches[i]['key']][j]=bestmodel['searches'][k]['object'][allsearches[i]['key']][j]
-
-
-#309-2919
 spl=spss(model=model1) # set of statistical potentials/dicrete searches
 
 spl.currentcutoffpercinitial=0.0# no randomness on dicrete searches
 spl.currentcutoffpercratio=0.0
 spl.maximumround=10
-#spl.eval_allpars()
-spl.find_best_par()#find the best paramters on discrete and continuous vairables.
+spl.eval_allpars()
+#spl.find_best_par()#find the best paramters on discrete and continuous vairables.
 spl.log()
-pdb.set_trace()
-
-logpath=spso.cvlist[0].logpath
-print logpath
-bm=pickle.load(open(logpath+'cvmodel.pickle'))
-bestpars=bm['allresult'][0]['repna']
-so=scorer(model=bm['model'])
-print so.assess(bm['allresult'][0]['bestpar'])
-print so.assess_model()
-bm['model']['bmtype']['dslist']=mjloop
-so=scorer(model=bm['model'])
-print so.assess(bm['allresult'][0]['bestpar'])
-print so.assess_model()
-
 pdb.set_trace()
 
 
