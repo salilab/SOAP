@@ -105,7 +105,7 @@ class feature(object):
             return mdt.features.ResidueIndexDifference(mlib, bins=mdt.uniform_bins(1, -1,1)+mdt.uniform_bins(1, 1,1), absolute=False)
         elif sfc=='s33':
             return mdt.features.ResidueIndexDifference(mlib, bins=mdt.uniform_bins(1, -10015,10000)+mdt.uniform_bins(31, -15,1)+mdt.uniform_bins(1, 16,100000), absolute=False)
-        elif sfc=='dt':
+        elif sfc in ['dt','dtl']:
             return mdt.features.TupleDistance(mlib,bins=ub)
         elif sfc=='g':
             return mdt.features.TupleAngle1(mlib,bins=ub)
@@ -113,9 +113,9 @@ class feature(object):
             return mdt.features.TupleAngle2(mlib,bins=ub)
         elif sfc=='h':
             return mdt.features.TupleDihedral1(mlib,bins=ub)
-        elif sfc=='t306':            
+        elif sfc[0]=='t':            
             return mdt.features.TupleType(mlib)
-        elif sfc=='ts306':
+        elif sfc[:2]=='ts':
             return mdt.features.TupleType(mlib, pos2=True)
         else:
             raise Exception('can not find feature '+sfc+' in module feature._gen_single_feature()')
@@ -123,12 +123,36 @@ class feature(object):
         #remember to update feature type and the getlib feature when adding features
 
     def define_feature_type(self,sfc):
-        if sfc[0] in ['a','t','r','ca','cb','cd']:
+        if sfc[0] in ['a','t','r'] or sfc[:2] in ['ca','cb','cd']:#bug need fix
             return 0 #independent feature
-        elif sfc[0] in ['d','b','bs','s','g','h','l','m','c','p']:
+        elif sfc[0] in ['d','b','s','g','h','l','m','c','p']:
             return 1
         else:
             raise Exception('The feature type of '+sfc+' is undefined in feature.define_feature_type()')
+
+    def get_lib(self):
+        if self.features in ['posescore']:
+            return 'atmcls-plas.lib'
+        if re.search('dl|al',self.features):
+            return 'atmcls-plas.lib'
+        elif re.search('tl|dtl',self.features):
+            return 'dicls-lig.lib'
+        elif re.search('dca',self.features):
+            return 'caatm.lib'
+        elif re.search('dmc',self.features):
+            return 'atmcls-mc.lib'
+        elif re.search('dsc',self.features):
+            return 'atmcls-sc.lib'        
+        elif re.search('cn',self.features):
+            return 'anggrp.lib'
+        elif re.search('co',self.features):
+            return 'bndgrp.lib'
+        elif re.search('ci',self.features):
+            return 'impgrp.lib'  
+        elif self.features[0] in ['h','g','t'] or self.features[0:2] in ['gs','dt']:
+            return 'dicls-all.lib'
+        else:
+            return 'atmcls-mf.lib'
 
     def issubset(self, f2):
         shrinkindex=[[] for item in f2.fclist]
@@ -238,27 +262,6 @@ class feature(object):
         else:
             mlibr.atom_classes.read(runenv.libdir+libfile) 
 
-    def get_lib(self):
-        if self.features in ['posescore']:
-            return 'atmcls-plas.lib'
-        if re.search('dl|al',self.features):
-            return 'atmcls-plas.lib'
-        elif re.search('dca',self.features):
-            return 'caatm.lib'
-        elif re.search('dmc',self.features):
-            return 'atmcls-mc.lib'
-        elif re.search('dsc',self.features):
-            return 'atmcls-sc.lib'        
-        elif re.search('cn',self.features):
-            return 'anggrp.lib'
-        elif re.search('co',self.features):
-            return 'bndgrp.lib'
-        elif re.search('ci',self.features):
-            return 'impgrp.lib'  
-        elif self.features[0] in ['h','g','t'] or self.features[0:2] in ['gs','dt']:
-            return 'dicls-all.lib'
-        else:
-            return 'atmcls-mf.lib'
 
     def issymetry(self):
         fn=self.get_featurenames()

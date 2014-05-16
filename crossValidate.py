@@ -324,7 +324,8 @@ class k2cv(object):
         if model==None:
             model=self.spsfo.scorer.originalmodel
         os.chdir(self.logdir)
-        del model['str']
+        if 'str' in model:
+            del model['str']
         model['str']=any2str(model)        
         with FileLock("log.shelve", timeout=100, delay=2) as lock:
             print("Lock acquired.")
