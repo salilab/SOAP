@@ -21,9 +21,10 @@ Basic workflow for using SOAP to generate a statistical potential
 5. Write out the optimial potential in hdf5 or lib formart for use in Modeller, IMP or other packages. 
 
 Examples:
+
 .. toctree::
    :maxdepth: 2
-  
+
    mhc2
    soaplig
 

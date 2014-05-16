@@ -27,7 +27,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="SOAP 0.1 documentation" href="#" />
-    <link rel="next" title="Enviromental variables" href="env.html" /> 
+    <link rel="next" title="Calcualte SOAP poential for ranking MHC2 peptides." href="mhc2.html" /> 
   </head>
   <body>
     <div class="related">
@@ -40,7 +40,7 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="env.html" title="Enviromental variables"
+          <a href="mhc2.html" title="Calcualte SOAP poential for ranking MHC2 peptides."
              accesskey="N">next</a> |</li>
         <li><a href="#">SOAP 0.1 documentation</a> &raquo;</li> 
       </ul>
@@ -53,12 +53,49 @@
             
   <div class="section" id="welcome-to-soap-s-documentation">
 <h1>Welcome to SOAP&#8217;s documentation!<a class="headerlink" href="#welcome-to-soap-s-documentation" title="Permalink to this headline">¶</a></h1>
-<p>Contents:</p>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li>Install required packages defined in env-config.py</li>
+<li>Config env-config.py and rename it to env.py</li>
+</ol>
+</div>
+<div class="section" id="basic-workflow-for-using-soap-to-generate-a-statistical-potential">
+<h2>Basic workflow for using SOAP to generate a statistical potential<a class="headerlink" href="#basic-workflow-for-using-soap-to-generate-a-statistical-potential" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li>Preprocess PDB if necessary and generate sequence files.</li>
+<li>Prepare Decoys.</li>
+<li>Run SOAP script to select models.</li>
+<li>Run SOAP script to calculate the optimal statistical potential using the best model.</li>
+<li>Write out the optimial potential in hdf5 or lib formart for use in Modeller, IMP or other packages.</li>
+</ol>
+<p>Examples:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="mhc2.html">Calcualte SOAP poential for ranking MHC2 peptides.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="soaplig.html">Calcualte SOAP poential for ranking small molecule ligands.</a></li>
+</ul>
+</div>
+<p>Additonal undocumented examples can be found at SOAP/examples.</p>
+</div>
+<div class="section" id="pre-calculated-soap-tables">
+<h2>Pre-calculated SOAP tables<a class="headerlink" href="#pre-calculated-soap-tables" title="Permalink to this headline">¶</a></h2>
+<p>Pre-calcualted SOAP statistical potentials for ranking peptides, loops, proteins, protein interfaces and ligands can be found at : <a class="reference external" href="http://salialb.org/SOAP">salialb.org/SOAP</a></p>
+</div>
+<div class="section" id="please-cite">
+<h2>Please cite:<a class="headerlink" href="#please-cite" title="Permalink to this headline">¶</a></h2>
+<p>Dong GQ, Fan H, Schneidman-Duhovny D, Webb B, Sali A. Optimized atomic statistical potentials: assessment of protein interfaces and loops. Bioinformatics. 2013 Dec 15; 29(24):3158-66.</p>
+</div>
+<div class="section" id="modules">
+<h2>Modules:<a class="headerlink" href="#modules" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="env.html">Enviromental variables</a></li>
 <li class="toctree-l1"><a class="reference internal" href="jobSchedule.html">Job scheduler (local and on SGE cluster)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="modelSelection.html">Select the best model and generate statistical potentials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modelSelection.html">Select the best model and generate statistical potentials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="modelSelection.html#define-statistical-potential-model-and-model-space">Define statistical potential model and model space</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="sequences.html">Collection of sequences for known structures or decoys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="decoys.html">Decoys</a></li>
 <li class="toctree-l1"><a class="reference internal" href="statsTable.html">Calcualte statistics from a set of structures</a></li>
@@ -72,6 +109,7 @@
 <li class="toctree-l1"><a class="reference internal" href="loop.html">Loop modeling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utility.html">Utility classes and functions</a></li>
 </ul>
+</div>
 </div>
 </div>
 <div class="section" id="indices-and-tables">
@@ -92,14 +130,23 @@
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Welcome to SOAP&#8217;s documentation!</a><ul>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#basic-workflow-for-using-soap-to-generate-a-statistical-potential">Basic workflow for using SOAP to generate a statistical potential</a><ul>
+</ul>
+</li>
+<li><a class="reference internal" href="#pre-calculated-soap-tables">Pre-calculated SOAP tables</a></li>
+<li><a class="reference internal" href="#please-cite">Please cite:</a></li>
+<li><a class="reference internal" href="#modules">Modules:</a><ul>
+</ul>
+</li>
 </ul>
 </li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
 </ul>
 
   <h4>Next topic</h4>
-  <p class="topless"><a href="env.html"
-                        title="next chapter">Enviromental variables</a></p>
+  <p class="topless"><a href="mhc2.html"
+                        title="next chapter">Calcualte SOAP poential for ranking MHC2 peptides.</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/index.txt"
@@ -132,7 +179,7 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="env.html" title="Enviromental variables"
+          <a href="mhc2.html" title="Calcualte SOAP poential for ranking MHC2 peptides."
              >next</a> |</li>
         <li><a href="#">SOAP 0.1 documentation</a> &raquo;</li> 
       </ul>
