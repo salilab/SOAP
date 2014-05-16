@@ -241,13 +241,13 @@ class rawsp(object):
             try:
                 temppath=scratchdir
                 runsuccess=True
-                m.write_hdf5(temppath+str(runnumber)+'.result.hdf5')
+                m.write_hdf5(temppath+str(runnumber)+'.result.hdf5',gzip=True)
             except:
                 try:
                     temppath=runenv.serverScrathPath+'/'+os.getenv('JOB_ID')+'/'
                     os.makedirs(temppath)
                     print os.system('mkdir '+temppath)
-                    m.write_hdf5(temppath+str(runnumber)+'.result.hdf5')
+                    m.write_hdf5(temppath+str(runnumber)+'.result.hdf5',gzip=True)
                     runsuccess=True
                 except:
                     runsuccess=False
@@ -473,7 +473,7 @@ class rawsp(object):
                 pdb.set_trace()
                 traceback.print_exc()
                 return 1
-        m1.write_hdf5('sum.hdf5')
+        m1.write_hdf5('sum.hdf5',gzip=True)
         m1=[]
         m2=[]    
         print "Combining finished"
@@ -1627,7 +1627,6 @@ class scaledsp(rawsp):
             for i in range(apca.shape[0]):
                 for j in range(apca.shape[1]):
                     mdtb[i,j,...]=(mdtb[i,j]+ref[apca[i,j]])*ratio[apca[i,j]]
-        #pdb.set_trace()
         if len(svdilist)==0 and self.permute:
             mdtb=np.transpose(mdtb,self.rs2) 
         if savetype=='hdf5':
