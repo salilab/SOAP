@@ -28,7 +28,7 @@ Examples:
    mhc2
    soaplig
 
-Additonal undocumented examples can be found at SOAP/examples.
+Additonal undocumented examples can be found at SOAP/examples. 
 
 Pre-calculated SOAP tables
 --------------------------

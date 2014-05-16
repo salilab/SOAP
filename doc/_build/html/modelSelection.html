@@ -60,6 +60,7 @@
 <div class="section" id="define-statistical-potential-model-and-model-space">
 <h2>Define statistical potential model and model space<a class="headerlink" href="#define-statistical-potential-model-and-model-space" title="Permalink to this headline">¶</a></h2>
 <p>The model and model space are defined using python lists and dictionaries.</p>
+<<<<<<< HEAD
 <p>Define the recovery function features, distance only, from 0 to 20A with bin size 0.05:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">rfeature</span><span class="o">=</span><span class="p">[[</span><span class="s">&#39;d&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mf">0.05</span><span class="p">]]</span>
 </pre></div>
@@ -74,6 +75,23 @@
 </pre></div>
 </div>
 <dl class="docutils">
+=======
+<dl class="docutils">
+<dt>Define the recovery function features, distance only, from 0 to 20A with bin size 0.05::</dt>
+<dd>rfeature=[[&#8216;d&#8217;,0,20,0.05]]</dd>
+<dt>Define the spliens used for generating recoery functions. The most important parameter is &#8216;uniform&#8217;::</dt>
+<dd><p class="first">par={&#8216;uniform&#8217;:4,&#8217;featurebins&#8217;:rfeature[0],&#8217;distribute&#8217;:&#8217;lownumberpriority&#8217;,&#8217;firstpoint&#8217;:2.25}
+slo={&#8216;key&#8217;:&#8217;sacnfflex&#8217;,</p>
+<blockquote class="last">
+<div><dl class="docutils">
+<dt>&#8216;valueset&#8217;:{</dt>
+<dd>&#8216;sacnfflex&#8217;:{&#8216;sftype&#8217;:&#8217;sacnf&#8217;,&#8217;par&#8217;:par,&#8217;parvalue&#8217;:[1,1,1,1]},
+&#8216;sacnf52&#8217;:{&#8216;sftype&#8217;:&#8217;sacnf&#8217;,&#8217;par&#8217;:[2.75,3.75],&#8217;parvalue&#8217;:[1,1,1,1]},</dd>
+</dl>
+<p>}}</p>
+</div></blockquote>
+</dd>
+>>>>>>> 339cf2b864e9fc50ebc17d62c2a2ce77d00155eb
 <dt>Define the recovery function::</dt>
 <dd>ref1={&#8216;type&#8217;:&#8217;sf&#8217;,&#8217;features&#8217;:rfeature,&#8217;sftype&#8217;:slo,&#8217;par&#8217;:slo,&#8217;parvalue&#8217;:slo,&#8217;ratio&#8217;:[1.0]}</dd>
 <dt>Define the features for the probablistic table calcualtion, a158 represent residue dependent atom type ::</dt>
@@ -128,7 +146,30 @@ ssm={&#8216;sm&#8217;:&#8217;mcp&#8217;,&#8217;reset_betweenruns&#8217;:2,&#8217
 <dd>&#8216;dsearches&#8217;:[dsearch2,dsearch5,dsearch4,dsearch7,dsearch8,dsearch9],&#8217;sml&#8217;:sml,&#8217;cvk&#8217;:2,&#8217;repeat&#8217;:1,&#8217;fold&#8217;:3}</dd>
 </dl>
 </dd>
+<<<<<<< HEAD
 </dl>
+</div>
+=======
+</dl>
+<span class="target" id="module-modelSelection"></span><p>SOAP Model Selection module</p>
+<dl class="class">
+<dt id="modelSelection.sps">
+<em class="property">class </em><tt class="descclassname">modelSelection.</tt><tt class="descname">sps</tt><big>(</big><em>env=&lt;env.env object at 0x624dd10&gt;</em>, <em>modellist=</em><span class="optional">[</span><span class="optional">]</span>, <em>evalPotFunc=None</em><big>)</big><a class="reference internal" href="_modules/modelSelection.html#sps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modelSelection.sps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate a list of models on sge cluster</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="modelSelection.spss">
+<em class="property">class </em><tt class="descclassname">modelSelection.</tt><tt class="descname">spss</tt><big>(</big><em>model=</em><span class="optional">[</span><span class="optional">]</span>, <em>logfoldername=''</em>, <em>evalPotFunc=None</em><big>)</big><a class="reference internal" href="_modules/modelSelection.html#spss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modelSelection.spss" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Select the best model. Common usage::</dt>
+<dd>spl=spss(model=model1)
+spl.find_best_par()
+spl.log()</dd>
+</dl>
+</dd></dl>
+
+>>>>>>> 339cf2b864e9fc50ebc17d62c2a2ce77d00155eb
 </div>
 </div>
 

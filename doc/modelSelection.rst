@@ -12,7 +12,7 @@ The model and model space are defined using python lists and dictionaries.
 
 Define the recovery function features, distance only, from 0 to 20A with bin size 0.05::
 
-   rfeature=[['d',0,20,0.05]]
+   rfeature=[['d',0,20,0.05]] 
 
 Define the spliens used for generating recoery functions. The most important parameter is 'uniform'::
 
