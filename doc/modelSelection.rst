@@ -6,7 +6,7 @@
 Select the best model and generate statistical potentials
 ================================
 
-Define statistical potential model and model space 
+Define statistical potential model and model space  
 ---------------------------------
 The model and model space are defined using python lists and dictionaries.
 

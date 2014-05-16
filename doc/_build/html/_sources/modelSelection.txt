@@ -6,14 +6,13 @@
 Select the best model and generate statistical potentials
 ================================
 
-Define statistical potential model and model space 
+Define statistical potential model and model space  
 ---------------------------------
 The model and model space are defined using python lists and dictionaries.
 
 Define the recovery function features, distance only, from 0 to 20A with bin size 0.05::
-<<<<<<< HEAD
 
-   rfeature=[['d',0,20,0.05]]
+   rfeature=[['d',0,20,0.05]] 
 
 Define the spliens used for generating recoery functions. The most important parameter is 'uniform'::
 
@@ -23,17 +22,6 @@ Define the spliens used for generating recoery functions. The most important par
                     'sacnfflex':{'sftype':'sacnf','par':par,'parvalue':[1,1,1,1]},
                     'sacnf52':{'sftype':'sacnf','par':[2.75,3.75],'parvalue':[1,1,1,1]},
     }}
-=======
-    rfeature=[['d',0,20,0.05]]
-
-Define the spliens used for generating recoery functions. The most important parameter is 'uniform'::
-    par={'uniform':4,'featurebins':rfeature[0],'distribute':'lownumberpriority','firstpoint':2.25}
-    slo={'key':'sacnfflex',
-        'valueset':{
-                        'sacnfflex':{'sftype':'sacnf','par':par,'parvalue':[1,1,1,1]},
-                        'sacnf52':{'sftype':'sacnf','par':[2.75,3.75],'parvalue':[1,1,1,1]},
-        }}
->>>>>>> 339cf2b864e9fc50ebc17d62c2a2ce77d00155eb
     
 Define the recovery function::
     ref1={'type':'sf','features':rfeature,'sftype':slo,'par':slo,'parvalue':slo,'ratio':[1.0]}

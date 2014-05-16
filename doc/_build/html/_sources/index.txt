@@ -8,7 +8,7 @@ Welcome to SOAP's documentation!
 
 Installation
 ------------------------
-1. Install required packages defined in env-config.py  
+1. Install required packages defined in env-config.py   
 2. Config env-config.py and rename it to env.py
 
 Basic workflow for using SOAP to generate a statistical potential
@@ -21,20 +21,14 @@ Basic workflow for using SOAP to generate a statistical potential
 5. Write out the optimial potential in hdf5 or lib formart for use in Modeller, IMP or other packages. 
 
 Examples:
-<<<<<<< HEAD
 
 .. toctree::
    :maxdepth: 2
 
-=======
-.. toctree::
-   :maxdepth: 2
-  
->>>>>>> 339cf2b864e9fc50ebc17d62c2a2ce77d00155eb
    mhc2
    soaplig
 
-Additonal undocumented examples can be found at SOAP/examples.
+Additonal undocumented examples can be found at SOAP/examples. 
 
 Pre-calculated SOAP tables
 --------------------------

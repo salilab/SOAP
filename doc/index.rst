@@ -8,7 +8,7 @@ Welcome to SOAP's documentation!
 
 Installation
 ------------------------
-1. Install required packages defined in env-config.py  
+1. Install required packages defined in env-config.py   
 2. Config env-config.py and rename it to env.py
 
 Basic workflow for using SOAP to generate a statistical potential
