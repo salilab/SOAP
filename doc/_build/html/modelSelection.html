@@ -57,45 +57,98 @@
             
   <div class="section" id="select-the-best-model-and-generate-statistical-potentials">
 <h1>Select the best model and generate statistical potentials<a class="headerlink" href="#select-the-best-model-and-generate-statistical-potentials" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="define-statistical-potential-model-and-model-space">
+<h2>Define statistical potential model and model space<a class="headerlink" href="#define-statistical-potential-model-and-model-space" title="Permalink to this headline">¶</a></h2>
+<p>The model and model space are defined using python lists and dictionaries.</p>
+<dl class="docutils">
+<dt>Define the recovery function features, distance only, from 0 to 20A with bin size 0.05::</dt>
+<dd>rfeature=[[&#8216;d&#8217;,0,20,0.05]]</dd>
+<dt>Define the spliens used for generating recoery functions. The most important parameter is &#8216;uniform&#8217;::</dt>
+<dd><p class="first">par={&#8216;uniform&#8217;:4,&#8217;featurebins&#8217;:rfeature[0],&#8217;distribute&#8217;:&#8217;lownumberpriority&#8217;,&#8217;firstpoint&#8217;:2.25}
+slo={&#8216;key&#8217;:&#8217;sacnfflex&#8217;,</p>
+<blockquote class="last">
+<div><dl class="docutils">
+<dt>&#8216;valueset&#8217;:{</dt>
+<dd>&#8216;sacnfflex&#8217;:{&#8216;sftype&#8217;:&#8217;sacnf&#8217;,&#8217;par&#8217;:par,&#8217;parvalue&#8217;:[1,1,1,1]},
+&#8216;sacnf52&#8217;:{&#8216;sftype&#8217;:&#8217;sacnf&#8217;,&#8217;par&#8217;:[2.75,3.75],&#8217;parvalue&#8217;:[1,1,1,1]},</dd>
+</dl>
+<p>}}</p>
+</div></blockquote>
+</dd>
+<dt>Define the recovery function::</dt>
+<dd>ref1={&#8216;type&#8217;:&#8217;sf&#8217;,&#8217;features&#8217;:rfeature,&#8217;sftype&#8217;:slo,&#8217;par&#8217;:slo,&#8217;parvalue&#8217;:slo,&#8217;ratio&#8217;:[1.0]}</dd>
+<dt>Define the features for the probablistic table calcualtion, a158 represent residue dependent atom type ::</dt>
+<dd>sfeature=[rfeature[0],&#8217;a158&#8217;,&#8217;as158&#8217;]</dd>
+<dt>Define the processing method of the probablistic table, &#8216;npend&#8217; means normalized by the last bin value::</dt>
+<dd>pm=[&#8216;&#8217;,&#8217;npend&#8217;]</dd>
+<dt>Define the probabilistic table using for scoring::</dt>
+<dd>scaledsp1={&#8216;type&#8217;:&#8217;scaledsp&#8217;,&#8217;pdbset&#8217;:&#8217;X2_2.2A_0.25rfree&#8217;,&#8217;features&#8217;:sfeature,&#8217;genmethod&#8217;:&#8217;cs1&#8217;,&#8217;pm&#8217;:pm,&#8217;refs&#8217;:[ref1],&#8217;ratio&#8217;:[1.0]}</dd>
+<dt>The benchmark criteria, defines how the statistical potentials are benchmarked::</dt>
+<dd>bmtype={&#8216;type&#8217;:&#8217;dsscore&#8217;,&#8217;dslist&#8217;:[&#8216;fpdb&#8217;,&#8217;fpdu&#8217;],&#8217;criteria&#8217;:&#8216;3xtop1_rmsdallif_mean_+2xtop3_rmsdallif_mean_&#8217;,&#8217;combine&#8217;:&#8217;scoresum&#8217;,&#8217;bm&#8217;:&#8217;cs1&#8217;}</dd>
+<dt>Parameters to optimize::</dt>
+<dd>search1={&#8216;object&#8217;:ref1,&#8217;key&#8217;:&#8217;parvalue&#8217;,&#8217;pos&#8217;:[0,1,2,3],&#8217;InitialGenerator&#8217;:{&#8216;type&#8217;:&#8217;dfire&#8217;,&#8217;values&#8217;:initvalues}}
+search2={&#8216;object&#8217;:ref1,&#8217;key&#8217;:&#8217;par&#8217;,&#8217;pos&#8217;:[0,1,2,3],&#8217;InitialGenerator&#8217;:{&#8216;type&#8217;:&#8217;dfire&#8217;,&#8217;values&#8217;:initvalues}}</dd>
+<dt>Discrete search dictionaries, defining the model space - the model variables/options to vary::</dt>
+<dd><p class="first">dsearch4={&#8216;object&#8217;:par,&#8217;key&#8217;:&#8217;uniform&#8217;,&#8217;valueset&#8217;:[7,6,5,4,3]}</p>
+<p class="last">dsearch9={&#8216;object&#8217;:[scaledsp1,scaledsp1],&#8217;key&#8217;:[&#8216;genmethod&#8217;,&#8217;pdbset&#8217;],&#8217;valueset&#8217;:[[&#8216;cs1&#8217;,&#8217;X2_2.2A_0.25rfree&#8217;]]}#,[&#8216;cs1&#8217;,&#8217;X2_2.2A_0.25rfree_30&#8217;],[&#8216;cs1&#8217;,&#8217;X2_2.2A_0.25rfree_60&#8217;],[&#8216;cs1&#8217;,&#8217;X2_2.2A_0.25rfree_95&#8217;],[&#8216;bs20dsp&#8217;,&#8217;X_2.2A_0.25rfree&#8217;],[&#8216;bs20dsp&#8217;,&#8217;X_2.2A_0.25rfree_30&#8217;],[&#8216;bs20dsp&#8217;,&#8217;X_2.2A_0.25rfree_60&#8217;],[&#8216;bs15dsp&#8217;,&#8217;X_2.2A_0.25rfree&#8217;],[&#8216;bs10dsp&#8217;,&#8217;X_2.2A_0.25rfree&#8217;]]}#,,&#8217;cs1&#8217;</p>
+</dd>
+<dt>Parameters controling sampling and optimization::</dt>
+<dd><p class="first">ni=40</p>
+<p>initvalues=list(np.arange(0,ni)/10.0+1)</p>
+<p>initvalues=np.array(initvalues)</p>
+<p>inner={&#8216;improved&#8217;:2,&#8217;maxloop&#8217;:100,&#8217;minloop&#8217;:2}
+outer={&#8216;improved&#8217;:4,&#8217;maxloop&#8217;:5023}</p>
+<p>td=list(np.sqrt(np.linspace(1,float(10)**2,ni)))
+td=np.array(td)
+tune_interval=200</p>
+<p>sampleschedule={&#8216;inner&#8217;:inner,&#8217;outer&#8217;:outer}
+ssm={&#8216;sm&#8217;:&#8217;mcp&#8217;,&#8217;reset_betweenruns&#8217;:2,&#8217;blockupdate&#8217;:True, &#8216;exchange_method&#8217;:1,</p>
+<blockquote>
+<div>&#8216;sample_schedule&#8217;:sampleschedule,
+&#8216;stepmethod&#8217;:&#8217;mxmp2.0&#8217;,&#8217;tune_interval&#8217;:200,&#8217;add_bias&#8217;:False,&#8217;temperature_distribution&#8217;:td}</div></blockquote>
+<dl class="docutils">
+<dt>ssm0={&#8216;sm&#8217;:&#8217;mcs&#8217;,&#8217;reset_betweenruns&#8217;:2,&#8217;blockupdate&#8217;:False,&#8217;using_globalbest&#8217;:True,</dt>
+<dd>&#8216;sample_schedule&#8217;:sampleschedule,
+&#8216;stepmethod&#8217;:&#8217;mxmp2.0&#8217;,&#8217;tune_interval&#8217;:201,&#8217;add_bias&#8217;:False,&#8217;temperature_distribution&#8217;:td}</dd>
+<dt>ssm2={&#8216;sm&#8217;:&#8217;mcp&#8217;,&#8217;reset_betweenruns&#8217;:2,&#8217;blockupdate&#8217;:False, &#8216;exchange_method&#8217;:1,</dt>
+<dd>&#8216;sample_schedule&#8217;:sampleschedule,
+&#8216;stepmethod&#8217;:&#8217;mxmp2.0&#8217;,&#8217;tune_interval&#8217;:200,&#8217;add_bias&#8217;:False,&#8217;temperature_distribution&#8217;:td}</dd>
+<dt>ssm20={&#8216;sm&#8217;:&#8217;mcs&#8217;,&#8217;reset_betweenruns&#8217;:2,&#8217;blockupdate&#8217;:True,&#8217;using_globalbest&#8217;:True,</dt>
+<dd>&#8216;sample_schedule&#8217;:sampleschedule,
+&#8216;stepmethod&#8217;:&#8217;mxmp2.0&#8217;,&#8217;tune_interval&#8217;:201,&#8217;add_bias&#8217;:False,&#8217;temperature_distribution&#8217;:td}</dd>
+<dt>ssm1={&#8216;sm&#8217;:&#8217;mca&#8217;,&#8217;reset_betweenruns&#8217;:2,&#8217;blockupdate&#8217;:True, &#8216;using_globalbest&#8217;:True,</dt>
+<dd>&#8216;sample_schedule&#8217;:sampleschedule,
+&#8216;stepmethod&#8217;:&#8217;mxmp2.0&#8217;,&#8217;tune_interval&#8217;:201,&#8217;add_bias&#8217;:False,&#8217;temperature_distribution&#8217;:np.zeros(ni)+2}</dd>
+</dl>
+<p>ssm3={&#8216;sm&#8217;:&#8217;powell&#8217;,&#8217;blockupdate&#8217;:False}</p>
+<p class="last">sml=[ssm20,ssm2,ssm0,ssm,ssm0,ssm,ssm0,ssm, ssm1]</p>
+</dd>
+<dt>Define the final model::</dt>
+<dd><dl class="first last docutils">
+<dt>model1={&#8216;scorers&#8217;:[scaledsp1,ref1],&#8217;bmtype&#8217;:bmtype,&#8217;searches&#8217;:[search1,search2], &#8216;runsperscorer&#8217;:ni,</dt>
+<dd>&#8216;dsearches&#8217;:[dsearch2,dsearch5,dsearch4,dsearch7,dsearch8,dsearch9],&#8217;sml&#8217;:sml,&#8217;cvk&#8217;:2,&#8217;repeat&#8217;:1,&#8217;fold&#8217;:3}</dd>
+</dl>
+</dd>
+</dl>
 <span class="target" id="module-modelSelection"></span><p>SOAP Model Selection module</p>
-<dl class="function">
-<dt id="modelSelection.random_number">
-<tt class="descclassname">modelSelection.</tt><tt class="descname">random_number</tt><big>(</big><big>)</big><a class="headerlink" href="#modelSelection.random_number" title="Permalink to this definition">¶</a></dt>
-<dd><p>random_sample(size=None)</p>
-<p>Return random floats in the half-open interval [0.0, 1.0).</p>
-<p>Results are from the &#8220;continuous uniform&#8221; distribution over the
-stated interval.  To sample <span class="math">\(Unif[a, b), b &gt; a\)</span> multiply
-the output of <cite>random_sample</cite> by <cite>(b-a)</cite> and add <cite>a</cite>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="n">b</span> <span class="o">-</span> <span class="n">a</span><span class="p">)</span> <span class="o">*</span> <span class="n">random_sample</span><span class="p">()</span> <span class="o">+</span> <span class="n">a</span>
-</pre></div>
-</div>
-<dl class="docutils">
-<dt>size <span class="classifier-delimiter">:</span> <span class="classifier">int or tuple of ints, optional</span></dt>
-<dd>Defines the shape of the returned array of random floats. If None
-(the default), returns a single float.</dd>
-</dl>
-<dl class="docutils">
-<dt>out <span class="classifier-delimiter">:</span> <span class="classifier">float or ndarray of floats</span></dt>
-<dd>Array of random floats of shape <cite>size</cite> (unless <tt class="docutils literal"><span class="pre">size=None</span></tt>, in which
-case a single float is returned).</dd>
-</dl>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random_sample</span><span class="p">()</span>
-<span class="go">0.47108547995356098</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random_sample</span><span class="p">())</span>
-<span class="go">&lt;type &#39;float&#39;&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random_sample</span><span class="p">((</span><span class="mi">5</span><span class="p">,))</span>
-<span class="go">array([ 0.30220482,  0.86820401,  0.1654503 ,  0.11659149,  0.54323428])</span>
-</pre></div>
-</div>
-<p>Three-by-two array of random numbers from [-5, 0):</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="mi">5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random_sample</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">-</span> <span class="mi">5</span>
-<span class="go">array([[-3.99149989, -0.52338984],</span>
-<span class="go">       [-2.99091858, -0.79479508],</span>
-<span class="go">       [-1.23204345, -1.75224494]])</span>
-</pre></div>
-</div>
+<dl class="class">
+<dt id="modelSelection.sps">
+<em class="property">class </em><tt class="descclassname">modelSelection.</tt><tt class="descname">sps</tt><big>(</big><em>env=&lt;env.env object at 0x624dd10&gt;</em>, <em>modellist=</em><span class="optional">[</span><span class="optional">]</span>, <em>evalPotFunc=None</em><big>)</big><a class="reference internal" href="_modules/modelSelection.html#sps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modelSelection.sps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate a list of models on sge cluster</p>
 </dd></dl>
 
+<dl class="class">
+<dt id="modelSelection.spss">
+<em class="property">class </em><tt class="descclassname">modelSelection.</tt><tt class="descname">spss</tt><big>(</big><em>model=</em><span class="optional">[</span><span class="optional">]</span>, <em>logfoldername=''</em>, <em>evalPotFunc=None</em><big>)</big><a class="reference internal" href="_modules/modelSelection.html#spss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modelSelection.spss" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Select the best model. Common usage::</dt>
+<dd>spl=spss(model=model1)
+spl.find_best_par()
+spl.log()</dd>
+</dl>
+</dd></dl>
+
+</div>
 </div>
 
 
@@ -104,6 +157,14 @@ case a single float is returned).</dd>
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Select the best model and generate statistical potentials</a><ul>
+<li><a class="reference internal" href="#define-statistical-potential-model-and-model-space">Define statistical potential model and model space</a></li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
   <p class="topless"><a href="jobSchedule.html"
                         title="previous chapter">Job scheduler (local and on SGE cluster)</a></p>

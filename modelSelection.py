@@ -5,9 +5,6 @@
 from env import *
 from crossValidate import *
 
-#import objgraph
-#import multiprocessing.util as util
-#util.log_to_stderr(util.SUBDEBUG)
 debug=True
 
 
@@ -24,11 +21,12 @@ def cvplot(cl):
     gc.collect()
     return 0
 
-#from multiprocessing import Pool
-#p = Pool(1,maxtasksperchild=1000)#,maxtasksperchild=1
 
 
 class sps(object):
+    """
+    Evaluate a list of models on sge cluster
+    """
     def __init__(self,env=env(),modellist=[],evalPotFunc=None):
         self.env=env
         self.models=modellist
@@ -227,7 +225,19 @@ class sps(object):
         return rdl
   
 class spss(object):
+    """
+    Select the best model. Common usage::
+        spl=spss(model=model1)
+        spl.find_best_par()
+        spl.log()    
+    
+    """
     def __init__(self, model=[],logfoldername='',evalPotFunc=None):
+        """
+        :Parameters:
+          - `model`: the model space to search the best model within
+    
+        """
         self.dsearches=model['dsearches']
         self.env=env()
         self.model=model

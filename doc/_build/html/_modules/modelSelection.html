@@ -80,7 +80,7 @@
 <span class="c">#p = Pool(1,maxtasksperchild=1000)#,maxtasksperchild=1</span>
 
 
-<span class="k">class</span> <span class="nc">sps</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="sps"><a class="viewcode-back" href="../modelSelection.html#modelSelection.sps">[docs]</a><span class="k">class</span> <span class="nc">sps</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">(),</span><span class="n">modellist</span><span class="o">=</span><span class="p">[],</span><span class="n">evalPotFunc</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">=</span><span class="n">env</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">models</span><span class="o">=</span><span class="n">modellist</span>
@@ -277,8 +277,8 @@
         <span class="k">for</span> <span class="n">cv</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cvlist</span><span class="p">:</span>
             <span class="n">rdl</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cv</span><span class="o">.</span><span class="n">rundir</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">rdl</span>
-  
-<span class="k">class</span> <span class="nc">spss</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+  </div>
+<div class="viewcode-block" id="spss"><a class="viewcode-back" href="../modelSelection.html#modelSelection.spss">[docs]</a><span class="k">class</span> <span class="nc">spss</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="p">[],</span><span class="n">logfoldername</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span><span class="n">evalPotFunc</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dsearches</span><span class="o">=</span><span class="n">model</span><span class="p">[</span><span class="s">&#39;dsearches&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">()</span>
@@ -674,7 +674,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">get_all_models</span><span class="p">(</span><span class="n">ml3</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">resultdict</span><span class="p">:</span>
             <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">resultdict</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="s">&#39;, &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-    
+    </div>
 <span class="k">def</span> <span class="nf">pickle2shelf</span><span class="p">(</span><span class="n">prefix</span><span class="p">):</span>
     <span class="n">fh</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="n">prefix</span><span class="o">+</span><span class="s">&#39;.pickle&#39;</span><span class="p">)</span>
     <span class="n">a</span><span class="o">=</span><span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fh</span><span class="p">)</span>

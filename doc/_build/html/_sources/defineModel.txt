@@ -3,8 +3,6 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Enviromental variables
+Define statistical potential model and model space 
 ================================
 
-.. automodule:: env-config
-   :members:
