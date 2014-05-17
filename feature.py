@@ -9,7 +9,28 @@ from env import *
          
              
 class feature(object):
-    def __init__(self,features,mlib=None):
+    """
+        Define the features for calcualting statistics from structures
+    """
+    def __init__(self,features,mlib=None):#mlib does not need to be supplied anymore
+        """
+        :Parameters:
+          - `features`: the string representation of features, mini language::
+          
+            features => feature [,features]
+            feature  => type, number of bins, #, range, [,#, start value] #start value will be zero if not defined
+        
+        Example::
+            
+            features='d30#15'# 0-30A, 0.5 bin size    
+                
+        
+        Types are from MDT:
+        
+        .. literalinclude:: ./feature.py 
+           :pyobject: feature._gen_single_feature
+        
+        """
         self.features=features
         #self.preprocess_features()
         self.featurelist=[]

@@ -836,7 +836,7 @@ def convert2old(nm):
             nm['scorers']=ssd['valueset'][ssd['index']][0]
             nm['searches']=ssd['valueset'][ssd['index']][1]
     k=-1
-    preprocessing(nm) 
+    preprocessing(nm)
     for search in nm['searches']:
         #k+=1
         #search=nm['searches'][k]
@@ -886,15 +886,16 @@ def convert2old(nm):
         if 0 and (search['key']=='parvalue') and ('par' in scorer) and len(scorer['par'])>0:
             scorer['parvalue']=[1 for item in scorer['par']]
         try:
-            if (search['key']=='parvalue'):
+            if search['key']=='parvalue':
                 search['pos']=range(0,len(scorer['parvalue']))
             elif search['key']=='par':
                 search['pos']=range(0,len(scorer['par']))
         except Exception,e:
             traceback.print_exc()
-            print scorer
-            print search
+            #print scorer
+            #print search
             pdb.set_trace()
+    print 'converting model'
     if ('bm' in nm['bmtype']) and isinstance(nm['bmtype']['bm'],list):
         npl=[]
         for item in nm['bmtype']['bm']:
@@ -916,6 +917,7 @@ def convert2old(nm):
                         else:
                             nfl.append(item[0]+str(int(0.5+(item[2]-item[1])/item[3]))+'#'+str(item[2])+'#'+str(item[1]))                        
                     except:
+                        traceback.print_exc()
                         pdb.set_trace()
                 else:
                     nfl.append(item)

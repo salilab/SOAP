@@ -58,42 +58,16 @@
   <div class="section" id="module-recoveryFunction">
 <span id="recovery-functions"></span><h1>Recovery Functions<a class="headerlink" href="#module-recoveryFunction" title="Permalink to this headline">¶</a></h1>
 <p>SOAP recovery function module</p>
-<dl class="function">
-<dt id="recoveryFunction.random_number">
-<tt class="descclassname">recoveryFunction.</tt><tt class="descname">random_number</tt><big>(</big><big>)</big><a class="headerlink" href="#recoveryFunction.random_number" title="Permalink to this definition">¶</a></dt>
-<dd><p>random_sample(size=None)</p>
-<p>Return random floats in the half-open interval [0.0, 1.0).</p>
-<p>Results are from the &#8220;continuous uniform&#8221; distribution over the
-stated interval.  To sample <span class="math">\(Unif[a, b), b &gt; a\)</span> multiply
-the output of <cite>random_sample</cite> by <cite>(b-a)</cite> and add <cite>a</cite>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="n">b</span> <span class="o">-</span> <span class="n">a</span><span class="p">)</span> <span class="o">*</span> <span class="n">random_sample</span><span class="p">()</span> <span class="o">+</span> <span class="n">a</span>
-</pre></div>
-</div>
-<dl class="docutils">
-<dt>size <span class="classifier-delimiter">:</span> <span class="classifier">int or tuple of ints, optional</span></dt>
-<dd>Defines the shape of the returned array of random floats. If None
-(the default), returns a single float.</dd>
-</dl>
-<dl class="docutils">
-<dt>out <span class="classifier-delimiter">:</span> <span class="classifier">float or ndarray of floats</span></dt>
-<dd>Array of random floats of shape <cite>size</cite> (unless <tt class="docutils literal"><span class="pre">size=None</span></tt>, in which
-case a single float is returned).</dd>
-</dl>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random_sample</span><span class="p">()</span>
-<span class="go">0.47108547995356098</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random_sample</span><span class="p">())</span>
-<span class="go">&lt;type &#39;float&#39;&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random_sample</span><span class="p">((</span><span class="mi">5</span><span class="p">,))</span>
-<span class="go">array([ 0.30220482,  0.86820401,  0.1654503 ,  0.11659149,  0.54323428])</span>
-</pre></div>
-</div>
-<p>Three-by-two array of random numbers from [-5, 0):</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="mi">5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random_sample</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">-</span> <span class="mi">5</span>
-<span class="go">array([[-3.99149989, -0.52338984],</span>
-<span class="go">       [-2.99091858, -0.79479508],</span>
-<span class="go">       [-1.23204345, -1.75224494]])</span>
-</pre></div>
-</div>
+<dl class="class">
+<dt id="recoveryFunction.sf">
+<em class="property">class </em><tt class="descclassname">recoveryFunction.</tt><tt class="descname">sf</tt><big>(</big><em>data=None</em>, <em>sftype=''</em>, <em>par=</em><span class="optional">[</span><span class="optional">]</span>, <em>parvalue=</em><span class="optional">[</span><span class="optional">]</span>, <em>features=''</em>, <em>type=''</em>, <em>model=</em><span class="optional">[</span><span class="optional">]</span>, <em>rawsp=None</em>, <em>*args</em>, <em>**args2</em><big>)</big><a class="reference internal" href="_modules/recoveryFunction.html#sf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#recoveryFunction.sf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recovery function class</p>
+<dl class="method">
+<dt id="recoveryFunction.sf.get_sf">
+<tt class="descname">get_sf</tt><big>(</big><em>returnreft=False</em><big>)</big><a class="reference internal" href="_modules/recoveryFunction.html#sf.get_sf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#recoveryFunction.sf.get_sf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the recovery function calcualted using the self.par and self.parvalue.</p>
+</dd></dl>
+
 </dd></dl>
 
 </div>

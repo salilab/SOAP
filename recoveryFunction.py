@@ -8,7 +8,19 @@ import numpy as np
 import scipy.interpolate
 
 class sf(object):
+    """
+    Recovery function class
+    """
     def __init__(self,data=None,sftype='',par=[],parvalue=[],features='',type='',model=[],rawsp=None,*args,**args2):
+        """
+        
+        :param str sftype: the type of recovery function, see source codes for detail: get1d().
+        :param list|numpyArray par: anchor points positions for splines.
+        :param list|numpyArray parvalue: anchor values for splines, and parameters for other type of recovery functions.
+        :param str features: features the recovery function corresponding to, see :mod:`feature`.
+        :param dict model: a dict contains the same parameters described above
+
+        """
         if model:
             sftype=model['sftype']
             features=model['features']
@@ -93,6 +105,9 @@ class sf(object):
             raise Exception('The length of parvalue is not the same as needed for building the reference distribution')
                  
     def get_sf(self, returnreft=False):
+        """
+        Return the recovery function calcualted using the self.par and self.parvalue.
+        """
         if self.type.startswith('sippl'):
             return np.log(self.data.sum(0)+0.000000000000000001)
         for i in range(0,self.nlen):

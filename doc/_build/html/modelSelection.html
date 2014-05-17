@@ -60,11 +60,12 @@
 <div class="section" id="define-statistical-potential-model-and-model-space">
 <h2>Define statistical potential model and model space<a class="headerlink" href="#define-statistical-potential-model-and-model-space" title="Permalink to this headline">¶</a></h2>
 <p>The model and model space are defined using python lists and dictionaries.</p>
-<p>Define the recovery function features, distance only, from 0 to 20A with bin size 0.05:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">rfeature</span><span class="o">=</span><span class="p">[[</span><span class="s">&#39;d&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mf">0.05</span><span class="p">]]</span>
+<p>Define the recovery function features, distance only, from 0 to 20A with bin size 0.05, see the <tt class="xref py py-mod docutils literal"><span class="pre">features</span></tt>.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">rfeature</span><span class="o">=</span><span class="p">[[</span><span class="s">&#39;d&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mf">0.05</span><span class="p">]]</span> <span class="c"># &#39;d&#39; - distance, 0 - start position, 20 - end position, 0.05 - bin size</span>
 </pre></div>
 </div>
-<p>Define the spliens used for generating recoery functions. The most important parameter is &#8216;uniform&#8217;:</p>
+<p>Features can be defined using either list or string, list defintion will be converted into string defintion on the fly.</p>
+<p>Define the spliens used for generating recoery functions. see <a class="reference internal" href="recoveryFucntion.html#module-recoveryFunction" title="recoveryFunction"><tt class="xref py py-mod docutils literal"><span class="pre">recoveryFunction</span></tt></a>:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">par</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;uniform&#39;</span><span class="p">:</span><span class="mi">4</span><span class="p">,</span><span class="s">&#39;featurebins&#39;</span><span class="p">:</span><span class="n">rfeature</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="s">&#39;distribute&#39;</span><span class="p">:</span><span class="s">&#39;lownumberpriority&#39;</span><span class="p">,</span><span class="s">&#39;firstpoint&#39;</span><span class="p">:</span><span class="mf">2.25</span><span class="p">}</span>
 <span class="n">slo</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;key&#39;</span><span class="p">:</span><span class="s">&#39;sacnfflex&#39;</span><span class="p">,</span>
 <span class="s">&#39;valueset&#39;</span><span class="p">:{</span>
@@ -73,55 +74,81 @@
 <span class="p">}}</span>
 </pre></div>
 </div>
+<p>The most important parameter to vary is &#8216;uniform&#8217;, which defines the number of anchor points to use.</p>
+<p>Define the recovery function, see <a class="reference internal" href="recoveryFucntion.html#module-recoveryFunction" title="recoveryFunction"><tt class="xref py py-mod docutils literal"><span class="pre">recoveryFunction</span></tt></a>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">ref1</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;sf&#39;</span><span class="p">,</span><span class="s">&#39;features&#39;</span><span class="p">:</span><span class="n">rfeature</span><span class="p">,</span><span class="s">&#39;sftype&#39;</span><span class="p">:</span><span class="n">slo</span><span class="p">,</span><span class="s">&#39;par&#39;</span><span class="p">:</span><span class="n">slo</span><span class="p">,</span><span class="s">&#39;parvalue&#39;</span><span class="p">:</span><span class="n">slo</span><span class="p">,</span><span class="s">&#39;ratio&#39;</span><span class="p">:[</span><span class="mf">1.0</span><span class="p">]}</span>
+</pre></div>
+</div>
 <dl class="docutils">
-<dt>Define the recovery function::</dt>
-<dd>ref1={&#8216;type&#8217;:&#8217;sf&#8217;,&#8217;features&#8217;:rfeature,&#8217;sftype&#8217;:slo,&#8217;par&#8217;:slo,&#8217;parvalue&#8217;:slo,&#8217;ratio&#8217;:[1.0]}</dd>
 <dt>Define the features for the probablistic table calcualtion, a158 represent residue dependent atom type ::</dt>
 <dd>sfeature=[rfeature[0],&#8217;a158&#8217;,&#8217;as158&#8217;]</dd>
-<dt>Define the processing method of the probablistic table, &#8216;npend&#8217; means normalized by the last bin value::</dt>
-<dd>pm=[&#8216;&#8217;,&#8217;npend&#8217;]</dd>
-<dt>Define the probabilistic table using for scoring::</dt>
-<dd>scaledsp1={&#8216;type&#8217;:&#8217;scaledsp&#8217;,&#8217;pdbset&#8217;:&#8217;X2_2.2A_0.25rfree&#8217;,&#8217;features&#8217;:sfeature,&#8217;genmethod&#8217;:&#8217;cs1&#8217;,&#8217;pm&#8217;:pm,&#8217;refs&#8217;:[ref1],&#8217;ratio&#8217;:[1.0]}</dd>
-<dt>The benchmark criteria, defines how the statistical potentials are benchmarked::</dt>
-<dd>bmtype={&#8216;type&#8217;:&#8217;dsscore&#8217;,&#8217;dslist&#8217;:[&#8216;fpdb&#8217;,&#8217;fpdu&#8217;],&#8217;criteria&#8217;:&#8216;3xtop1_rmsdallif_mean_+2xtop3_rmsdallif_mean_&#8217;,&#8217;combine&#8217;:&#8217;scoresum&#8217;,&#8217;bm&#8217;:&#8217;cs1&#8217;}</dd>
-<dt>Parameters to optimize::</dt>
-<dd>search1={&#8216;object&#8217;:ref1,&#8217;key&#8217;:&#8217;parvalue&#8217;,&#8217;pos&#8217;:[0,1,2,3],&#8217;InitialGenerator&#8217;:{&#8216;type&#8217;:&#8217;dfire&#8217;,&#8217;values&#8217;:initvalues}}
-search2={&#8216;object&#8217;:ref1,&#8217;key&#8217;:&#8217;par&#8217;,&#8217;pos&#8217;:[0,1,2,3],&#8217;InitialGenerator&#8217;:{&#8216;type&#8217;:&#8217;dfire&#8217;,&#8217;values&#8217;:initvalues}}</dd>
-<dt>Discrete search dictionaries, defining the model space - the model variables/options to vary::</dt>
-<dd><p class="first">dsearch4={&#8216;object&#8217;:par,&#8217;key&#8217;:&#8217;uniform&#8217;,&#8217;valueset&#8217;:[7,6,5,4,3]}</p>
-<p class="last">dsearch9={&#8216;object&#8217;:[scaledsp1,scaledsp1],&#8217;key&#8217;:[&#8216;genmethod&#8217;,&#8217;pdbset&#8217;],&#8217;valueset&#8217;:[[&#8216;cs1&#8217;,&#8217;X2_2.2A_0.25rfree&#8217;]]}#,[&#8216;cs1&#8217;,&#8217;X2_2.2A_0.25rfree_30&#8217;],[&#8216;cs1&#8217;,&#8217;X2_2.2A_0.25rfree_60&#8217;],[&#8216;cs1&#8217;,&#8217;X2_2.2A_0.25rfree_95&#8217;],[&#8216;bs20dsp&#8217;,&#8217;X_2.2A_0.25rfree&#8217;],[&#8216;bs20dsp&#8217;,&#8217;X_2.2A_0.25rfree_30&#8217;],[&#8216;bs20dsp&#8217;,&#8217;X_2.2A_0.25rfree_60&#8217;],[&#8216;bs15dsp&#8217;,&#8217;X_2.2A_0.25rfree&#8217;],[&#8216;bs10dsp&#8217;,&#8217;X_2.2A_0.25rfree&#8217;]]}#,,&#8217;cs1&#8217;</p>
-</dd>
-<dt>Parameters controling sampling and optimization::</dt>
-<dd><p class="first">ni=40</p>
-<p>initvalues=list(np.arange(0,ni)/10.0+1)</p>
-<p>initvalues=np.array(initvalues)</p>
-<p>inner={&#8216;improved&#8217;:2,&#8217;maxloop&#8217;:100,&#8217;minloop&#8217;:2}
-outer={&#8216;improved&#8217;:4,&#8217;maxloop&#8217;:5023}</p>
-<p>td=list(np.sqrt(np.linspace(1,float(10)**2,ni)))
-td=np.array(td)
-tune_interval=200</p>
-<p>sampleschedule={&#8216;inner&#8217;:inner,&#8217;outer&#8217;:outer}
-ssm={&#8216;sm&#8217;:&#8217;mcp&#8217;,&#8217;reset_betweenruns&#8217;:2,&#8217;blockupdate&#8217;:True, &#8216;exchange_method&#8217;:1,</p>
-<blockquote>
-<div>&#8216;sample_schedule&#8217;:sampleschedule,
-&#8216;stepmethod&#8217;:&#8217;mxmp2.0&#8217;,&#8217;tune_interval&#8217;:200,&#8217;add_bias&#8217;:False,&#8217;temperature_distribution&#8217;:td}</div></blockquote>
-<dl class="docutils">
-<dt>ssm0={&#8216;sm&#8217;:&#8217;mcs&#8217;,&#8217;reset_betweenruns&#8217;:2,&#8217;blockupdate&#8217;:False,&#8217;using_globalbest&#8217;:True,</dt>
-<dd>&#8216;sample_schedule&#8217;:sampleschedule,
-&#8216;stepmethod&#8217;:&#8217;mxmp2.0&#8217;,&#8217;tune_interval&#8217;:201,&#8217;add_bias&#8217;:False,&#8217;temperature_distribution&#8217;:td}</dd>
-<dt>ssm2={&#8216;sm&#8217;:&#8217;mcp&#8217;,&#8217;reset_betweenruns&#8217;:2,&#8217;blockupdate&#8217;:False, &#8216;exchange_method&#8217;:1,</dt>
-<dd>&#8216;sample_schedule&#8217;:sampleschedule,
-&#8216;stepmethod&#8217;:&#8217;mxmp2.0&#8217;,&#8217;tune_interval&#8217;:200,&#8217;add_bias&#8217;:False,&#8217;temperature_distribution&#8217;:td}</dd>
-<dt>ssm20={&#8216;sm&#8217;:&#8217;mcs&#8217;,&#8217;reset_betweenruns&#8217;:2,&#8217;blockupdate&#8217;:True,&#8217;using_globalbest&#8217;:True,</dt>
-<dd>&#8216;sample_schedule&#8217;:sampleschedule,
-&#8216;stepmethod&#8217;:&#8217;mxmp2.0&#8217;,&#8217;tune_interval&#8217;:201,&#8217;add_bias&#8217;:False,&#8217;temperature_distribution&#8217;:td}</dd>
-<dt>ssm1={&#8216;sm&#8217;:&#8217;mca&#8217;,&#8217;reset_betweenruns&#8217;:2,&#8217;blockupdate&#8217;:True, &#8216;using_globalbest&#8217;:True,</dt>
-<dd>&#8216;sample_schedule&#8217;:sampleschedule,
-&#8216;stepmethod&#8217;:&#8217;mxmp2.0&#8217;,&#8217;tune_interval&#8217;:201,&#8217;add_bias&#8217;:False,&#8217;temperature_distribution&#8217;:np.zeros(ni)+2}</dd>
 </dl>
-<p>ssm3={&#8216;sm&#8217;:&#8217;powell&#8217;,&#8217;blockupdate&#8217;:False}</p>
-<p class="last">sml=[ssm20,ssm2,ssm0,ssm,ssm0,ssm,ssm0,ssm, ssm1]</p>
-</dd>
+<p>Define the processing method of the probablistic table, &#8216;npend&#8217; means normalized by the last bin value:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">pm</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;&#39;</span><span class="p">,</span><span class="s">&#39;npend&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Define the probabilistic table using for scoring:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">scaledsp1</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;scaledsp&#39;</span><span class="p">,</span><span class="s">&#39;pdbset&#39;</span><span class="p">:</span><span class="s">&#39;X2_2.2A_0.25rfree&#39;</span><span class="p">,</span><span class="s">&#39;features&#39;</span><span class="p">:</span><span class="n">sfeature</span><span class="p">,</span><span class="s">&#39;genmethod&#39;</span><span class="p">:</span><span class="s">&#39;cs1&#39;</span><span class="p">,</span><span class="s">&#39;pm&#39;</span><span class="p">:</span><span class="n">pm</span><span class="p">,</span><span class="s">&#39;refs&#39;</span><span class="p">:[</span><span class="n">ref1</span><span class="p">],</span><span class="s">&#39;ratio&#39;</span><span class="p">:[</span><span class="mf">1.0</span><span class="p">]}</span>
+</pre></div>
+</div>
+<p>The benchmark criteria, defines how the statistical potentials are benchmarked:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">bmtype</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;dsscore&#39;</span><span class="p">,</span><span class="s">&#39;dslist&#39;</span><span class="p">:[</span><span class="s">&#39;fpdb&#39;</span><span class="p">,</span><span class="s">&#39;fpdu&#39;</span><span class="p">],</span><span class="s">&#39;criteria&#39;</span><span class="p">:</span><span class="s">&#39;3xtop1_rmsdallif_mean_+2xtop3_rmsdallif_mean_&#39;</span><span class="p">,</span><span class="s">&#39;combine&#39;</span><span class="p">:</span><span class="s">&#39;scoresum&#39;</span><span class="p">,</span><span class="s">&#39;bm&#39;</span><span class="p">:</span><span class="s">&#39;cs1&#39;</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>Parameters to optimize:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">search1</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;object&#39;</span><span class="p">:</span><span class="n">ref1</span><span class="p">,</span><span class="s">&#39;key&#39;</span><span class="p">:</span><span class="s">&#39;parvalue&#39;</span><span class="p">,</span><span class="s">&#39;pos&#39;</span><span class="p">:[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span><span class="s">&#39;InitialGenerator&#39;</span><span class="p">:{</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;dfire&#39;</span><span class="p">,</span><span class="s">&#39;values&#39;</span><span class="p">:</span><span class="n">initvalues</span><span class="p">}}</span>
+<span class="n">search2</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;object&#39;</span><span class="p">:</span><span class="n">ref1</span><span class="p">,</span><span class="s">&#39;key&#39;</span><span class="p">:</span><span class="s">&#39;par&#39;</span><span class="p">,</span><span class="s">&#39;pos&#39;</span><span class="p">:[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span><span class="s">&#39;InitialGenerator&#39;</span><span class="p">:{</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;dfire&#39;</span><span class="p">,</span><span class="s">&#39;values&#39;</span><span class="p">:</span><span class="n">initvalues</span><span class="p">}}</span>
+</pre></div>
+</div>
+<p>Discrete search dictionaries, defining the model space - the model variables/options to vary:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">dsearch4</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;object&#39;</span><span class="p">:</span><span class="n">par</span><span class="p">,</span><span class="s">&#39;key&#39;</span><span class="p">:</span><span class="s">&#39;uniform&#39;</span><span class="p">,</span><span class="s">&#39;valueset&#39;</span><span class="p">:[</span><span class="mi">7</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">3</span><span class="p">]}</span>
+
+<span class="n">dsearch9</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;object&#39;</span><span class="p">:[</span><span class="n">scaledsp1</span><span class="p">,</span><span class="n">scaledsp1</span><span class="p">],</span><span class="s">&#39;key&#39;</span><span class="p">:[</span><span class="s">&#39;genmethod&#39;</span><span class="p">,</span><span class="s">&#39;pdbset&#39;</span><span class="p">],</span><span class="s">&#39;valueset&#39;</span><span class="p">:[[</span><span class="s">&#39;cs1&#39;</span><span class="p">,</span><span class="s">&#39;X2_2.2A_0.25rfree&#39;</span><span class="p">]]}</span><span class="c">#,[&#39;cs1&#39;,&#39;X2_2.2A_0.25rfree_30&#39;],[&#39;cs1&#39;,&#39;X2_2.2A_0.25rfree_60&#39;],[&#39;cs1&#39;,&#39;X2_2.2A_0.25rfree_95&#39;],[&#39;bs20dsp&#39;,&#39;X_2.2A_0.25rfree&#39;],[&#39;bs20dsp&#39;,&#39;X_2.2A_0.25rfree_30&#39;],[&#39;bs20dsp&#39;,&#39;X_2.2A_0.25rfree_60&#39;],[&#39;bs15dsp&#39;,&#39;X_2.2A_0.25rfree&#39;],[&#39;bs10dsp&#39;,&#39;X_2.2A_0.25rfree&#39;]]}#,,&#39;cs1&#39;</span>
+</pre></div>
+</div>
+<p>Parameters controling sampling and optimization, please check the code in the sampling module for detailed meanings:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">ni</span><span class="o">=</span><span class="mi">40</span>
+
+<span class="n">initvalues</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">ni</span><span class="p">)</span><span class="o">/</span><span class="mf">10.0</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">initvalues</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">initvalues</span><span class="p">)</span>
+
+<span class="n">inner</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;improved&#39;</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span><span class="s">&#39;maxloop&#39;</span><span class="p">:</span><span class="mi">100</span><span class="p">,</span><span class="s">&#39;minloop&#39;</span><span class="p">:</span><span class="mi">2</span><span class="p">}</span>
+<span class="n">outer</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;improved&#39;</span><span class="p">:</span><span class="mi">4</span><span class="p">,</span><span class="s">&#39;maxloop&#39;</span><span class="p">:</span><span class="mi">5023</span><span class="p">}</span>
+
+<span class="n">td</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">float</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span><span class="n">ni</span><span class="p">)))</span>
+<span class="n">td</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">td</span><span class="p">)</span>
+<span class="n">tune_interval</span><span class="o">=</span><span class="mi">200</span>
+
+<span class="n">sampleschedule</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;inner&#39;</span><span class="p">:</span><span class="n">inner</span><span class="p">,</span><span class="s">&#39;outer&#39;</span><span class="p">:</span><span class="n">outer</span><span class="p">}</span>
+<span class="n">ssm</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;sm&#39;</span><span class="p">:</span><span class="s">&#39;mcp&#39;</span><span class="p">,</span><span class="s">&#39;reset_betweenruns&#39;</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span><span class="s">&#39;blockupdate&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">,</span> <span class="s">&#39;exchange_method&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span>
+      <span class="s">&#39;sample_schedule&#39;</span><span class="p">:</span><span class="n">sampleschedule</span><span class="p">,</span>
+      <span class="s">&#39;stepmethod&#39;</span><span class="p">:</span><span class="s">&#39;mxmp2.0&#39;</span><span class="p">,</span><span class="s">&#39;tune_interval&#39;</span><span class="p">:</span><span class="mi">200</span><span class="p">,</span><span class="s">&#39;add_bias&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">,</span><span class="s">&#39;temperature_distribution&#39;</span><span class="p">:</span><span class="n">td</span><span class="p">}</span>
+
+<span class="n">ssm0</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;sm&#39;</span><span class="p">:</span><span class="s">&#39;mcs&#39;</span><span class="p">,</span><span class="s">&#39;reset_betweenruns&#39;</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span><span class="s">&#39;blockupdate&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">,</span><span class="s">&#39;using_globalbest&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">,</span>
+      <span class="s">&#39;sample_schedule&#39;</span><span class="p">:</span><span class="n">sampleschedule</span><span class="p">,</span>
+      <span class="s">&#39;stepmethod&#39;</span><span class="p">:</span><span class="s">&#39;mxmp2.0&#39;</span><span class="p">,</span><span class="s">&#39;tune_interval&#39;</span><span class="p">:</span><span class="mi">201</span><span class="p">,</span><span class="s">&#39;add_bias&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">,</span><span class="s">&#39;temperature_distribution&#39;</span><span class="p">:</span><span class="n">td</span><span class="p">}</span>
+
+
+<span class="n">ssm2</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;sm&#39;</span><span class="p">:</span><span class="s">&#39;mcp&#39;</span><span class="p">,</span><span class="s">&#39;reset_betweenruns&#39;</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span><span class="s">&#39;blockupdate&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">,</span> <span class="s">&#39;exchange_method&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span>
+      <span class="s">&#39;sample_schedule&#39;</span><span class="p">:</span><span class="n">sampleschedule</span><span class="p">,</span>
+      <span class="s">&#39;stepmethod&#39;</span><span class="p">:</span><span class="s">&#39;mxmp2.0&#39;</span><span class="p">,</span><span class="s">&#39;tune_interval&#39;</span><span class="p">:</span><span class="mi">200</span><span class="p">,</span><span class="s">&#39;add_bias&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">,</span><span class="s">&#39;temperature_distribution&#39;</span><span class="p">:</span><span class="n">td</span><span class="p">}</span>
+
+<span class="n">ssm20</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;sm&#39;</span><span class="p">:</span><span class="s">&#39;mcs&#39;</span><span class="p">,</span><span class="s">&#39;reset_betweenruns&#39;</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span><span class="s">&#39;blockupdate&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">,</span><span class="s">&#39;using_globalbest&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">,</span>
+      <span class="s">&#39;sample_schedule&#39;</span><span class="p">:</span><span class="n">sampleschedule</span><span class="p">,</span>
+      <span class="s">&#39;stepmethod&#39;</span><span class="p">:</span><span class="s">&#39;mxmp2.0&#39;</span><span class="p">,</span><span class="s">&#39;tune_interval&#39;</span><span class="p">:</span><span class="mi">201</span><span class="p">,</span><span class="s">&#39;add_bias&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">,</span><span class="s">&#39;temperature_distribution&#39;</span><span class="p">:</span><span class="n">td</span><span class="p">}</span>
+
+
+<span class="n">ssm1</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;sm&#39;</span><span class="p">:</span><span class="s">&#39;mca&#39;</span><span class="p">,</span><span class="s">&#39;reset_betweenruns&#39;</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span><span class="s">&#39;blockupdate&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">,</span> <span class="s">&#39;using_globalbest&#39;</span><span class="p">:</span><span class="bp">True</span><span class="p">,</span>
+      <span class="s">&#39;sample_schedule&#39;</span><span class="p">:</span><span class="n">sampleschedule</span><span class="p">,</span>
+      <span class="s">&#39;stepmethod&#39;</span><span class="p">:</span><span class="s">&#39;mxmp2.0&#39;</span><span class="p">,</span><span class="s">&#39;tune_interval&#39;</span><span class="p">:</span><span class="mi">201</span><span class="p">,</span><span class="s">&#39;add_bias&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">,</span><span class="s">&#39;temperature_distribution&#39;</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">ni</span><span class="p">)</span><span class="o">+</span><span class="mi">2</span><span class="p">}</span>
+
+<span class="n">ssm3</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;sm&#39;</span><span class="p">:</span><span class="s">&#39;powell&#39;</span><span class="p">,</span><span class="s">&#39;blockupdate&#39;</span><span class="p">:</span><span class="bp">False</span><span class="p">}</span>
+
+<span class="n">sml</span><span class="o">=</span><span class="p">[</span><span class="n">ssm20</span><span class="p">,</span><span class="n">ssm2</span><span class="p">,</span><span class="n">ssm0</span><span class="p">,</span><span class="n">ssm</span><span class="p">,</span><span class="n">ssm0</span><span class="p">,</span><span class="n">ssm</span><span class="p">,</span><span class="n">ssm0</span><span class="p">,</span><span class="n">ssm</span><span class="p">,</span> <span class="n">ssm1</span><span class="p">]</span>
+</pre></div>
+</div>
+<dl class="docutils">
 <dt>Define the final model::</dt>
 <dd><dl class="first last docutils">
 <dt>model1={&#8216;scorers&#8217;:[scaledsp1,ref1],&#8217;bmtype&#8217;:bmtype,&#8217;searches&#8217;:[search1,search2], &#8216;runsperscorer&#8217;:ni,</dt>
@@ -129,6 +156,24 @@ ssm={&#8216;sm&#8217;:&#8217;mcp&#8217;,&#8217;reset_betweenruns&#8217;:2,&#8217
 </dl>
 </dd>
 </dl>
+<span class="target" id="module-modelSelection"></span><p>SOAP Model Selection module</p>
+<dl class="class">
+<dt id="modelSelection.sps">
+<em class="property">class </em><tt class="descclassname">modelSelection.</tt><tt class="descname">sps</tt><big>(</big><em>env=&lt;env.env object at 0x5622390&gt;</em>, <em>modellist=</em><span class="optional">[</span><span class="optional">]</span>, <em>evalPotFunc=None</em><big>)</big><a class="reference internal" href="_modules/modelSelection.html#sps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modelSelection.sps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate a list of models on sge cluster</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="modelSelection.spss">
+<em class="property">class </em><tt class="descclassname">modelSelection.</tt><tt class="descname">spss</tt><big>(</big><em>model=</em><span class="optional">[</span><span class="optional">]</span>, <em>logfoldername=''</em>, <em>evalPotFunc=None</em><big>)</big><a class="reference internal" href="_modules/modelSelection.html#spss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modelSelection.spss" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Select the best model. Common usage::</dt>
+<dd>spl=spss(model=model1)
+spl.find_best_par()
+spl.log()</dd>
+</dl>
+</dd></dl>
+
 </div>
 </div>
 

@@ -1,4 +1,4 @@
-from sps import *
+from SOAP import *
 import cProfile
 runenv.otherrun=False
 ni=40
@@ -11,13 +11,18 @@ dslist=['ml'+str(i) for i in range(4,13)]#
 #looplist=['mgl'+str(i) for i in range(4,21)]
 dslist=['DecoysRUS','baker1']
 dslist=['wang','wangm','astex','astexm']
-dslist=['dude']
+#dslist=['dude']
 criteria='3xtop1_rmsd_mean_+NativeSelection+2xtop3_rmsd_mean_'#'3xtop1_rmsd_mean_+NativeSelection+2xtop3_rmsd_mean_'
 criteria='top1_rmsd_mean_+10xNativeSelection+cc'
 criteria='enrichment'
+criteria='3xtop1_rmsd_mean_+2xtop3_rmsd_mean_'
+
 bm=['cs1'] 
 filters=[]
 finalcriteria='enrichment'
+finalcriteria='top1_rmsd_mean_'
+
+
 if True:
     bmtype={'type':'dsscore','dslist':dslist,'criteria':criteria,'combine':'scoresum','bm':bm}
     if len(filters)>0:
@@ -148,15 +153,15 @@ ddsSf={'object':dsfl,'key':'key','valueset':dsfl['valueset'].keys()}
 
 
 ####OD pot scorers and searches
-odrfeature=[['dt',0,8,0.2]]
-odrrfeature=[['dt',0,8,8]]
-odgf=[['g',0,180,30]]
-odgsf=[['gs',0,180,30]]
-odhf=[['h',-180,180,30]]
+odrfeature=[['dtl',0,6,0.5]]
+odrrfeature=[['dtl',0,6,6]]
+odgf=[['g',0,180,60]]
+odgsf=[['gs',0,180,60]]
+odhf=[['h',-180,180,60]]
 odpm=['','nbsum']
 
 if True:
-    sfeature=[odrfeature[0],'g6#180','gs6#180','h12#180#-180','t306','ts306']
+    sfeature=[odrfeature[0],odgf[0],odgsf[0],odhf[0],'tl982','tsl982']
     odscaledsp1={'type':'scaledsp','pdbset':dpdbset,'features':sfeature,'genmethod':dgenmethod,'pm':odpm,'ratio':dratio}
     odref1={'type':'sf','features':odrfeature,'sftype':dsfl,'par':dsfl,'parvalue':dsfl,'ratio':dratio}
     odref2={'type':'sf','features':[odrrfeature[0],odgf[0]],'sftype':'spline','par':[0,60,120,180],'parvalue':[1,1,1,1],'ratio':dratio}
@@ -184,8 +189,8 @@ odpgratio=[1.0]
 odphratio=[1.0]
 
 if True:
-    sfeature1=[odgf, odrfeature[0],'t306','ts306']
-    sfeature2=[odhf, odrfeature[0],'t306','ts306']
+    sfeature1=[odgf[0], odrfeature[0],'tl982','tsl982']
+    sfeature2=[odhf[0], odrfeature[0],'tl982','tsl982']
     odpscaledsp1={'type':'scaledsp','pdbset':dpdbset,'features':sfeature1,'genmethod':dgenmethod,'pm':odppm,'ratio':odpgratio}
     odpscaledsp2={'type':'scaledsp','pdbset':dpdbset,'features':sfeature2,'genmethod':dgenmethod,'pm':odppm,'ratio':odphratio}
     odpref1={'type':'sf','features':[odrrfeature[0],odgf[0]],'sftype':'spline','par':[0,60,120,180],'parvalue':[1,1,1,1],'ratio':odpgratio}
@@ -205,7 +210,7 @@ odpdsCutoff={'object':[odgf[0],odgsf[0],odhf[0]],'key':[3,3,3],'valueset':[[item
 
 ####Fractional Surface assessibility feature
 bfeature=[['b',0,1.0,0.1]]
-bsfeature=[bfeature[0],'a184']
+bsfeature=[bfeature[0],'al184']
 bpm=['pp1','nbsum']
 bratio=[3.8]
 dSfList={'sacnf':[4],'sacf':[4],'bins':True,'expb':[1,2]}#'ig','dfire','bins','sinb':[],
@@ -245,8 +250,8 @@ ssl['d+b']=[[dscaledsp1,dref1,bscaledsp2,bref1],[dsParvalue,dsPar,dsRatio,bsParv
 dsspm=['pp5','npendi1']
 
 if True:
-    dssfeature=[dfeature[0], 'm5','ms5','a158','as158']
-    dssScaledsp1={'type':'scaledsp','pdbset':dpdbset,'features':dssfeature,'genmethod':dgenmethod,'pm':dsspm}
+    dssfeature=[dfeature[0], 'm5','ms5','al184','asl184']
+    dssScaledsp1={'type':'scaledsp','pdbset':dpdbset,'features':dssfeature,'genmethod':dgenmethod,'pm':dsspm,'ratio':[1.0]}
 
 ssl['dss']=[[dssScaledsp1,dref1],[dsParvalue,dsPar]]
 
@@ -258,8 +263,8 @@ dssdsPm0={'object':dsspm,'key':0,'valueset':['','pp5','pp1']}#'gps0.5','gps0.2'
 daapm=['pp5','nbsum']
 
 if True:
-    daafeature=[dfeature[0], bfeature[0],bfeature[0],'a158','as158']
-    daaScaledsp1={'type':'scaledsp','pdbset':dpdbset,'features':daafeature,'genmethod':dgenmethod,'pm':daapm}
+    daafeature=[dfeature[0], bfeature[0],bfeature[0],'al184','asl184']
+    daaScaledsp1={'type':'scaledsp','pdbset':dpdbset,'features':daafeature,'genmethod':dgenmethod,'pm':daapm,'ratio':[1.0]}
 
 ssl['daa']=[[daaScaledsp1,dref1],[dsParvalue,dsPar]]
 
@@ -269,8 +274,8 @@ daadsPm0={'object':daapm,'key':0,'valueset':['','pp5','pp1']}#'gps0.5','gps0.2'
 ####distance-aass scorers and searches
 
 if True:
-    daassfeature=[dfeature[0], 'b2','bs2','m5','ms5','a158','as158']
-    daassScaledsp1={'type':'scaledsp','pdbset':dpdbset,'features':daassfeature,'genmethod':dgenmethod,'pm':dsspm}
+    daassfeature=[dfeature[0], 'b2','bs2','m5','ms5','al184','asl184']
+    daassScaledsp1={'type':'scaledsp','pdbset':dpdbset,'features':daassfeature,'genmethod':dgenmethod,'pm':dsspm,'ratio':[1.0]}
 
 ssl['daass']=[[daassScaledsp1,dref1,bref1],[dsParvalue,dsPar,dsRatio,bsParvalue,bsRatio]]
 
@@ -284,10 +289,10 @@ daadsPm0={'object':daapm,'key':0,'valueset':['','pp5','pp1']}#'gps0.5','gps0.2'
 ssmodel={'index':'d','valueset':ssl}
 
 #dsSc defines the scorers to try
-dsSs={'object':ssmodel,'key':'index','valueset':['d','dsvd20','dsvdall','dsvd220','dsvdref','dsvd210','dsvd110','dsvd10']}#'d','b'
+dsSs={'object':ssmodel,'key':'index','valueset':['d','dsvd20','od','odp','dss','d+b','daa','daass']}#'d','b'
 
 #dsList defins the model space to search for
-dsList=[ddsCutoff,ddsBinsize,ddsSf]#[dsSs,ddsPm0,ddsPm1]#ddsSf
+dsList=[dsSs]#[dsSs,ddsPm0,ddsPm1]#ddsSf,ddsCutoff,ddsBinsize,ddsSf
 
 ##########optimization method section ##############
 step=1001
@@ -328,6 +333,7 @@ sml=[ssm20,ssm2,ssm0,ssm,ssm0,ssm,ssm0,ssm, ssm1]
 sml2=[ssm3, ssm1]
 sml3=[ssm1]
 ###############Define the final model#########
+runenv.runpriority=-10# maximum 0
 cvk=2
 repeat=1
 fold=3
@@ -345,7 +351,7 @@ if True:
         model['initialmodelpath=']=initialmodelpath
 
 ##############run the model###############
-rrn=0
+rrn=2
 #0: test optimizer
 #1: find best par--default
 #2: find best par -- no elimination

@@ -10,11 +10,13 @@ Define statistical potential model and model space
 ---------------------------------
 The model and model space are defined using python lists and dictionaries.
 
-Define the recovery function features, distance only, from 0 to 20A with bin size 0.05::
+Define the recovery function features, distance only, from 0 to 20A with bin size 0.05, see the :mod:`features`. ::
 
-   rfeature=[['d',0,20,0.05]] 
+   rfeature=[['d',0,20,0.05]] # 'd' - distance, 0 - start position, 20 - end position, 0.05 - bin size
+   
+Features can be defined using either list or string, list defintion will be converted into string defintion on the fly.
 
-Define the spliens used for generating recoery functions. The most important parameter is 'uniform'::
+Define the spliens used for generating recoery functions. see :mod:`recoveryFunction`::
 
     par={'uniform':4,'featurebins':rfeature[0],'distribute':'lownumberpriority','firstpoint':2.25}
     slo={'key':'sacnfflex',
@@ -22,34 +24,43 @@ Define the spliens used for generating recoery functions. The most important par
                     'sacnfflex':{'sftype':'sacnf','par':par,'parvalue':[1,1,1,1]},
                     'sacnf52':{'sftype':'sacnf','par':[2.75,3.75],'parvalue':[1,1,1,1]},
     }}
+
+The most important parameter to vary is 'uniform', which defines the number of anchor points to use.
     
-Define the recovery function::
+Define the recovery function, see :mod:`recoveryFunction`::
+
     ref1={'type':'sf','features':rfeature,'sftype':slo,'par':slo,'parvalue':slo,'ratio':[1.0]}
 
 Define the features for the probablistic table calcualtion, a158 represent residue dependent atom type ::
     sfeature=[rfeature[0],'a158','as158']
     
 Define the processing method of the probablistic table, 'npend' means normalized by the last bin value::
+
     pm=['','npend']
 
 Define the probabilistic table using for scoring::
+
     scaledsp1={'type':'scaledsp','pdbset':'X2_2.2A_0.25rfree','features':sfeature,'genmethod':'cs1','pm':pm,'refs':[ref1],'ratio':[1.0]}
 
 
 The benchmark criteria, defines how the statistical potentials are benchmarked::
+
     bmtype={'type':'dsscore','dslist':['fpdb','fpdu'],'criteria':'3xtop1_rmsdallif_mean_+2xtop3_rmsdallif_mean_','combine':'scoresum','bm':'cs1'}
 
 Parameters to optimize::
+
     search1={'object':ref1,'key':'parvalue','pos':[0,1,2,3],'InitialGenerator':{'type':'dfire','values':initvalues}}
     search2={'object':ref1,'key':'par','pos':[0,1,2,3],'InitialGenerator':{'type':'dfire','values':initvalues}}
 
 Discrete search dictionaries, defining the model space - the model variables/options to vary::
+
     dsearch4={'object':par,'key':'uniform','valueset':[7,6,5,4,3]}
     
     dsearch9={'object':[scaledsp1,scaledsp1],'key':['genmethod','pdbset'],'valueset':[['cs1','X2_2.2A_0.25rfree']]}#,['cs1','X2_2.2A_0.25rfree_30'],['cs1','X2_2.2A_0.25rfree_60'],['cs1','X2_2.2A_0.25rfree_95'],['bs20dsp','X_2.2A_0.25rfree'],['bs20dsp','X_2.2A_0.25rfree_30'],['bs20dsp','X_2.2A_0.25rfree_60'],['bs15dsp','X_2.2A_0.25rfree'],['bs10dsp','X_2.2A_0.25rfree']]}#,,'cs1'
 
 
-Parameters controling sampling and optimization::
+Parameters controling sampling and optimization, please check the code in the sampling module for detailed meanings::
+
     ni=40
     
     initvalues=list(np.arange(0,ni)/10.0+1)
