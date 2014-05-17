@@ -6,5 +6,6 @@
 Enviromental variables
 ================================
 
-.. automodule:: env-config
+
+.. automodule:: envconfig
    :members:

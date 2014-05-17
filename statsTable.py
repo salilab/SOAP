@@ -9,6 +9,10 @@ from sequences import *
 from decoys import decoysets
                     
 class rawsp(object):
+    """
+    
+    """
+    
     def __init__(self,pdbset='',features='',genmethod='',tlib=None,decoy=False,routine='calc_sp_all', model={}):
         if model:
             features=model['features']
