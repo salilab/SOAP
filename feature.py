@@ -10,22 +10,22 @@ from env import *
              
 class feature(object):
     """
-        Define the features for calcualting statistics from structures
-        :Parameters:
-          - `features`: the string representation of features, mini language::
-          
-            features => feature [,features]
-            feature  => type, number of bins, #, range, [,#, start value] #start value will be zero if not defined
+    Define the features for calcualting statistics from structures
+    
+    :param str features: the string representation of features. Feature definition mini language::
+      
+        features => feature [,features]
+        feature  => type, number of bins, #, range, [,#, start value] #start value will be zero if not defined
+    
+    Example::
         
-        Example::
+        features='d30#15'# 0-30A, 0.5 bin size    
             
-            features='d30#15'# 0-30A, 0.5 bin size    
-                
-        
-        Types are from MDT:
-        
-        .. literalinclude:: ./feature.py 
-           :pyobject: feature._gen_single_feature
+    
+    Types are from MDT:
+    
+    .. literalinclude:: feature.py 
+       :pyobject: feature._gen_single_feature
         
 
         

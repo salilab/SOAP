@@ -10,11 +10,15 @@ import scipy.interpolate
 class sf(object):
     """
     Recovery function class
+    
+    :param str sftype: the type of recovery function, see source codes for detail, get1d().
+    :param list|numpyArray par: anchor points positions for splines.
+    :param list|numpyArray parvalue: anchor values for splines, and parameters for other type of recovery functions.
+    :param str features: features the recovery function corresponding to, see :mod:`feature`.
+    :param dict model: a dict contains the same parameters described above
+    
     """
     def __init__(self,data=None,sftype='',par=[],parvalue=[],features='',type='',model=[],rawsp=None,*args,**args2):
-        """
-        ddddddd        
-        """
         if model:
             sftype=model['sftype']
             features=model['features']
