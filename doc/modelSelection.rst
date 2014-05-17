@@ -31,7 +31,8 @@ Define the recovery function, see :mod:`recoveryFunction`::
 
     ref1={'type':'sf','features':rfeature,'sftype':slo,'par':slo,'parvalue':slo,'ratio':[1.0]}
 
-Define the features for the probablistic table calcualtion, a158 represent residue dependent atom type ::
+Define the features for the statistics calcualtion from a set of structures, a158 represent residue dependent atom type::
+
     sfeature=[rfeature[0],'a158','as158']
     
 Define the processing method of the probablistic table, 'npend' means normalized by the last bin value::

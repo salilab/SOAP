@@ -226,18 +226,18 @@ class sps(object):
   
 class spss(object):
     """
-    Select the best model. Common usage::
+    Select the best model.
+    
+    :Parameters:
+      - `model`: the model space to search the best model within
+
+    Common usage::
         spl=spss(model=model1)
         spl.find_best_par()
         spl.log()    
     
     """
     def __init__(self, model=[],logfoldername='',evalPotFunc=None):
-        """
-        :Parameters:
-          - `model`: the model space to search the best model within
-    
-        """
         self.dsearches=model['dsearches']
         self.env=env()
         self.model=model

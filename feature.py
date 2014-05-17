@@ -11,9 +11,6 @@ from env import *
 class feature(object):
     """
         Define the features for calcualting statistics from structures
-    """
-    def __init__(self,features,mlib=None):#mlib does not need to be supplied anymore
-        """
         :Parameters:
           - `features`: the string representation of features, mini language::
           
@@ -30,7 +27,10 @@ class feature(object):
         .. literalinclude:: ./feature.py 
            :pyobject: feature._gen_single_feature
         
-        """
+
+        
+    """
+    def __init__(self,features,mlib=None):#mlib does not need to be supplied anymore
         self.features=features
         #self.preprocess_features()
         self.featurelist=[]

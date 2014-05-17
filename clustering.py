@@ -6,6 +6,8 @@ import numpy as np
 import scipy.cluster
 
 class singlecluster(object):
+    """
+    """
     def __init__(self, parindex=[],allclusters=None):
         self.pars=allclusters.pars[parindex,:]
         self.results=allclusters.results[parindex]
@@ -129,6 +131,8 @@ class singlecluster(object):
         self.rankscore=score
                 
 class optclustering(object):
+    """
+    """
     def __init__(self,optpars=[],optresults=[],scorer=[],clustermethod={}):
         self.pars=optpars
         self.results=optresults
@@ -395,6 +399,8 @@ class optclustering(object):
         ph1.savefig('fa2.eps')
         
 class cvclustering(object):
+    """
+    """
     def __init__(self,optparlist=[],optresultlist=[],scorerlist=[],clustermethod=[], figpath=''):
         self.parlist=optparlist
         self.resultlist=optresultlist

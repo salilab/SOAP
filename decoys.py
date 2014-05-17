@@ -24,7 +24,6 @@ class decoys4single(object):
         specially for atom class features (see :class:`features.AtomType`)"""
         
     def __init__(self,code='',dsname='',path=''):
-        """Intialize the class with :attr:`code`, :attr:`dsname`, and :attr:`path`"""
         self.code=code
         self.dsname=dsname
         self.dir=path

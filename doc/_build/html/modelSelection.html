@@ -79,10 +79,10 @@
 <div class="highlight-python"><div class="highlight"><pre><span class="n">ref1</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;sf&#39;</span><span class="p">,</span><span class="s">&#39;features&#39;</span><span class="p">:</span><span class="n">rfeature</span><span class="p">,</span><span class="s">&#39;sftype&#39;</span><span class="p">:</span><span class="n">slo</span><span class="p">,</span><span class="s">&#39;par&#39;</span><span class="p">:</span><span class="n">slo</span><span class="p">,</span><span class="s">&#39;parvalue&#39;</span><span class="p">:</span><span class="n">slo</span><span class="p">,</span><span class="s">&#39;ratio&#39;</span><span class="p">:[</span><span class="mf">1.0</span><span class="p">]}</span>
 </pre></div>
 </div>
-<dl class="docutils">
-<dt>Define the features for the probablistic table calcualtion, a158 represent residue dependent atom type ::</dt>
-<dd>sfeature=[rfeature[0],&#8217;a158&#8217;,&#8217;as158&#8217;]</dd>
-</dl>
+<p>Define the features for the statistics calcualtion from a set of structures, a158 represent residue dependent atom type:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">sfeature</span><span class="o">=</span><span class="p">[</span><span class="n">rfeature</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="s">&#39;a158&#39;</span><span class="p">,</span><span class="s">&#39;as158&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
 <p>Define the processing method of the probablistic table, &#8216;npend&#8217; means normalized by the last bin value:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">pm</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;&#39;</span><span class="p">,</span><span class="s">&#39;npend&#39;</span><span class="p">]</span>
 </pre></div>
@@ -159,15 +159,27 @@
 <span class="target" id="module-modelSelection"></span><p>SOAP Model Selection module</p>
 <dl class="class">
 <dt id="modelSelection.sps">
-<em class="property">class </em><tt class="descclassname">modelSelection.</tt><tt class="descname">sps</tt><big>(</big><em>env=&lt;env.env object at 0x5622390&gt;</em>, <em>modellist=</em><span class="optional">[</span><span class="optional">]</span>, <em>evalPotFunc=None</em><big>)</big><a class="reference internal" href="_modules/modelSelection.html#sps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modelSelection.sps" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">modelSelection.</tt><tt class="descname">sps</tt><big>(</big><em>env=&lt;env.env object at 0x4fe7650&gt;</em>, <em>modellist=</em><span class="optional">[</span><span class="optional">]</span>, <em>evalPotFunc=None</em><big>)</big><a class="reference internal" href="_modules/modelSelection.html#sps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modelSelection.sps" title="Permalink to this definition">¶</a></dt>
 <dd><p>Evaluate a list of models on sge cluster</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="modelSelection.spss">
 <em class="property">class </em><tt class="descclassname">modelSelection.</tt><tt class="descname">spss</tt><big>(</big><em>model=</em><span class="optional">[</span><span class="optional">]</span>, <em>logfoldername=''</em>, <em>evalPotFunc=None</em><big>)</big><a class="reference internal" href="_modules/modelSelection.html#spss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modelSelection.spss" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>Select the best model. Common usage::</dt>
+<dd><p>Select the best model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><ul class="first last simple">
+<li><cite>model</cite>: the model space to search the best model within</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Common usage::</dt>
 <dd>spl=spss(model=model1)
 spl.find_best_par()
 spl.log()</dd>

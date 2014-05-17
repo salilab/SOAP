@@ -15,14 +15,11 @@ class pir(object):
     can be overwiritten to define the error bar parameters associated
     with each structure, used by MDT to cacluate the error bar
     on the position of each atom.
+    
+    :Parameters:
+      - `path`: path to the pir file.
     """
     def __init__(self, path=''):
-        """
-        Create a new pir instance.
-
-        :Parameters:
-          - `path`: path to the pir file.
-        """
         self.pirpath=path
         
     def get_pir(self,pdbset):#X-xray, U-biological unit, T-transmembrane protein, M-membrane protein,S-single chain, W-non-membrane protein,1-single chain pir or none, 2-multiple chain pir, H-helical protein, B-beta protein
