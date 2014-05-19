@@ -39,8 +39,8 @@ class dsscorestats(object):
 	"""
 	Calcualte the performance measure.
 	
-	:param str slevel: benchmark criteria/performace measure
-	:param dsscore dsscoreo: the score object :class:`rankScores.dsscore`, with the socres
+	:param str slevel: benchmark criteria\/performace measure
+	:param dsscore dsscoreo: the score object :class:`rankScores.dsscore`, with the socres 
 	:param list score: the socres
 	:param str report: single|full, report single number summarizing the performance or detailed measures
 

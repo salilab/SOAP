@@ -226,6 +226,7 @@ class sps(object):
   
 class spss(object):
     """
+    
     Select the best model.
     
     :Parameters:
@@ -235,6 +236,134 @@ class spss(object):
         spl=spss(model=model1)
         spl.find_best_par()
         spl.log()    
+    
+    Define statistical potential model and model space  
+    ---------------------------------
+    The model and model space are defined using python lists and dictionaries.
+    
+    Define the recovery function features, distance only, from 0 to 20A with bin size 0.05, see the :mod:`features`. ::
+    
+       rfeature=[['d',0,20,0.05]] # 'd' - distance, 0 - start position, 20 - end position, 0.05 - bin size
+       
+    Features can be defined using either list or string, list defintion will be converted into string defintion on the fly.
+    
+    Define the spliens used for generating recoery functions. see :mod:`recoveryFunction`::
+    
+        par={'uniform':4,'featurebins':rfeature[0],'distribute':'lownumberpriority','firstpoint':2.25}
+        slo={'key':'sacnfflex',
+        'valueset':{
+                        'sacnfflex':{'sftype':'sacnf','par':par,'parvalue':[1,1,1,1]},
+                        'sacnf52':{'sftype':'sacnf','par':[2.75,3.75],'parvalue':[1,1,1,1]},
+        }}
+    
+    The most important parameter to vary is 'uniform', which defines the number of anchor points to use.
+        
+    Define the recovery function, see :mod:`recoveryFunction`::
+    
+        ref1={'type':'sf','features':rfeature,'sftype':slo,'par':slo,'parvalue':slo,'ratio':[1.0]}
+    
+    Define the features for the statistics calcualtion from a set of structures, a158 represent residue dependent atom type::
+    
+        sfeature=[rfeature[0],'a158','as158']
+        
+    Define the processing method of the probablistic table, 'npend' means normalized by the last bin value, see :class:`statsTable.scaledsp`::
+    
+        pm=['','npend']
+        
+    Processing method can be defined using either list or string, list defintion will be converted into string defintion on the fly.
+    
+    
+    Define the probabilistic table using for scoring::
+    
+        scaledsp1={'type':'scaledsp','pdbset':'X_2.2A_0.25rfree','features':sfeature,'genmethod':'cs1','pm':pm,'refs':[ref1],'ratio':[1.0]}
+    
+    
+    The benchmark criteria, defines how the statistical potentials are benchmarked, see :mod:`benchmark`::
+    
+        bmtype={'type':'dsscore','dslist':['fpdb','fpdu'],'criteria':'3xtop1_rmsdallif_mean_+2xtop3_rmsdallif_mean_','combine':'scoresum','bm':'cs1'}
+    
+    * 'type' can be 'dsscore' or 'refinescore' (use SOAP for refine).
+    * 'combine' can only be 'scoresum' at the moment.
+    * 'bm' has the same meaning as 'genmethod' :ref:`genmethod`.
+    
+    Parameters to optimize::
+    
+        search1={'object':ref1,'key':'parvalue','pos':[0,1,2,3],'InitialGenerator':{'type':'dfire','values':initvalues}}
+        search2={'object':ref1,'key':'par','pos':[0,1,2,3],'InitialGenerator':{'type':'dfire','values':initvalues}}
+        
+    * 'Object': the object to optimize, needs to be a dict
+    * 'key': the key of the object to optimize, must be a list
+    * 'pos': the positions of the values in the list to optimize.
+    * 'InitialGenerator': ways to generate initial value
+    
+    Discrete search dictionaries, defining the model space - the model variables/options to vary::
+    
+        dsearch4={'object':par,'key':'uniform','valueset':[7,6,5,4,3]}
+        
+        dsearch9={'object':[scaledsp1,scaledsp1],'key':['genmethod','pdbset'],'valueset':[['cs1','X2_2.2A_0.25rfree']]}#,['cs1','X2_2.2A_0.25rfree_30'],['cs1','X2_2.2A_0.25rfree_60'],['cs1','X2_2.2A_0.25rfree_95'],['bs20dsp','X_2.2A_0.25rfree'],['bs20dsp','X_2.2A_0.25rfree_30'],['bs20dsp','X_2.2A_0.25rfree_60'],['bs15dsp','X_2.2A_0.25rfree'],['bs10dsp','X_2.2A_0.25rfree']]}#,,'cs1'
+    
+    * 'Object': the object to vary, needs to be a dict
+    * 'key': the key of the object to vary, often a string
+    * 'valueset': the set of values to search within.
+    
+    Parameters controling sampling and optimization, please check the code in the sampling module for detailed meanings::
+    
+        ni=40
+        
+        initvalues=list(np.arange(0,ni)/10.0+1)
+        
+        initvalues=np.array(initvalues)
+        
+        inner={'improved':2,'maxloop':100,'minloop':2}
+        outer={'improved':4,'maxloop':5023}
+        
+        td=list(np.sqrt(np.linspace(1,float(10)**2,ni)))
+        td=np.array(td)
+        tune_interval=200
+        
+        sampleschedule={'inner':inner,'outer':outer}
+        ssm={'sm':'mcp','reset_betweenruns':2,'blockupdate':True, 'exchange_method':1,
+              'sample_schedule':sampleschedule,
+              'stepmethod':'mxmp2.0','tune_interval':200,'add_bias':False,'temperature_distribution':td}
+        
+        ssm0={'sm':'mcs','reset_betweenruns':2,'blockupdate':False,'using_globalbest':True,
+              'sample_schedule':sampleschedule,
+              'stepmethod':'mxmp2.0','tune_interval':201,'add_bias':False,'temperature_distribution':td}
+        
+        
+        ssm2={'sm':'mcp','reset_betweenruns':2,'blockupdate':False, 'exchange_method':1,
+              'sample_schedule':sampleschedule,
+              'stepmethod':'mxmp2.0','tune_interval':200,'add_bias':False,'temperature_distribution':td}
+        
+        ssm20={'sm':'mcs','reset_betweenruns':2,'blockupdate':True,'using_globalbest':True,
+              'sample_schedule':sampleschedule,
+              'stepmethod':'mxmp2.0','tune_interval':201,'add_bias':False,'temperature_distribution':td}
+        
+        
+        ssm1={'sm':'mca','reset_betweenruns':2,'blockupdate':True, 'using_globalbest':True,
+              'sample_schedule':sampleschedule,
+              'stepmethod':'mxmp2.0','tune_interval':201,'add_bias':False,'temperature_distribution':np.zeros(ni)+2}
+        
+        ssm3={'sm':'powell','blockupdate':False}
+        
+        sml=[ssm20,ssm2,ssm0,ssm,ssm0,ssm,ssm0,ssm, ssm1]
+    
+    
+    Define the final model::
+        model1={'scorers':[scaledsp1,ref1],'bmtype':bmtype,'searches':[search1,search2], 'runsperscorer':ni,
+            'dsearches':[dsearch2,dsearch5,dsearch4,dsearch7,dsearch8,dsearch9],'sml':sml,'cvk':2,'repeat':1,'fold':3}
+
+    * 'scorers': scoring terms
+    * 'bmtype' : benchmark criteria for juding a statistical potential
+    * 'searches' : parameters to optimzie
+    * 'dsearches' : model options/values for model seleciton
+    * 'sml' : optimization method
+    * 'runsperscorer' : how many runs per replica exchange
+    * 'cvk' : k times cross validation
+    * 'repeat' : how many replica exchanges to carry out for each optimization run
+    * 'fold' : n fold cross validation
+    * 'testperc': if included, this percentage of decoys will be left out for final validation.
+    
     
     """
     def __init__(self, model=[],logfoldername='',evalPotFunc=None):

@@ -10,6 +10,10 @@ from recoveryFunction import sf
 from mcmc import *
 
 class optimizer(object):
+    """
+    Sampling and optimizing parameters for a scorer.
+    """
+    
     def __init__(self,scorer=[],seed=0):
         print 'Optimizer'
         self.inputcode=''

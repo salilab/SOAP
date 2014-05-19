@@ -57,8 +57,34 @@
             
   <div class="section" id="select-the-best-model-and-generate-statistical-potentials">
 <h1>Select the best model and generate statistical potentials<a class="headerlink" href="#select-the-best-model-and-generate-statistical-potentials" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="define-statistical-potential-model-and-model-space">
-<h2>Define statistical potential model and model space<a class="headerlink" href="#define-statistical-potential-model-and-model-space" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-modelSelection"></span><p>SOAP Model Selection module</p>
+<dl class="class">
+<dt id="modelSelection.sps">
+<em class="property">class </em><tt class="descclassname">modelSelection.</tt><tt class="descname">sps</tt><big>(</big><em>modellist=</em><span class="optional">[</span><span class="optional">]</span>, <em>evalPotFunc=None</em><big>)</big><a class="reference internal" href="_modules/modelSelection.html#sps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modelSelection.sps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate a list of models on sge cluster</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="modelSelection.spss">
+<em class="property">class </em><tt class="descclassname">modelSelection.</tt><tt class="descname">spss</tt><big>(</big><em>model=</em><span class="optional">[</span><span class="optional">]</span>, <em>logfoldername=''</em>, <em>evalPotFunc=None</em><big>)</big><a class="reference internal" href="_modules/modelSelection.html#spss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modelSelection.spss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select the best model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><ul class="first last simple">
+<li><cite>model</cite>: the model space to search the best model within</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Common usage::</dt>
+<dd>spl=spss(model=model1)
+spl.find_best_par()
+spl.log()</dd>
+</dl>
 <p>The model and model space are defined using python lists and dictionaries.</p>
 <p>Define the recovery function features, distance only, from 0 to 20A with bin size 0.05, see the <tt class="xref py py-mod docutils literal"><span class="pre">features</span></tt>.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">rfeature</span><span class="o">=</span><span class="p">[[</span><span class="s">&#39;d&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mf">0.05</span><span class="p">]]</span> <span class="c"># &#39;d&#39; - distance, 0 - start position, 20 - end position, 0.05 - bin size</span>
@@ -92,21 +118,37 @@
 <div class="highlight-python"><div class="highlight"><pre><span class="n">scaledsp1</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;scaledsp&#39;</span><span class="p">,</span><span class="s">&#39;pdbset&#39;</span><span class="p">:</span><span class="s">&#39;X_2.2A_0.25rfree&#39;</span><span class="p">,</span><span class="s">&#39;features&#39;</span><span class="p">:</span><span class="n">sfeature</span><span class="p">,</span><span class="s">&#39;genmethod&#39;</span><span class="p">:</span><span class="s">&#39;cs1&#39;</span><span class="p">,</span><span class="s">&#39;pm&#39;</span><span class="p">:</span><span class="n">pm</span><span class="p">,</span><span class="s">&#39;refs&#39;</span><span class="p">:[</span><span class="n">ref1</span><span class="p">],</span><span class="s">&#39;ratio&#39;</span><span class="p">:[</span><span class="mf">1.0</span><span class="p">]}</span>
 </pre></div>
 </div>
-<p>The benchmark criteria, defines how the statistical potentials are benchmarked:</p>
+<p>The benchmark criteria, defines how the statistical potentials are benchmarked, see <a class="reference internal" href="benchmark.html#module-benchmark" title="benchmark"><tt class="xref py py-mod docutils literal"><span class="pre">benchmark</span></tt></a>:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">bmtype</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;dsscore&#39;</span><span class="p">,</span><span class="s">&#39;dslist&#39;</span><span class="p">:[</span><span class="s">&#39;fpdb&#39;</span><span class="p">,</span><span class="s">&#39;fpdu&#39;</span><span class="p">],</span><span class="s">&#39;criteria&#39;</span><span class="p">:</span><span class="s">&#39;3xtop1_rmsdallif_mean_+2xtop3_rmsdallif_mean_&#39;</span><span class="p">,</span><span class="s">&#39;combine&#39;</span><span class="p">:</span><span class="s">&#39;scoresum&#39;</span><span class="p">,</span><span class="s">&#39;bm&#39;</span><span class="p">:</span><span class="s">&#39;cs1&#39;</span><span class="p">}</span>
 </pre></div>
 </div>
+<ul class="simple">
+<li>&#8216;type&#8217; can be &#8216;dsscore&#8217; or &#8216;refinescore&#8217; (use SOAP for refine).</li>
+<li>&#8216;combine&#8217; can only be &#8216;scoresum&#8217; at the moment.</li>
+<li>&#8216;bm&#8217; has the same meaning as &#8216;genmethod&#8217; <em class="xref std std-ref">genmethod</em>.</li>
+</ul>
 <p>Parameters to optimize:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">search1</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;object&#39;</span><span class="p">:</span><span class="n">ref1</span><span class="p">,</span><span class="s">&#39;key&#39;</span><span class="p">:</span><span class="s">&#39;parvalue&#39;</span><span class="p">,</span><span class="s">&#39;pos&#39;</span><span class="p">:[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span><span class="s">&#39;InitialGenerator&#39;</span><span class="p">:{</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;dfire&#39;</span><span class="p">,</span><span class="s">&#39;values&#39;</span><span class="p">:</span><span class="n">initvalues</span><span class="p">}}</span>
 <span class="n">search2</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;object&#39;</span><span class="p">:</span><span class="n">ref1</span><span class="p">,</span><span class="s">&#39;key&#39;</span><span class="p">:</span><span class="s">&#39;par&#39;</span><span class="p">,</span><span class="s">&#39;pos&#39;</span><span class="p">:[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span><span class="s">&#39;InitialGenerator&#39;</span><span class="p">:{</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;dfire&#39;</span><span class="p">,</span><span class="s">&#39;values&#39;</span><span class="p">:</span><span class="n">initvalues</span><span class="p">}}</span>
 </pre></div>
 </div>
+<ul class="simple">
+<li>&#8216;Object&#8217;: the object to optimize, needs to be a dict</li>
+<li>&#8216;key&#8217;: the key of the object to optimize, must be a list</li>
+<li>&#8216;pos&#8217;: the positions of the values in the list to optimize.</li>
+<li>&#8216;InitialGenerator&#8217;: ways to generate initial value</li>
+</ul>
 <p>Discrete search dictionaries, defining the model space - the model variables/options to vary:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">dsearch4</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;object&#39;</span><span class="p">:</span><span class="n">par</span><span class="p">,</span><span class="s">&#39;key&#39;</span><span class="p">:</span><span class="s">&#39;uniform&#39;</span><span class="p">,</span><span class="s">&#39;valueset&#39;</span><span class="p">:[</span><span class="mi">7</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">3</span><span class="p">]}</span>
 
 <span class="n">dsearch9</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;object&#39;</span><span class="p">:[</span><span class="n">scaledsp1</span><span class="p">,</span><span class="n">scaledsp1</span><span class="p">],</span><span class="s">&#39;key&#39;</span><span class="p">:[</span><span class="s">&#39;genmethod&#39;</span><span class="p">,</span><span class="s">&#39;pdbset&#39;</span><span class="p">],</span><span class="s">&#39;valueset&#39;</span><span class="p">:[[</span><span class="s">&#39;cs1&#39;</span><span class="p">,</span><span class="s">&#39;X2_2.2A_0.25rfree&#39;</span><span class="p">]]}</span><span class="c">#,[&#39;cs1&#39;,&#39;X2_2.2A_0.25rfree_30&#39;],[&#39;cs1&#39;,&#39;X2_2.2A_0.25rfree_60&#39;],[&#39;cs1&#39;,&#39;X2_2.2A_0.25rfree_95&#39;],[&#39;bs20dsp&#39;,&#39;X_2.2A_0.25rfree&#39;],[&#39;bs20dsp&#39;,&#39;X_2.2A_0.25rfree_30&#39;],[&#39;bs20dsp&#39;,&#39;X_2.2A_0.25rfree_60&#39;],[&#39;bs15dsp&#39;,&#39;X_2.2A_0.25rfree&#39;],[&#39;bs10dsp&#39;,&#39;X_2.2A_0.25rfree&#39;]]}#,,&#39;cs1&#39;</span>
 </pre></div>
 </div>
+<ul class="simple">
+<li>&#8216;Object&#8217;: the object to vary, needs to be a dict</li>
+<li>&#8216;key&#8217;: the key of the object to vary, often a string</li>
+<li>&#8216;valueset&#8217;: the set of values to search within.</li>
+</ul>
 <p>Parameters controling sampling and optimization, please check the code in the sampling module for detailed meanings:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">ni</span><span class="o">=</span><span class="mi">40</span>
 
@@ -157,37 +199,20 @@
 </dl>
 </dd>
 </dl>
-<span class="target" id="module-modelSelection"></span><p>SOAP Model Selection module</p>
-<dl class="class">
-<dt id="modelSelection.sps">
-<em class="property">class </em><tt class="descclassname">modelSelection.</tt><tt class="descname">sps</tt><big>(</big><em>modellist=</em><span class="optional">[</span><span class="optional">]</span>, <em>evalPotFunc=None</em><big>)</big><a class="reference internal" href="_modules/modelSelection.html#sps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modelSelection.sps" title="Permalink to this definition">¶</a></dt>
-<dd><p>Evaluate a list of models on sge cluster</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="modelSelection.spss">
-<em class="property">class </em><tt class="descclassname">modelSelection.</tt><tt class="descname">spss</tt><big>(</big><em>model=</em><span class="optional">[</span><span class="optional">]</span>, <em>logfoldername=''</em>, <em>evalPotFunc=None</em><big>)</big><a class="reference internal" href="_modules/modelSelection.html#spss"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#modelSelection.spss" title="Permalink to this definition">¶</a></dt>
-<dd><p>Select the best model.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters :</th><td class="field-body"><ul class="first last simple">
-<li><cite>model</cite>: the model space to search the best model within</li>
+<ul class="simple">
+<li>&#8216;scorers&#8217;: scoring terms</li>
+<li>&#8216;bmtype&#8217; : benchmark criteria for juding a statistical potential</li>
+<li>&#8216;searches&#8217; : parameters to optimzie</li>
+<li>&#8216;dsearches&#8217; : model options/values for model seleciton</li>
+<li>&#8216;sml&#8217; : optimization method</li>
+<li>&#8216;runsperscorer&#8217; : how many runs per replica exchange</li>
+<li>&#8216;cvk&#8217; : k times cross validation</li>
+<li>&#8216;repeat&#8217; : how many replica exchanges to carry out for each optimization run</li>
+<li>&#8216;fold&#8217; : n fold cross validation</li>
+<li>&#8216;testperc&#8217;: if included, this percentage of decoys will be left out for final validation.</li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="docutils">
-<dt>Common usage::</dt>
-<dd>spl=spss(model=model1)
-spl.find_best_par()
-spl.log()</dd>
-</dl>
 </dd></dl>
 
-</div>
 </div>
 
 
@@ -196,14 +221,6 @@ spl.log()</dd>
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Select the best model and generate statistical potentials</a><ul>
-<li><a class="reference internal" href="#define-statistical-potential-model-and-model-space">Define statistical potential model and model space</a></li>
-</ul>
-</li>
-</ul>
-
   <h4>Previous topic</h4>
   <p class="topless"><a href="jobSchedule.html"
                         title="previous chapter">Job scheduler (local and on SGE cluster)</a></p>

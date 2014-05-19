@@ -9,6 +9,10 @@ from refineScores import *
 from loop import sprefine
         
 class scorer(object):
+    """
+    Calculate benchmark score/value given a model
+    """
+    
     def __init__(self,model=[]):
         self.bmtype=model['bmtype']
         self.model=model
@@ -552,6 +556,7 @@ class scorer(object):
             if atompairclustering:
                 reflist.append(ref)
             ratiolist.append(spmodel['ratio'])
+            print ref
             ssp=scaledsp(model=spmodel)
             if atompairclustering:
                 ssp.add_ref(reflist,affix,filetype,apca=apca,ratio=ratiolist,permute=permute)
