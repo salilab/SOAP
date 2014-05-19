@@ -219,6 +219,7 @@ class ORLoop(loopmodel):
     def __init__(self, env, sequence, alnfile=None, knowns=[], inimodel=None,
                  deviation=None, library_schedule=None, csrfile=None,
                  inifile=None, assess_methods=None, loop_assess_methods=None,
+                 refinepot=['$(LIB)/atmcls-mf.lib','$(LIB)/dist-mf.lib'],
                  loops=[],calcrmsds='111',nonbond_spine=0.1,contact_shell=12.0,deviations=50,energytrace=False):
         loopmodel.__init__(self, env, sequence, alnfile, knowns, inimodel,
                  deviation, library_schedule, csrfile,
