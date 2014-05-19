@@ -356,12 +356,9 @@ class sprefine(object):
                 print os.system('rm -r '+'loop.'+loopname)
                 #print os.mkdir('loop.'+loopname)
                 #print os.chdir('loop.'+loopname)                  
-                try:                  
-                    res=self.loop_model_single_protein(modelfile='pdb'+key+'.ent',loops=[loop], modelname=loopname)
-                    resultdict[loopname]=res
+                res=self.loop_model_single_protein(modelfile='pdb'+key+'.ent',loops=[loop], modelname=loopname)
+                resultdict[loopname]=res
                     #print os.system('mv '+loopname+'.output.pickle loop'+str(self.input)+'.'+loopname+'.output.pickle')
-                except Exception,e:
-                    print >> sys.stderr, e
                 print os.system('rm '+loopname+'.lrsr')
                 print os.system('rm '+loopname+'.DL*')                    
                 #print os.chdir('..')

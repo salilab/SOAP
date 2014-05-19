@@ -267,12 +267,14 @@ class spss(object):
         self.currentcutoffpercratio=0.1
         self.maximumround=10
         self.numofevals=0
-        self.num2evalall=10
+        self.num2evalall=20
         if 'refineProtocal' in model:
             self.refineProtocal=model['refineProtocal']
             #del model['refineProtocal']
         else:
             self.refineProtocal={}
+        self.currentOptimal=-np.inf
+        self.bestpar=[]
     
     def modelinlog(self,nm):
         os.chdir(self.baselogdir)
@@ -365,10 +367,10 @@ class spss(object):
             nm=copy.deepcopy(self.model)
             convert2old(nm)
             nm['str']=any2str(nm)
-            nmresult=self.modelinlog(nm)
-            if len(nmresult)>0:
-                self.resultdict[any2str(modelkey)]=nmresult
-                continue
+            #nmresult=self.modelinlog(nm)
+            #if len(nmresult)>0:
+            #    self.resultdict[any2str(modelkey)]=nmresult
+            #    continue
             nml.append(nm)
             mil.append(i)
         return [nml,mkl,mil]        
@@ -387,9 +389,9 @@ class spss(object):
         #get the list of models
         [nml,mkl,mil]=self.get_model_list(dsearch)
         #evaluate the list of models
-        if len(nml)==0:
-            print "no model to evaluate skip this round"
-            return 0
+        #if len(nml)==0:
+        #    print "no model to evaluate skip this round"
+        #    return 0
         pickedindex=self.eval_modellist(nml,mkl,mil,'SinglePar\n')
         self.update_dsearches(pickedindex,dsearch)
 
@@ -460,6 +462,10 @@ class spss(object):
         ras=ra[:,-1]
         if ras.min()==ras.max():
             return [range(len(ras)),False,len(ras)]
+        if ras.max()>=self.currentOptimal:
+            self.currentOptimal=ras.max()
+        else:
+            pdb.set_trace()
         rassort=ras.argsort()
         rascutoff=ras.min()+(ras.max()-ras.min())*self.currentcutoffperc
         if ras.max()>0:
@@ -499,7 +505,7 @@ class spss(object):
         
     def oneloop_through_dsearches(self):
         self.numofevals=0
-        for dsearch,i in zip(self.dsearches,range(len(self.dsearches))):
+        for i,dsearch in enumerate(self.dsearches):
             if len(dsearch)==1:
                 continue
             self.dsearchpos=i
@@ -514,13 +520,17 @@ class spss(object):
     def find_best_par(self):
         k=0
         while k<self.maximumround and self.count_searchspace()>self.num2evalall:
-            self.currentcutoffperc=self.currentcutoffpercinitial+k*self.currentcutoffpercratio           
+            oldbestpar=self.bestpar
+            self.currentcutoffperc=self.currentcutoffpercinitial+k*self.currentcutoffpercratio
             self.oneloop_through_dsearches()
             k=k+1
+            if self.currentcutoffpercratio==0 and self.bestpar==oldbestpar:
+                break
             #if self.numofevals==0:
             #    break
-        if self.count_searchspace()<=self.num2evalall:
-            self.eval_allpars()
+            if self.count_searchspace()<=self.num2evalall:
+                self.eval_allpars()
+                break
         mkl=self.resultdict.keys()
         self.analyze_results(mkl,'FinalAll\n')
         
@@ -558,42 +568,45 @@ class spss(object):
         
     def log(self):
         #not used anymore
-        os.chdir(self.logdir)
-        self.write2log(self.get_valuesets())
-        self.write2log('\n'+str(self.resultdict[str(self.bestpar)][4]))
-        self.write2log('\n'+str(self.resultdict[str(self.bestpar)][3]))
-        #self.dump()
-        fl=os.listdir(self.baselogdir+'runs/')
-        bbd=[f for f in fl if f.startswith(self.resultdict[str(self.bestpar)][2])][0]
-        bbd='runs/'+bbd
-        print os.system('cp '+self.baselogdir+bbd+'/bestmodel.pickle '+self.logdir)
-        print os.system('touch '+self.logdir+'BMF-'+bbd)
-        print os.system('cp '+sys.path[1]+'/'+sys.argv[0]+' '+self.logdir)
-        #print os.system('cp '+self.logdir+'log '+self.logdir2)# keep the log in dropbox
-        #print os.system('cp '+self.logdir+'*py '+self.logdir2)# keep the log in dropbox
-        #print "Waiting for pool to finish"
-        #p.close()
-        #print "Pool close"
-        #p.join()
-        #print "Pool finished"
-        print "The pool will just be ignored......(can't get it to work properly), now plotting the best one"
-        cvplot(self.baselogdir+bbd)
-        os.chdir(self.logdir)
-        for key in self.resultdict:
-            bd=[f for f in fl if f.startswith(self.resultdict[key][2])][0]
-            print os.system('rm '+self.baselogdir+'runs/'+bd+'/figinput*')
-        #print os.system('cp '+self.baselogdir+bbd+'/*eps '+self.logdir2)
-        print os.system('mv '+self.logdir+' '+self.logdir[:-1]+'-'+bd[5:])
-        #print os.system('mv '+self.logdir2+' '+self.logdir2[:-1]+'-'+bd[5:])
-        self.logdir=self.logdir[:-1]+'-'+bd[5:]+'/'
-        #self.logdir2=self.logdir2[:-1]+'-'+bd[5:]+'/'
-        with FileLock("spsslog.shelve", timeout=100, delay=2) as lock:
-            print("Lock acquired.")
-            resultdictlog=shelve.open(self.baselogdir+'spsslog.shelve')
-            resultdictlog[self.modelstr]=self.logdir[:-1]+'-'+bd[5:]
-            resultdictlog.close()
-            print("lock released")
-        return bbd
+        try:
+            os.chdir(self.logdir)
+            self.write2log(self.get_valuesets())
+            self.write2log('\n'+str(self.resultdict[str(self.bestpar)][4]))
+            self.write2log('\n'+str(self.resultdict[str(self.bestpar)][3]))
+            #self.dump()
+            fl=os.listdir(self.baselogdir+'runs/')
+            bbd=[f for f in fl if f.startswith(self.resultdict[str(self.bestpar)][2])][0]
+            bbd='runs/'+bbd
+            print os.system('cp '+self.baselogdir+bbd+'/bestmodel.pickle '+self.logdir)
+            print os.system('touch '+self.logdir+'BMF-'+bbd)
+            print os.system('cp '+sys.path[1]+'/'+sys.argv[0]+' '+self.logdir)
+            #print os.system('cp '+self.logdir+'log '+self.logdir2)# keep the log in dropbox
+            #print os.system('cp '+self.logdir+'*py '+self.logdir2)# keep the log in dropbox
+            #print "Waiting for pool to finish"
+            #p.close()
+            #print "Pool close"
+            #p.join()
+            #print "Pool finished"
+            print "The pool will just be ignored......(can't get it to work properly), now plotting the best one"
+            cvplot(self.baselogdir+bbd)
+            os.chdir(self.logdir)
+            for key in self.resultdict:
+                bd=[f for f in fl if f.startswith(self.resultdict[key][2])][0]
+                print os.system('rm '+self.baselogdir+'runs/'+bd+'/figinput*')
+            #print os.system('cp '+self.baselogdir+bbd+'/*eps '+self.logdir2)
+            print os.system('mv '+self.logdir+' '+self.logdir[:-1]+'-'+bd[5:])
+            #print os.system('mv '+self.logdir2+' '+self.logdir2[:-1]+'-'+bd[5:])
+            self.logdir=self.logdir[:-1]+'-'+bd[5:]+'/'
+            #self.logdir2=self.logdir2[:-1]+'-'+bd[5:]+'/'
+            with FileLock("spsslog.shelve", timeout=100, delay=2) as lock:
+                print("Lock acquired.")
+                resultdictlog=shelve.open(self.baselogdir+'spsslog.shelve')
+                resultdictlog[self.modelstr]=self.logdir[:-1]+'-'+bd[5:]
+                resultdictlog.close()
+                print("lock released")
+            return bbd
+        except:
+            pass
         
     def write_best_pot(self):
         print "only works for the case with single pot, single reference state"

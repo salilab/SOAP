@@ -11,16 +11,16 @@ dslist=['ml'+str(i) for i in range(4,13)]#
 #looplist=['mgl'+str(i) for i in range(4,21)]
 dslist=['DecoysRUS','baker1']
 dslist=['wang','wangm','astex','astexm']
-#dslist=['dude']
+dslist=['dude']
 criteria='3xtop1_rmsd_mean_+NativeSelection+2xtop3_rmsd_mean_'#'3xtop1_rmsd_mean_+NativeSelection+2xtop3_rmsd_mean_'
 criteria='top1_rmsd_mean_+10xNativeSelection+cc'
 criteria='enrichment'
-criteria='3xtop1_rmsd_mean_+2xtop3_rmsd_mean_'
+#criteria='3xtop1_rmsd_mean_+2xtop3_rmsd_mean_'
 
 bm=['cs1'] 
 filters=[]
 finalcriteria='enrichment'
-finalcriteria='top1_rmsd_mean_'
+#finalcriteria='top1_rmsd_mean_'
 
 
 if True:
