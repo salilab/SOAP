@@ -7,5 +7,5 @@ Enviromental variables
 ================================
 
 
-.. automodule:: envconfig
+.. automodule:: envConfig
    :members:
