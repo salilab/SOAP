@@ -210,6 +210,88 @@ class MyLoop(loopmodel):
         for id1 in range(self.loop.starting_model, self.loop.ending_model + 1):
             r = self.single_loop_model(atmsel, ini_model, num, id1, sched)
             
+class ORLoop(loopmodel):
+    """
+    Original loop modeling class
+    """
+    # This routine picks the residues to be refined by loop modeling
+    # This routine picks the residues to be refined by loop modeling
+    def __init__(self, env, sequence, alnfile=None, knowns=[], inimodel=None,
+                 deviation=None, library_schedule=None, csrfile=None,
+                 inifile=None, assess_methods=None, loop_assess_methods=None,
+                 loops=[],calcrmsds='111',nonbond_spine=0.1,contact_shell=12.0,deviations=50,energytrace=False):
+        loopmodel.__init__(self, env, sequence, alnfile, knowns, inimodel,
+                 deviation, library_schedule, csrfile,
+                 inifile, assess_methods, loop_assess_methods)
+        self.loops=loops
+        self.refinepotential=refinepot
+        #self.load_native_model()
+        self.calc_rmsds=calcrmsds
+        self.deviations=deviations
+        self.energytrace=energytrace
+       
+        self.rmsd_calc_initialized=False
+
+    def initilialize_rmsd_calcualtion(self):
+        ormdl=Mymodel(self.env)
+        ormdl.read(file=self.inimodel)
+        self.ormdl=ormdl
+        self.ors=ormdl.select_loop_atoms(self.loops)
+        #self.load_native_model()
+        s2=self.select_loop_atoms()
+        self.s2=s2
+        aln=alignment(self.env)
+        aln.append_model(self.ormdl, align_codes='c1', atom_files=self.inimodel)
+        aln.append_model(self, align_codes='c2')
+        self.aln=aln
+        self.rmsd_calc_initialized=True
+       
+    def select_loop_atoms(self):
+        s=selection()
+        if not isinstance(self.loops[0],list):
+            self.add_loop2selection(self.loops,s)
+        else:
+            for loop in self.loops:
+                self.add_loop2selection(loop,s)
+        return s
+   
+    def add_loop2selection(self,loop,s):
+        if loop[0]=='':
+            loop[0]=self.chains[0].name
+        try:
+            s.add(selection(self.residue_range(str(loop[2])+':'+loop[0],str(loop[3])+':'+loop[0])))
+        except:
+            lind=self.residues[str(loop[2])+':'+loop[0]].index
+            s.add(selection(self.residues[lind:(lind+loop[1])]))
+        
+    def user_after_single_loop_model(self,out):
+        if not self.calc_rmsds:
+            return 0
+        if not self.rmsd_calc_initialized:
+            self.initilialize_rmsd_calcualtion()        
+        # We can now use the calculated RMS, DRMS, etc. from the returned 'r' object:
+        rt=str(self.calc_rmsds)
+        if rt[-1]=='1':
+            r = self.ors.superpose(self, self.aln,fit=False,refine_local=False)
+            out['rmsd']=min(r.rms,out['rmsd'])
+        if len(rt)>=2 and rt[-2]=='1':
+            r=self.ors.only_mainchain().superpose(self, self.aln,fit=False,refine_local=False)
+            out['mcrmsd']=min(r.rms,out['rmsd'])
+        if len(rt)>=3 and rt[-3]=='1':
+            r=self.ors.only_sidechain().superpose(self, self.aln,fit=False,refine_local=False)
+            out['scrmsd']=r.rms
+        if self.energytrace:
+            if not 'trace' in out:
+                out['trace']=[]
+            out['trace'].append((out['mcrmsd'],self.loop.assess_methods[0](self.s2)[1],self.loop.assess_methods[1](self.s2)[1]))                
+        print r.rms
+        return r.rms
+    
+    def get_loop_actions(self):
+        """Get actions to carry out during loop optimization"""
+        act = []
+        act.append(checkRMSD(20,self))
+        return act
                
 class sprefine(object):
     """
@@ -234,7 +316,7 @@ class sprefine(object):
             criteria=model['criteria']
         self.bm=bm
         self.dslist=dslist
-        self.assess=assess
+        self.assess_method=assess
         self.criteria=criteria
         #self.codelist=decoysets(self.dslist).get_nativelist()  not applicalbel for loops    
         self.refpot=['$(LIB)/atmcls-mf.lib','$(LIB)/dist-mf.lib']
@@ -382,14 +464,20 @@ class sprefine(object):
         env.io.atom_files_directory = [os.path.join(runenv.loopStructurePath,self.dslist),scratchdir,runenv.opdbdir,'.']
         # Create a new class based on 'loopmodel' so that we can redefine
         # select_loop_atoms (necessary)
-        if self.assess=='SOAP':
+        if self.assess_method=='SOAP':
             from modeller import soap_loop
             loop_assess_methods=(assess.DOPE, soap_loop.Scorer())
             energytrace=True
         else:
             loop_assess_methods=(assess.DOPE)
             energytrace=False
-        m = MyLoop(env,
+        if self.refinetype=='original':
+            m = ORLoop(env,
+                   inimodel=modelfile, # initial model of the target
+                   sequence=modelname,loop_assess_methods=loop_assess_methods,
+                   refinepot=self.refpot,loops=loops, nonbond_spine=self.nonbond_spline,contact_shell=self.contact_shell,deviations=self.deviations,energytrace=energytrace)
+        else:
+            m = MyLoop(env,
                    inimodel=modelfile, # initial model of the target
                    sequence=modelname,loop_assess_methods=loop_assess_methods,
                    refinepot=self.refpot,loops=loops, nonbond_spine=self.nonbond_spline,contact_shell=self.contact_shell,deviations=self.deviations,energytrace=energytrace)
@@ -419,7 +507,7 @@ class sprefine(object):
         #pdb.set_trace()
         for i in range(0,len(loopoutput)):
             try:
-                lastone='trace' if self.assess=='SOAP' else 'DOPE score'
+                lastone='trace' if self.assess_method=='SOAP' else 'DOPE score'
                 resultlist.append((loopoutput[i]['rmsd'],loopoutput[i]['mcrmsd'],loopoutput[i][lastone]))
             except Exception,e:
                 print >> sys.stderr, e 
@@ -454,7 +542,7 @@ class sprefine(object):
         os.system('rm -r '+self.rundir)
         os.mkdir(self.rundir)
         os.chdir(self.dir+self.rundir)
-        if self.assess=='SOAP':
+        if self.assess_method=='SOAP':
             freememory=2
         else:
             freememory=1
@@ -505,7 +593,7 @@ class sprefine(object):
         inputlist.write(','.join([str(i)+'.pickle' for i in range(1,nors+1)]))
         inputlist.close()
         makemdt=open('runme.py','w')#nonbond_spline=0.1,contact_shell=12.0,deviations=50
-        makemdt.write('from SOAP.loop import *\nimport sys \n \nspopt=sprefine(sys.argv[1],"'+self.bm+'","'+self.criteria+'",'+str(self.nonbond_spline)+','+str(self.contact_shell)+','+str(self.deviations)+')\nspopt.runpath=\''+self.runpath+'\'\nspopt.refpot[1]="'+self.refpot[1]+'"\n\nspopt.assess="'+self.assess+'"\n\nspopt.initialize_dslist()'+'\n'+'\nspopt.assess_cluster_node()\n')
+        makemdt.write('from SOAP.loop import *\nimport sys \n \nspopt=sprefine(sys.argv[1],"'+self.bm+'","'+self.criteria+'",'+str(self.nonbond_spline)+','+str(self.contact_shell)+','+str(self.deviations)+')\nspopt.runpath=\''+self.runpath+'\'\nspopt.refpot[1]="'+self.refpot[1]+'"\n\nspopt.assess_method="'+self.assess_method+'"\n\nspopt.initialize_dslist()'+'\n'+'\nspopt.assess_cluster_node()\n')
         makemdt.flush()
         generate_job_submit_script(freememory,self.rundir,runtime,nors,parallel=self.slavenumber)        
         return 0
@@ -567,7 +655,7 @@ class sprefine(object):
                 fh.close()
                 if not res.keys()[0] in rd:
                     rd[res.keys()[0]]=[]
-                if self.assess=='SOAP':
+                if self.assess_method=='SOAP':
                     for item in res.values()[0]:
                         rd[res.keys()[0]].extend(item[-1])
                 else:
@@ -615,7 +703,7 @@ class sprefine(object):
         for key in result:
             ra[k,:,:]=np.array(result[key])[:mn,:]
             k+=1
-        if self.assess=='SOAP':
+        if self.assess_method=='SOAP':
             self.averageRMSD=ra[:,:,0].min(axis=1).mean()
             print "min rmsd",self.averageRMSD
             minind=ra[:,:,1].argmin(axis=1)
