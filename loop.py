@@ -287,6 +287,55 @@ class ORLoop(loopmodel):
             out['trace'].append((out['mcrmsd'],self.loop.assess_methods[0](self.s2)[1],self.loop.assess_methods[1](self.s2)[1]))                
         print r.rms
         return r.rms
+
+    def single_loop_model(self, atmsel, ini_model, num, id1, sched,
+                          parallel=False):
+        """Build a single loop model"""
+        self.tracefile = self.new_loop_trace_file(id1, num)
+
+        if parallel:
+            self.read_top_par()
+            self.read_ini_loop_model(ini_model)
+            aln = self.read_loop_alignment(ini_model)
+            self.create_loop_topology(aln, ini_model)
+        else:
+            self.read_ini_loop_model(ini_model)
+
+        atmsel.randomize_xyz(deviation=4)
+
+        if parallel:
+            self.group_restraints = self.read_potential()
+            self.rd_restraints()
+
+        filename = self.get_loop_model_filename(self.sequence, id1, num,
+                                                self.pdb_ext)
+        out = {'name':filename, 'loopnum':id1, 'num':num, 'failure':None,'mcrmsd':999.0,'rmsd':999.0}
+
+        self.loop.outputs.append(out)
+
+        actions = self.get_loop_actions()
+        try:
+            # Refine without the rest of the protein:
+            self.env.edat.nonbonded_sel_atoms = 2
+            self.optimize_loop(atmsel, sched, actions)
+            # Refine in the context of the rest of the protein:
+            self.env.edat.nonbonded_sel_atoms = 1
+            self.optimize_loop(atmsel, sched, actions)
+
+            (out['molpdf'], out['pdfterms']) = atmsel.energy()
+
+            self.to_iupac()
+        except (ModellerError, OverflowError):
+            detail = sys.exc_info()[1]
+            if len(str(detail)) > 0:
+                out['failure'] = detail
+            else:
+                out['failure'] = 'Optimization failed'
+            del detail
+        else:
+            self.loop_model_analysis(atmsel, ini_model, filename, out, id1, num)
+        del self.tracefile
+        return out
     
     def get_loop_actions(self):
         """Get actions to carry out during loop optimization"""
