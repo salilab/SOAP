@@ -60,7 +60,7 @@
 <span class="target" id="module-benchmark"></span><p>SOAP benchmark module, calcualting statistics on the scores.</p>
 <dl class="class">
 <dt id="benchmark.dsscorestats">
-<em class="property">class </em><tt class="descclassname">benchmark.</tt><tt class="descname">dsscorestats</tt><big>(</big><em>dslist=</em><span class="optional">[</span><span class="optional">]</span>, <em>dsscore=&lt;rankScores.dsscore object at 0x5569850&gt;</em><big>)</big><a class="reference internal" href="_modules/benchmark.html#dsscorestats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#benchmark.dsscorestats" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">benchmark.</tt><tt class="descname">dsscorestats</tt><big>(</big><em>dslist=</em><span class="optional">[</span><span class="optional">]</span>, <em>dsscore=&lt;rankScores.dsscore object at 0x5366390&gt;</em><big>)</big><a class="reference internal" href="_modules/benchmark.html#dsscorestats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#benchmark.dsscorestats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Summarize the ranking results based on RMSDs and scores.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -68,7 +68,7 @@
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>dslist</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; the names of decoy sets used for benchmark, for retrieving the RMSD values</li>
-<li><strong>dsscore</strong> (<em>dsscore</em>) &#8211; the score object <tt class="xref py py-class docutils literal"><span class="pre">rankScores.dsscore</span></tt>, with the socres</li>
+<li><strong>dsscore</strong> (<em>dsscore</em>) &#8211; the score object <a class="reference internal" href="rankScore.html#rankScores.dsscore" title="rankScores.dsscore"><tt class="xref py py-class docutils literal"><span class="pre">rankScores.dsscore</span></tt></a>, with the socres</li>
 </ul>
 </td>
 </tr>
@@ -90,7 +90,7 @@
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>slevel</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; benchmark criteria/performace measure</li>
-<li><strong>dsscoreo</strong> (<em>dsscore</em>) &#8211; the score object <tt class="xref py py-class docutils literal"><span class="pre">rankScores.dsscore</span></tt>, with the socres</li>
+<li><strong>dsscoreo</strong> (<em>dsscore</em>) &#8211; the score object <a class="reference internal" href="rankScore.html#rankScores.dsscore" title="rankScores.dsscore"><tt class="xref py py-class docutils literal"><span class="pre">rankScores.dsscore</span></tt></a>, with the socres</li>
 <li><strong>score</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; the socres</li>
 <li><strong>report</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; single|full, report single number summarizing the performance or detailed measures</li>
 </ul>
@@ -122,7 +122,7 @@ None: or no filter</div></blockquote>
 len:len()
 nonempty: len&gt;0
 perc: percentage in total</dd>
-<dt>Examples:</dt>
+<dt>Examples::</dt>
 <dd>top1000_nonempty__rmsd10ORirmsd4 # whether there is a model sastifi
 top1000_len__rmsd10ORirmsd4 # the number of such models
 top1000_sum_revrank_rmsd10ORirmsd4FIRST</dd>

@@ -7,6 +7,9 @@ from env import *
 
     
 class sprefinescore(object):
+    """
+    Benchmark SOAP based on refinement of structures.
+    """
     def __init__(self,dslist='',bm='fast',criteria='bestrmsd',pn=8, model=[]):
         if spmodel: #needfix???
             if spmodel['scoretype']!='sprefine':

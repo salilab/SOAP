@@ -27,7 +27,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="SOAP 0.1 documentation" href="index.html" />
-    <link rel="next" title="Calcualte statistics from a set of structures" href="statsTable.html" />
+    <link rel="next" title="Features" href="feature.html" />
     <link rel="prev" title="Collection of sequences for known structures or decoys" href="sequences.html" /> 
   </head>
   <body>
@@ -41,7 +41,7 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="statsTable.html" title="Calcualte statistics from a set of structures"
+          <a href="feature.html" title="Features"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="sequences.html" title="Collection of sequences for known structures or decoys"
@@ -62,7 +62,7 @@
 <dt id="decoys.decoys4single">
 <em class="property">class </em><tt class="descclassname">decoys.</tt><tt class="descname">decoys4single</tt><big>(</big><em>code=''</em>, <em>dsname=''</em>, <em>path=''</em><big>)</big><a class="reference internal" href="_modules/decoys.html#decoys4single"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#decoys.decoys4single" title="Permalink to this definition">¶</a></dt>
 <dd><p>Single set of decoys, serving as the building block for <a class="reference internal" href="#decoys.decoyset" title="decoys.decoyset"><tt class="xref py py-class docutils literal"><span class="pre">decoyset</span></tt></a>, corresponding to a single subfolder in the <a class="reference internal" href="#decoys.decoyset" title="decoys.decoyset"><tt class="xref py py-class docutils literal"><span class="pre">decoyset</span></tt></a>&#8216;s folder. All the decoy structure files should present in this subfolder.</p>
-<p>This class contains utilitis for converting the input decoy strctures in the subfolder into formats necessary for using the decoy structures for statistical potential training, and for copying the prepared decoys into the correponding folders in SGE cluster.</p>
+<p>This class contains method for converting the input decoy strctures in the subfolder into formats necessary for using the decoy structures for statistical potential training, and for copying the prepared decoys into the correponding folders in SGE cluster.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -82,9 +82,32 @@ specially for atom class features (see <tt class="xref py py-class docutils lite
 <dl class="method">
 <dt id="decoys.decoys4single.build">
 <tt class="descname">build</tt><big>(</big><em>filter=False</em><big>)</big><a class="reference internal" href="_modules/decoys.html#decoys4single.build"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#decoys.decoys4single.build" title="Permalink to this definition">¶</a></dt>
-<dd><p>needattachtobase
-needtransformation
-needcombinewithbase</p>
+<dd><p>Build the decoys4single object from the files in the directory, and copy the built decoys into SGE cluster.</p>
+<dl class="docutils">
+<dt>The directory should have the following files:</dt>
+<dd><dl class="first docutils">
+<dt>Decoy struture files</dt>
+<dd><ul class="first last simple">
+<li>structure pdbs</li>
+<li>needtransformation: a base pdb file *base* and a transformation file *res, see <a class="reference internal" href="#decoys.decoys4single.build_dockingdecoys_withtransformation" title="decoys.decoys4single.build_dockingdecoys_withtransformation"><tt class="xref py py-meth docutils literal"><span class="pre">decoys4single.build_dockingdecoys_withtransformation()</span></tt></a></li>
+<li>needattachtobase: a base pdb file *base* and files with the remaining parts of decoy structures, the final decoy structure files are assembled on the fly by attaching the decoy file to the base file.</li>
+<li>needcombinewithbase: a base pdb file *base* and files with the remaining parts of decoy structures. The base file should contains &#8220;replacethis&#8221; str, which will be replaced by the decoy file on the fly.</li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Example: *base* can be the receptor file shared by all decoys/ligands/peptides</p>
+</div>
+<p class="last">rmsd.pickle | rosetta sc file |  a native structure *native*, see <a class="reference internal" href="#decoys.decoys4single.calc_rmsd" title="decoys.decoys4single.calc_rmsd"><tt class="xref py py-meth docutils literal"><span class="pre">decoys4single.calc_rmsd()</span></tt></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="decoys.decoys4single.build_dockingdecoys_withtransformation">
+<tt class="descname">build_dockingdecoys_withtransformation</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/decoys.html#decoys4single.build_dockingdecoys_withtransformation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#decoys.decoys4single.build_dockingdecoys_withtransformation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build decoys that need transformation, for pathdock only?</p>
 </dd></dl>
 
 <dl class="method">
@@ -101,18 +124,28 @@ rmsd.pickle
 <dl class="class">
 <dt id="decoys.decoyset">
 <em class="property">class </em><tt class="descclassname">decoys.</tt><tt class="descname">decoyset</tt><big>(</big><em>dsname=''</em>, <em>sourcedir=''</em><big>)</big><a class="reference internal" href="_modules/decoys.html#decoyset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#decoys.decoyset" title="Permalink to this definition">¶</a></dt>
-<dd><p>The pre-prepared decoys directory should looks like the following:
+<dd><p>A single set of decoys</p>
+<dl class="method">
+<dt id="decoys.decoyset.build">
+<tt class="descname">build</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/decoys.html#decoyset.build"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#decoys.decoyset.build" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build the decoy set.</p>
+<p>The pre-prepared decoys directory should looks like the following:
 root:</p>
 <blockquote>
 <div><dl class="docutils">
-<dt>decoySet1: could use the PDB code of the receptor here</dt>
+<dt>decoySet1: could use the PDB code of the receptor here </dt>
 <dd>Decoy files
-[<em>base</em>]: if this file is present in this directory, it should be the receptor file shared by all decoys, and the final decoys are generated by combining this
-rmsd.pickle</dd>
+rmsd file</dd>
 </dl>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#decoys.decoys4single.build" title="decoys.decoys4single.build"><tt class="xref py py-meth docutils literal"><span class="pre">decoys4single.build()</span></tt></a></p>
+</div>
 <p>decoySet2
 ...</p>
 </div></blockquote>
+</dd></dl>
+
 </dd></dl>
 
 </div>
@@ -127,8 +160,8 @@ rmsd.pickle</dd>
   <p class="topless"><a href="sequences.html"
                         title="previous chapter">Collection of sequences for known structures or decoys</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="statsTable.html"
-                        title="next chapter">Calcualte statistics from a set of structures</a></p>
+  <p class="topless"><a href="feature.html"
+                        title="next chapter">Features</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/decoys.txt"
@@ -161,7 +194,7 @@ rmsd.pickle</dd>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="statsTable.html" title="Calcualte statistics from a set of structures"
+          <a href="feature.html" title="Features"
              >next</a> |</li>
         <li class="right" >
           <a href="sequences.html" title="Collection of sequences for known structures or decoys"

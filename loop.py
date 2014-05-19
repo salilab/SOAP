@@ -10,6 +10,9 @@ from modeller.automodel.autosched import *
 log.none()
 
 class MyLoop(loopmodel):
+    """
+    SOAP loop modeling class
+    """
     # This routine picks the residues to be refined by loop modeling
     def __init__(self, env, sequence, alnfile=None, knowns=[], inimodel=None,
                  deviation=None, library_schedule=None, csrfile=None,
@@ -209,6 +212,9 @@ class MyLoop(loopmodel):
             
                
 class sprefine(object):
+    """
+    SOAP loop refinement benchmark class
+    """
     def __init__(self,dslist='101',bm='loop.100.8',criteria='bestrmsd',nonbond_spline=0.1,contact_shell=12.0,deviations=50,assess='',spmodel=None,refineProtocal=None):
         if refineProtocal!=None:
             self.refineProtocal=refineProtocal

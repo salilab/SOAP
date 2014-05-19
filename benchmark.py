@@ -230,7 +230,7 @@ class dsscorestats(object):
             len:len()
             nonempty: len>0
             perc: percentage in total
-        Examples:
+        Examples::
             top1000_nonempty__rmsd10ORirmsd4 # whether there is a model sastifi
             top1000_len__rmsd10ORirmsd4 # the number of such models
             top1000_sum_revrank_rmsd10ORirmsd4FIRST

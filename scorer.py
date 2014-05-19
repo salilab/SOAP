@@ -414,6 +414,9 @@ class scorer(object):
             return -self.sprefiner.assess()
     
     def assess(self,values=[],pos=[],report='single',slevel=''):
+        """
+        Assess the model based on the given values.
+        """
         if values==[]:
             print "parameter values are needed for scorer.assess"
             return 0

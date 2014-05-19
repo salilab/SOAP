@@ -7,6 +7,16 @@ from env import *
 
 
 class task(object):
+    """
+    A single SGE task
+    
+    :param str dir: name of the parent directory of the run directory
+    :param str rdirname: name of the run directory
+    :param object afterprocessing: An ojbect with afterprocessing method for processing the run output, called when the sge run finsihes.
+    :param object preparing: An ojbect with prepare_task_input method for prepare the run output, called when the task is started by monitor().
+    
+    
+    """
     def __init__(self,dir='',rdirname='',afterprocessing=None, preparing=None, targetfile=''):
         self.dir=dir
         self.rdirname=rdirname
@@ -416,6 +426,15 @@ class task(object):
             time.sleep(60)
         
     def monitor(self):
+        """
+        The of task is started on remote SGE cluster, monitored until all tasks finish, after whcih the `afterprocessing` will be called.
+        
+        Some error will be handled automately, but others will casue the program to pause, see :ref:`taskmonitor`
+
+        .. note::
+            It is better to wrap the task in a tasklist object and call :method:`tasklist.monitor2end`. 
+        
+        """
         try:
             if self.finished:
                 return 1
@@ -756,6 +775,9 @@ class task(object):
         return outputlist
 
 class localtask(task):
+    """
+    A single local task
+    """
     def __init__(self,func=None, inputlist=[]):
         self.func=func
         self.inputlist=inputlist
@@ -772,9 +794,9 @@ class localtask(task):
         pass
 
 class taskchain(task):
-    #this calss will chain a list of tasks, and excute the chained functions one by one, including local runs
-    #the inididual function should either excute some code, return some result as the input to the next function
-        #or the function should result a task object, which can be monitored, and the monitor() return 0 when not success
+    """this calss will chain a list of tasks, and excute the chained functions one by one, including local runs
+    the inididual function should either excute some code, return some result as the input to the next function
+    or the function should result a task object, which can be monitored, and the monitor() return 0 when not success"""
     def __init__(self, chains=[]):#, sharedinput=[], initialinput=[]
         
         self.taskchains=chains
@@ -796,7 +818,12 @@ class taskchain(task):
         if self.currentpos<len(self.taskchains):
             self.taskchains[self.currentpos].qdel_jobs(delete)
 
-class tasklist(task): 
+class tasklist(task):
+    """
+    List of tasks, task itself can be a :class:`jobSchedule.tasklist`, :class:`jobSchedule.task`,:class:`jobSchedule.localtask`, and :class:`jobSchedule.taskchain`.
+    
+    
+    """
     def __init__(self,tasklist=[],afterprocessing=None,other=None,reload_rundir='',reload_dirlist=[]):
         if reload_rundir:
             fl=os.listdir(reload_rundir)
@@ -864,6 +891,30 @@ class tasklist(task):
                 return self.resultlist
         
     def monitor2end(self):
+        """
+        The list of tasks are started(at the same time), local or on remote SGE cluster, monitored until all tasks finish, after whcih the `afterprocessing` will be called.
+            
+        .. note::
+            A task, tasklist, or taskchain and be interrupted by CTRL+c at runtime, to perform a list job controlling actions::
+            
+                @@@@@@@@ task-monitor
+        
+                You have 120s to interrupt the code to handle the error, otherwise code will continue looping 
+                 0-quit and delete;
+                 1-quit this job;
+                 2-re-raise;
+                 3-quit whole script and delete;
+                 4-enter debug mode;
+                 5-continue
+                 6-restart runs with updated SOAP code
+                 7-re-parepare and restart job 
+                 8-ignore erros
+             
+            The task will continue if no input is entered.
+            
+            *The "task-monitor" is also triggered by some fetal errors.*
+        """
+                
         try:
             while 0 in self.resultlist:
                 try:
@@ -911,6 +962,9 @@ class tasklist(task):
                
             
 def report_job_runstatus(runpath, runsuccess, runnumber, outputname,inputname='runme.py',temppath=''):
+    """
+    Utility function for  report the job run status when the runs finished.
+    """
     if runenv.hostn:
         if temppath:
             os.chdir(temppath)
@@ -957,6 +1011,9 @@ def report_job_runstatus(runpath, runsuccess, runnumber, outputname,inputname='r
             raise Exception('Run failed '+str(runnumber))
             
 def generate_job_submit_script(freememory,spname,runtime,nors,parallel=0,mem_total=0,additional_resources=''):
+    """
+    Utility function for generate SGE job submission script.
+    """
     runmdt=open('runme.sh','w')
     submdt=file(runenv.libdir+scriptname,'r')
     submdtf=submdt.read()

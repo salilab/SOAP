@@ -1,5 +1,7 @@
 """
-   SOAP RankScore module, calculating scores on decoys
+   SOAP RankScore module, calculating scores on decoys.
+   
+   In SOAP, recovery function scores are treated as a separate scoring term, which enables a substaintial~1000000x increase in evaluation speed.
 
 """
 
@@ -10,6 +12,9 @@ from decoys import decoysets
 
                 
 class dsscore(object):
+    """
+    Base class for decoy sets scores
+    """
     def __init__(self,scorename='',dir='',dslist=[]):
         self.scorename=scorename
         self.dir=dir
@@ -56,6 +61,9 @@ class dsscore(object):
         return self.score
 
 class sfdsscore(dsscore,sf): #the score comes from scaling function
+    """
+    Decoy sets scores calcualted using recovery function
+    """
     def __init__(self, dslist=[],bm='ss1', sfm='', features='', sftype='',par='',parvalue=[],type='',**argvs):
         dsscore.__init__(self,scorename='')
         sf.__init__(self,sftype=sftype,par=par,parvalue=parvalue,features=features,type=type, **argvs)
@@ -124,6 +132,9 @@ class sfdsscore(dsscore,sf): #the score comes from scaling function
         return self.score
         
 class spdsscore(dsscore,scaledsp): #the score from distributions
+    """
+    Decoy sets scores calcualted using stats tables
+    """    
     def __init__(self,dslist=[],bm='',ssp=scaledsp(),model=[]):
         dsscore.__init__(self)
         if model: #needfix???

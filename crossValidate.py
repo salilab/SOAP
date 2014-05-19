@@ -8,6 +8,9 @@ from sampling import *
 
 
 class k2cv(object):
+    """
+    Cross validate base class
+    """
     def __init__(self,spsfo=None,model=[]):
         if model:
             so=scorer(model=model)
@@ -528,6 +531,9 @@ class k2cv(object):
         con.close()
 
 class k2cvlocal(k2cv):
+    """
+    Cross validate a model locally // may not work on its own anymore
+    """
     def trainfunc(self,sample):
         #pdb.set_trace()
         self.spsfo.scorer=copy.deepcopy(self.ospsfo.scorer)
@@ -569,7 +575,10 @@ class k2cvlocal(k2cv):
         srtask=self.cross_validation_single_model(input)
         return self.analyze_cv([srtask])
         
-class k2cvcluster(k2cvlocal): 
+class k2cvcluster(k2cvlocal):
+    """
+    Cross validate a model on SGE cluster
+    """    
     def __init__(self,spsfo=None,model=[], initialize=False,logpath=''):
         self.model=model        
         self.spsfo=spsfo

@@ -235,7 +235,7 @@
             <span class="n">bs</span><span class="o">=</span><span class="n">bs</span><span class="o">+</span><span class="p">(</span><span class="n">ss</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="mi">3</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">bndsepdict</span><span class="p">[</span><span class="n">res2</span><span class="p">][</span><span class="n">atm2n</span><span class="o">+</span><span class="s">&#39;N&#39;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span>
             <span class="k">return</span> <span class="n">bs</span>
     
-<span class="k">class</span> <span class="nc">mypickle</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="mypickle"><a class="viewcode-back" href="../utility.html#utility.mypickle">[docs]</a><span class="k">class</span> <span class="nc">mypickle</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="c"># this class will save the numpy array seperately when pickling the object to speed up performance and avoid pickle problems with large array, /////old version: only works when the numpy array is a varialbe of an object. WILL NOT WORK if you have a list of numpy arrays.</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">npyobjlist</span><span class="o">=</span><span class="p">[]</span>
@@ -391,7 +391,7 @@
         <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fl</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">arraysize</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">arraysize</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">st_size</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">arraysize</span>
-
+</div>
 <span class="k">class</span> <span class="nc">savednpy</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">=</span><span class="n">name</span>
@@ -403,7 +403,7 @@
     <span class="n">mean</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">sl</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">sl</span><span class="o">-</span><span class="n">mean</span><span class="p">)</span><span class="o">/</span><span class="n">std</span>
     
-<span class="k">def</span> <span class="nf">decode_genmethod</span><span class="p">(</span><span class="n">genmethod</span><span class="p">):</span>
+<div class="viewcode-block" id="decode_genmethod"><a class="viewcode-back" href="../utility.html#utility.decode_genmethod">[docs]</a><span class="k">def</span> <span class="nf">decode_genmethod</span><span class="p">(</span><span class="n">genmethod</span><span class="p">):</span>
     <span class="n">csmin</span><span class="o">=</span><span class="mi">0</span>
     <span class="n">csmax</span><span class="o">=</span><span class="mi">99</span>
     <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">&#39;cs([0-1]+)&#39;</span><span class="p">,</span><span class="n">genmethod</span><span class="p">):</span>
@@ -443,7 +443,7 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">ssp</span><span class="o">=</span><span class="bp">False</span>
     <span class="k">return</span> <span class="n">csmin</span><span class="p">,</span> <span class="n">csmax</span><span class="p">,</span><span class="n">kcut</span><span class="p">,</span> <span class="n">kcut1</span><span class="p">,</span> <span class="n">bs</span><span class="p">,</span><span class="n">bsm</span><span class="p">,</span> <span class="n">errsv</span><span class="p">,</span> <span class="n">ssp</span>
-
+</div>
 <span class="k">def</span> <span class="nf">check_remote_file_exist</span><span class="p">(</span><span class="n">rs</span><span class="p">,</span><span class="n">rd</span><span class="p">,</span><span class="n">rfl</span><span class="p">):</span>
     <span class="n">proc1</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="s">&#39;ssh &#39;</span><span class="o">+</span><span class="n">rs</span><span class="o">+</span><span class="s">&#39; &#39;</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\&#39;</span><span class="s">cd &#39;</span><span class="o">+</span><span class="n">rd</span><span class="o">+</span><span class="s">&#39;; ls </span><span class="se">\&#39;</span><span class="s">&#39;</span><span class="p">,</span><span class="n">shell</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span><span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span>
     <span class="n">runstats</span><span class="o">=</span><span class="n">proc1</span><span class="o">.</span><span class="n">communicate</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
@@ -679,7 +679,7 @@
         <span class="n">cp</span><span class="o">=</span><span class="n">nindexlist</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">nindexlist</span>
 
-<span class="k">def</span> <span class="nf">load_scorer</span><span class="p">(</span><span class="n">originalscorer</span><span class="p">,</span><span class="n">indexlen</span><span class="p">):</span>
+<div class="viewcode-block" id="load_scorer"><a class="viewcode-back" href="../utility.html#utility.load_scorer">[docs]</a><span class="k">def</span> <span class="nf">load_scorer</span><span class="p">(</span><span class="n">originalscorer</span><span class="p">,</span><span class="n">indexlen</span><span class="p">):</span>
     <span class="k">print</span> <span class="s">&quot;loading scorer&quot;</span>
     <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
     <span class="n">mp</span><span class="o">=</span><span class="n">mypickle</span><span class="p">()</span>
@@ -699,8 +699,8 @@
     <span class="k">except</span><span class="p">:</span>
         <span class="k">pass</span>
     <span class="k">return</span> <span class="n">scorer</span>
-
-<span class="k">class</span> <span class="nc">Mymodel</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+</div>
+<div class="viewcode-block" id="Mymodel"><a class="viewcode-back" href="../utility.html#utility.Mymodel">[docs]</a><span class="k">class</span> <span class="nc">Mymodel</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">select_loop_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">loops</span><span class="p">):</span>
         <span class="n">s</span><span class="o">=</span><span class="n">selection</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">loops</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="nb">list</span><span class="p">):</span>
@@ -913,19 +913,19 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">save_model</span><span class="p">(</span><span class="n">othername</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gen_atomlist</span><span class="p">()</span>
 
-
+</div>
 <span class="k">def</span> <span class="nf">load_pickle</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
     <span class="k">pass</span>
 
 
 
 
-<span class="k">class</span> <span class="nc">MemoryMonitor</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="MemoryMonitor"><a class="viewcode-back" href="../utility.html#utility.MemoryMonitor">[docs]</a><span class="k">class</span> <span class="nc">MemoryMonitor</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create new MemoryMonitor instance.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mul</span><span class="o">=</span><span class="p">[]</span>
 
-    <span class="k">def</span> <span class="nf">usage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span> <span class="p">):</span>
+<div class="viewcode-block" id="MemoryMonitor.usage"><a class="viewcode-back" href="../utility.html#utility.MemoryMonitor.usage">[docs]</a>    <span class="k">def</span> <span class="nf">usage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span> <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return int containing memory used by user&#39;s processes.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">process</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="s">&quot;ps -aux | grep &quot;</span><span class="o">+</span><span class="n">name</span><span class="p">,</span>
                                         <span class="n">shell</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
@@ -935,7 +935,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">mm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">communicate</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">5</span><span class="p">]</span>
         <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">mm</span>
         <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mm</span><span class="p">)</span>
-        
+        </div>
     <span class="k">def</span> <span class="nf">monitor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="n">fn</span><span class="o">=</span><span class="s">&#39;mlog&#39;</span><span class="p">):</span>
         <span class="n">fh</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span><span class="s">&#39;a+&#39;</span><span class="p">)</span>
         <span class="n">mu</span><span class="o">=</span><span class="mi">11</span>
@@ -945,7 +945,7 @@
             <span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">mu</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
             <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
             <span class="n">fh</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
-        <span class="n">fh</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">fh</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 </pre></div>
 
           </div>

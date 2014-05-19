@@ -59,7 +59,7 @@
 <span class="kn">from</span> <span class="nn">sampling</span> <span class="kn">import</span> <span class="o">*</span>
 
 
-<span class="k">class</span> <span class="nc">k2cv</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="k2cv"><a class="viewcode-back" href="../crossValidate.html#crossValidate.k2cv">[docs]</a><span class="k">class</span> <span class="nc">k2cv</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">spsfo</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">model</span><span class="o">=</span><span class="p">[]):</span>
         <span class="k">if</span> <span class="n">model</span><span class="p">:</span>
             <span class="n">so</span><span class="o">=</span><span class="n">scorer</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">)</span>
@@ -577,8 +577,8 @@
             <span class="n">conn</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&#39;INSERT INTO Result values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)&#39;</span><span class="p">,</span><span class="nb">tuple</span><span class="p">(</span><span class="n">resList</span><span class="p">))</span>
         <span class="n">con</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
         <span class="n">con</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-
-<span class="k">class</span> <span class="nc">k2cvlocal</span><span class="p">(</span><span class="n">k2cv</span><span class="p">):</span>
+</div>
+<div class="viewcode-block" id="k2cvlocal"><a class="viewcode-back" href="../crossValidate.html#crossValidate.k2cvlocal">[docs]</a><span class="k">class</span> <span class="nc">k2cvlocal</span><span class="p">(</span><span class="n">k2cv</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">trainfunc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">sample</span><span class="p">):</span>
         <span class="c">#pdb.set_trace()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">spsfo</span><span class="o">.</span><span class="n">scorer</span><span class="o">=</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ospsfo</span><span class="o">.</span><span class="n">scorer</span><span class="p">)</span>
@@ -619,8 +619,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">testsample</span><span class="o">=</span><span class="n">testsample</span>
         <span class="n">srtask</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cross_validation_single_model</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyze_cv</span><span class="p">([</span><span class="n">srtask</span><span class="p">])</span>
-        
-<span class="k">class</span> <span class="nc">k2cvcluster</span><span class="p">(</span><span class="n">k2cvlocal</span><span class="p">):</span> 
+        </div>
+<div class="viewcode-block" id="k2cvcluster"><a class="viewcode-back" href="../crossValidate.html#crossValidate.k2cvcluster">[docs]</a><span class="k">class</span> <span class="nc">k2cvcluster</span><span class="p">(</span><span class="n">k2cvlocal</span><span class="p">):</span> 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">spsfo</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">model</span><span class="o">=</span><span class="p">[],</span> <span class="n">initialize</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span><span class="n">logpath</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">=</span><span class="n">model</span>        
         <span class="bp">self</span><span class="o">.</span><span class="n">spsfo</span><span class="o">=</span><span class="n">spsfo</span>
@@ -1285,7 +1285,7 @@
         <span class="k">print</span> <span class="n">libpath</span>
         <span class="k">print</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&#39;scp &#39;</span><span class="o">+</span><span class="n">libpath</span><span class="o">+</span><span class="s">&#39; &#39;</span><span class="o">+</span><span class="n">runenv</span><span class="o">.</span><span class="n">jobserver</span><span class="o">+</span><span class="s">&#39;:&#39;</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">runenv</span><span class="o">.</span><span class="n">serverUserPath</span><span class="o">+</span><span class="s">&#39;lib&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">rundir</span><span class="o">+</span><span class="s">&#39;.lib&#39;</span><span class="p">))</span>
         
-                
+                </div>
 </pre></div>
 
           </div>

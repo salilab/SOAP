@@ -61,7 +61,7 @@
 <span class="kn">from</span> <span class="nn">modeller.automodel.autosched</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="n">log</span><span class="o">.</span><span class="n">none</span><span class="p">()</span>
 
-<span class="k">class</span> <span class="nc">MyLoop</span><span class="p">(</span><span class="n">loopmodel</span><span class="p">):</span>
+<div class="viewcode-block" id="MyLoop"><a class="viewcode-back" href="../loop.html#loop.MyLoop">[docs]</a><span class="k">class</span> <span class="nc">MyLoop</span><span class="p">(</span><span class="n">loopmodel</span><span class="p">):</span>
     <span class="c"># This routine picks the residues to be refined by loop modeling</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="n">sequence</span><span class="p">,</span> <span class="n">alnfile</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">knowns</span><span class="o">=</span><span class="p">[],</span> <span class="n">inimodel</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                  <span class="n">deviation</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">library_schedule</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">csrfile</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
@@ -150,7 +150,7 @@
             <span class="n">lind</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">loop</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">+</span><span class="s">&#39;:&#39;</span><span class="o">+</span><span class="n">loop</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">index</span>
             <span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">selection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="n">lind</span><span class="p">:(</span><span class="n">lind</span><span class="o">+</span><span class="n">loop</span><span class="p">[</span><span class="mi">1</span><span class="p">])]))</span>
     
-    <span class="k">def</span> <span class="nf">loop_model_analysis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atmsel</span><span class="p">,</span> <span class="n">ini_model</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">id1</span><span class="p">,</span> <span class="n">num</span><span class="p">):</span>
+<div class="viewcode-block" id="MyLoop.loop_model_analysis"><a class="viewcode-back" href="../loop.html#loop.MyLoop.loop_model_analysis">[docs]</a>    <span class="k">def</span> <span class="nf">loop_model_analysis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atmsel</span><span class="p">,</span> <span class="n">ini_model</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">id1</span><span class="p">,</span> <span class="n">num</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Energy evaluation and assessment, and write out the loop model&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">user_after_single_loop_model</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">loop</span><span class="o">.</span><span class="n">write_selection_only</span><span class="p">:</span>
@@ -165,7 +165,7 @@
 
         <span class="c"># Do model assessment if requested</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assess</span><span class="p">(</span><span class="n">atmsel</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">loop</span><span class="o">.</span><span class="n">assess_methods</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span>
-        
+        </div>
     <span class="k">def</span> <span class="nf">user_after_single_loop_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">out</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_rmsds</span><span class="p">:</span>
             <span class="k">return</span> <span class="mi">0</span>
@@ -199,7 +199,7 @@
     <span class="c">#def read_potential(self):    </span>
     <span class="c">#    return group_restraints(self.env, classes=self.refinepotential[0],parameters=self.refinepotential[1])   </span>
 
-    <span class="k">def</span> <span class="nf">single_loop_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atmsel</span><span class="p">,</span> <span class="n">ini_model</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">id1</span><span class="p">,</span> <span class="n">sched</span><span class="p">,</span>
+<div class="viewcode-block" id="MyLoop.single_loop_model"><a class="viewcode-back" href="../loop.html#loop.MyLoop.single_loop_model">[docs]</a>    <span class="k">def</span> <span class="nf">single_loop_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atmsel</span><span class="p">,</span> <span class="n">ini_model</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">id1</span><span class="p">,</span> <span class="n">sched</span><span class="p">,</span>
                           <span class="n">parallel</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Build a single loop model&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tracefile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_loop_trace_file</span><span class="p">(</span><span class="n">id1</span><span class="p">,</span> <span class="n">num</span><span class="p">)</span>
@@ -247,20 +247,20 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">loop_model_analysis</span><span class="p">(</span><span class="n">atmsel</span><span class="p">,</span> <span class="n">ini_model</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">id1</span><span class="p">,</span> <span class="n">num</span><span class="p">)</span>
         <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">tracefile</span>
         <span class="k">return</span> <span class="n">out</span>
-    
-    <span class="k">def</span> <span class="nf">get_loop_actions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    </div>
+<div class="viewcode-block" id="MyLoop.get_loop_actions"><a class="viewcode-back" href="../loop.html#loop.MyLoop.get_loop_actions">[docs]</a>    <span class="k">def</span> <span class="nf">get_loop_actions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get actions to carry out during loop optimization&quot;&quot;&quot;</span>
         <span class="n">act</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">act</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">checkRMSD</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="bp">self</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">act</span>
-
-    <span class="k">def</span> <span class="nf">multiple_loop_models</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atmsel</span><span class="p">,</span> <span class="n">ini_model</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">sched</span><span class="p">):</span>
+</div>
+<div class="viewcode-block" id="MyLoop.multiple_loop_models"><a class="viewcode-back" href="../loop.html#loop.MyLoop.multiple_loop_models">[docs]</a>    <span class="k">def</span> <span class="nf">multiple_loop_models</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atmsel</span><span class="p">,</span> <span class="n">ini_model</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">sched</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Build all loop models for a given initial model&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">id1</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loop</span><span class="o">.</span><span class="n">starting_model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">loop</span><span class="o">.</span><span class="n">ending_model</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
             <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">single_loop_model</span><span class="p">(</span><span class="n">atmsel</span><span class="p">,</span> <span class="n">ini_model</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">id1</span><span class="p">,</span> <span class="n">sched</span><span class="p">)</span>
             
-               
-<span class="k">class</span> <span class="nc">sprefine</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+               </div></div>
+<div class="viewcode-block" id="sprefine"><a class="viewcode-back" href="../loop.html#loop.sprefine">[docs]</a><span class="k">class</span> <span class="nc">sprefine</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">dslist</span><span class="o">=</span><span class="s">&#39;101&#39;</span><span class="p">,</span><span class="n">bm</span><span class="o">=</span><span class="s">&#39;loop.100.8&#39;</span><span class="p">,</span><span class="n">criteria</span><span class="o">=</span><span class="s">&#39;bestrmsd&#39;</span><span class="p">,</span><span class="n">nonbond_spline</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span><span class="n">contact_shell</span><span class="o">=</span><span class="mf">12.0</span><span class="p">,</span><span class="n">deviations</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span><span class="n">assess</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span><span class="n">spmodel</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">refineProtocal</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">refineProtocal</span><span class="o">!=</span><span class="bp">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">refineProtocal</span><span class="o">=</span><span class="n">refineProtocal</span>
@@ -722,7 +722,7 @@
                     <span class="n">rmsdlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rmsddict</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
             <span class="n">brmsdlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">rmsdlist</span><span class="p">)</span><span class="o">.</span><span class="n">min</span><span class="p">())</span>
         <span class="k">return</span> <span class="n">brmsdlist</span>
-
+</div>
 <div class="viewcode-block" id="sgmd"><a class="viewcode-back" href="../loop.html#loop.sgmd">[docs]</a><span class="k">def</span> <span class="nf">sgmd</span><span class="p">(</span><span class="n">atmsel</span><span class="p">,</span> <span class="n">actions</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Very slow MD annealing&quot;&quot;&quot;</span>
     <span class="n">sgmdrefine</span><span class="p">(</span><span class="n">atmsel</span><span class="p">,</span> <span class="n">actions</span><span class="p">,</span> <span class="n">cap</span><span class="o">=</span><span class="mf">1.39</span><span class="p">,</span> <span class="n">timestep</span><span class="o">=</span><span class="mf">4.0</span><span class="p">,</span>

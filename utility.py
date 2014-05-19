@@ -184,7 +184,8 @@ class bndsep(object):
             return bs
     
 class mypickle(object):
-    # this class will save the numpy array seperately when pickling the object to speed up performance and avoid pickle problems with large array, /////old version: only works when the numpy array is a varialbe of an object. WILL NOT WORK if you have a list of numpy arrays.
+    """ this class will save the numpy array seperately when pickling the object to speed up performance and avoid pickle problems with large array, /////old version: only works when the numpy array is a varialbe of an object. WILL NOT WORK if you have a list of numpy arrays.
+    """
     def __init__(self):
         self.npyobjlist=[]
         self.npyobjidlist=[]
@@ -352,6 +353,9 @@ def calc_zscore(sl):
     return (sl-mean)/std
     
 def decode_genmethod(genmethod):
+    """
+    Decode genmethod str
+    """
     csmin=0
     csmax=99
     if re.search('cs([0-1]+)',genmethod):
@@ -628,6 +632,7 @@ def squeeze_indexlist(indexlist):
     return nindexlist
 
 def load_scorer(originalscorer,indexlen):
+    """loading scorer, used for tranfering scoring across computers"""
     print "loading scorer"
     gc.collect()
     mp=mypickle()
@@ -649,6 +654,9 @@ def load_scorer(originalscorer,indexlen):
     return scorer
 
 class Mymodel(model):
+    """
+    Modeller model class with customized functions. 
+    """
     def select_loop_atoms(self,loops):
         s=selection()
         if not isinstance(loops[0],list):
@@ -869,6 +877,7 @@ def load_pickle(fn):
 
 
 class MemoryMonitor(object):
+    """Monitor the memory usage of the current program"""
     def __init__(self):
         """Create new MemoryMonitor instance."""
         self.mul=[]

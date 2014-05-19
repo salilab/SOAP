@@ -461,7 +461,7 @@
             <span class="c">#self.sprefiner.refpot=[self.atomclasslib,self.potlib]</span>
             <span class="k">return</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">sprefiner</span><span class="o">.</span><span class="n">assess</span><span class="p">()</span>
     
-    <span class="k">def</span> <span class="nf">assess</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">values</span><span class="o">=</span><span class="p">[],</span><span class="n">pos</span><span class="o">=</span><span class="p">[],</span><span class="n">report</span><span class="o">=</span><span class="s">&#39;single&#39;</span><span class="p">,</span><span class="n">slevel</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="scorer.assess"><a class="viewcode-back" href="../scorer.html#scorer.scorer.assess">[docs]</a>    <span class="k">def</span> <span class="nf">assess</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">values</span><span class="o">=</span><span class="p">[],</span><span class="n">pos</span><span class="o">=</span><span class="p">[],</span><span class="n">report</span><span class="o">=</span><span class="s">&#39;single&#39;</span><span class="p">,</span><span class="n">slevel</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">values</span><span class="o">==</span><span class="p">[]:</span>
             <span class="k">print</span> <span class="s">&quot;parameter values are needed for scorer.assess&quot;</span>
             <span class="k">return</span> <span class="mi">0</span>
@@ -491,7 +491,7 @@
                 <span class="k">return</span> <span class="n">scoresum</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">singlescorerlist</span><span class="p">)</span>        
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">assess_model</span><span class="p">(</span><span class="n">report</span><span class="p">,</span><span class="n">slevel</span><span class="p">)</span>
-
+</div>
     <span class="k">def</span> <span class="nf">assess_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">values</span><span class="o">=</span><span class="p">[],</span><span class="n">blockind</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">report</span><span class="o">=</span><span class="s">&#39;single&#39;</span><span class="p">,</span><span class="n">slevel</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">values</span><span class="o">==</span><span class="p">[]:</span>
             <span class="k">print</span> <span class="s">&quot;parameter values are needed for scorer.assess_block&quot;</span>

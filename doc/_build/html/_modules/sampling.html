@@ -101,7 +101,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">globalbestpar</span><span class="o">=</span><span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">optm</span><span class="o">=</span><span class="bp">None</span>
          
-    <span class="k">def</span> <span class="nf">optimize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="optimizer.optimize"><a class="viewcode-back" href="../sampling.html#sampling.optimizer.optimize">[docs]</a>    <span class="k">def</span> <span class="nf">optimize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">optmind</span><span class="o">=</span><span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">optm</span><span class="o">=</span><span class="bp">None</span>
         <span class="n">sp</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">start_from_existing_runs</span><span class="p">()</span><span class="c"># start from where it failed.</span>
@@ -132,7 +132,7 @@
                 <span class="n">result</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">initialvalue</span><span class="p">[</span><span class="o">...</span><span class="p">]</span><span class="o">=</span><span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyze_optimization_results</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
-
+</div>
     <span class="k">def</span> <span class="nf">start_from_existing_runs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">fl</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s">&#39;./&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scorerid</span><span class="p">)</span> <span class="ow">in</span> <span class="n">fl</span><span class="p">:</span>

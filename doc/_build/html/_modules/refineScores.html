@@ -58,7 +58,7 @@
 <span class="kn">from</span> <span class="nn">env</span> <span class="kn">import</span> <span class="o">*</span>
 
     
-<span class="k">class</span> <span class="nc">sprefinescore</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="sprefinescore"><a class="viewcode-back" href="../refineScore.html#refineScores.sprefinescore">[docs]</a><span class="k">class</span> <span class="nc">sprefinescore</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">dslist</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span><span class="n">bm</span><span class="o">=</span><span class="s">&#39;fast&#39;</span><span class="p">,</span><span class="n">criteria</span><span class="o">=</span><span class="s">&#39;bestrmsd&#39;</span><span class="p">,</span><span class="n">pn</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="p">[]):</span>
         <span class="k">if</span> <span class="n">spmodel</span><span class="p">:</span> <span class="c">#needfix???</span>
             <span class="k">if</span> <span class="n">spmodel</span><span class="p">[</span><span class="s">&#39;scoretype&#39;</span><span class="p">]</span><span class="o">!=</span><span class="s">&#39;sprefine&#39;</span><span class="p">:</span>
@@ -261,7 +261,7 @@
         <span class="n">atmsel</span><span class="o">=</span><span class="n">selection</span><span class="p">(</span><span class="n">mdl</span><span class="p">)</span>
         <span class="n">cg</span> <span class="o">=</span> <span class="n">optimizers</span><span class="o">.</span><span class="n">conjugate_gradients</span><span class="p">()</span>            
         <span class="n">cg</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">atmsel</span><span class="p">,</span> <span class="n">max_iterations</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">mdl</span><span class="o">.</span><span class="n">optimize_output</span><span class="p">,</span> <span class="n">min_atom_shift</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
-
+</div>
 <span class="k">class</span> <span class="nc">refinemodel</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">decode_refinem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">refinem</span><span class="p">):</span>
         <span class="n">rsrm</span><span class="o">=</span><span class="n">refinem</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>

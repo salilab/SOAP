@@ -54,6 +54,9 @@ class optimizer(object):
         self.optm=None
          
     def optimize(self):
+        """
+        Optimize...
+        """
         self.optmind=0
         self.optm=None
         sp=self.start_from_existing_runs()# start from where it failed.

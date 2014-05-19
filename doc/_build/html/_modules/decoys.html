@@ -585,7 +585,7 @@
         <span class="k">print</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&#39;scp need* &#39;</span><span class="o">+</span><span class="n">runenv</span><span class="o">.</span><span class="n">jobserver</span><span class="o">+</span><span class="s">&#39;:&#39;</span><span class="o">+</span><span class="n">tdir</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
         
-    <span class="k">def</span> <span class="nf">build_dockingdecoys_withtransformation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="decoys4single.build_dockingdecoys_withtransformation"><a class="viewcode-back" href="../decoys.html#decoys.decoys4single.build_dockingdecoys_withtransformation">[docs]</a>    <span class="k">def</span> <span class="nf">build_dockingdecoys_withtransformation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">fh</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="s">&#39;firedockinput.pickle&#39;</span><span class="p">)</span>
         <span class="n">sd</span><span class="o">=</span><span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fh</span><span class="p">)</span>
         <span class="n">fh</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
@@ -653,7 +653,7 @@
         <span class="k">print</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&#39;scp &#39;</span><span class="o">+</span><span class="n">sd</span><span class="p">[</span><span class="s">&#39;rpdb&#39;</span><span class="p">]</span><span class="o">+</span><span class="s">&#39; &#39;</span><span class="o">+</span><span class="n">runenv</span><span class="o">.</span><span class="n">jobserver</span><span class="o">+</span><span class="s">&#39;:&#39;</span><span class="o">+</span><span class="n">tdir</span><span class="p">)</span>
         <span class="k">print</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&#39;scp &#39;</span><span class="o">+</span><span class="s">&#39;firedockinput.pickle &#39;</span><span class="o">+</span><span class="n">runenv</span><span class="o">.</span><span class="n">jobserver</span><span class="o">+</span><span class="s">&#39;:&#39;</span><span class="o">+</span><span class="n">tdir</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
-
+</div>
     <span class="k">def</span> <span class="nf">update_ppdt_pir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">make_basepir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dsname</span><span class="o">+</span><span class="s">&#39;.&#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="o">+</span><span class="s">&#39;.base.pdb&#39;</span><span class="p">)</span>
         <span class="n">basepir</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="s">&#39;base.pir&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
@@ -848,7 +848,7 @@
                 <span class="k">print</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&#39;mv  ./&#39;</span><span class="o">+</span><span class="n">subfolder</span><span class="o">+</span><span class="s">&#39; ../&#39;</span><span class="o">+</span><span class="n">subfolder</span><span class="p">)</span>
             <span class="k">print</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&#39;rm -r ../&#39;</span><span class="o">+</span><span class="n">folder</span><span class="p">)</span>
     
-    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="decoyset.build"><a class="viewcode-back" href="../decoys.html#decoys.decoyset.build">[docs]</a>    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcedir</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mkdir</span><span class="p">()</span>
         <span class="n">codelist</span><span class="o">=</span><span class="p">[]</span>
@@ -866,7 +866,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">bulid_rmsd_array</span><span class="p">(</span><span class="n">sal</span><span class="p">)</span>
         <span class="k">print</span> <span class="s">&quot;building array finished&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
-
+</div>
     <span class="k">def</span> <span class="nf">filter2good</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">bnors</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span><span class="n">scorefile</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">scorefile</span><span class="p">:</span>
             <span class="n">rsp</span><span class="o">=</span><span class="n">rawsp</span><span class="p">(</span><span class="n">pdbset</span><span class="o">=</span><span class="s">&#39;X_2.2A&#39;</span><span class="p">,</span><span class="n">features</span><span class="o">=</span><span class="s">&#39;a158a158d30&#39;</span><span class="c">#,&#39;a158a158d30&#39;,&#39;a158a158d200&#39;,&#39;a158a158d300&#39;]</span>
