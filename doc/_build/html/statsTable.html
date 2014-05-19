@@ -87,9 +87,9 @@
 <dl class="class">
 <dt id="statsTable.scaledsp">
 <em class="property">class </em><tt class="descclassname">statsTable.</tt><tt class="descname">scaledsp</tt><big>(</big><em>pm=''</em>, <em>rspo=</em><span class="optional">[</span><span class="optional">]</span>, <em>model=</em><span class="optional">[</span><span class="optional">]</span>, <em>previouspm=''</em><big>)</big><a class="reference internal" href="_modules/statsTable.html#scaledsp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#statsTable.scaledsp" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-<div><p>Processed statistics table from a set of structures</p>
-<table class="docutils field-list" frame="void" rules="none">
+<dd><p>Processed statistics table from a set of structures</p>
+<blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
@@ -103,13 +103,12 @@
 </tr>
 </tbody>
 </table>
-<p>pm definition mini language:</p>
-<div class="highlight-python"><pre>pm =&gt; spm [,+,spm]
-spm  =&gt; [pp[0-9]+] [,(gps|ks)</pre>
+<p>pm definition:</p>
+<div class="highlight-python"><pre>pm  =&gt; [pp[0-9]+] ,[(gps|ks)</pre>
 </div>
 </div></blockquote>
 <dl class="docutils">
-<dt>umber],[npend|npsum]</dt>
+<dt>umber] ,[npend|npsum]</dt>
 <dd>pp[0-9]+ : add number to raw table
 (gps|ks)</dd>
 </dl>
