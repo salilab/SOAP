@@ -264,6 +264,22 @@ class ORLoop(loopmodel):
         except:
             lind=self.residues[str(loop[2])+':'+loop[0]].index
             s.add(selection(self.residues[lind:(lind+loop[1])]))
+
+    def loop_model_analysis(self, atmsel, ini_model, filename, out, id1, num):
+        """Energy evaluation and assessment, and write out the loop model"""
+        self.user_after_single_loop_model(out)
+        if self.loop.write_selection_only:
+            self.select_loop_atoms().write(file=filename)
+        else:
+            self.write(file=filename)
+        if self.accelrys:
+            # Accelrys wants their analysis *after* the model is written, so
+            # that the written-out model keeps the original template-derived
+            # Biso, rather than getting the energy profile Biso:
+            self.loop_model_analysis_accelrys(ini_model, id1, num)
+
+        # Do model assessment if requested
+        self.assess(atmsel, self.loop.assess_methods, out)
         
     def user_after_single_loop_model(self,out):
         if not self.calc_rmsds:
