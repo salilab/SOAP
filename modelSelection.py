@@ -27,8 +27,8 @@ class sps(object):
     """
     Evaluate a list of models on sge cluster
     """
-    def __init__(self,env=env(),modellist=[],evalPotFunc=None):
-        self.env=env
+    def __init__(self,modellist=[],evalPotFunc=None):
+        self.env=runenv
         self.models=modellist
         self.modelso=copy.deepcopy(self.models)
         self.cvlist=[]
@@ -239,7 +239,7 @@ class spss(object):
     """
     def __init__(self, model=[],logfoldername='',evalPotFunc=None):
         self.dsearches=model['dsearches']
-        self.env=env()
+        self.env=runenv
         self.model=model
         self.modelstr=any2str(model)
         self.complete_model()

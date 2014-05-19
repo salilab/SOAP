@@ -6,8 +6,6 @@
 Calcualte statistics from a set of structures
 ================================
 
-.. automodule:: features
-   :members:
 
 .. automodule:: statsTable
    :members:

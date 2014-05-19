@@ -9,9 +9,12 @@ from sequences import *
 from decoys import decoysets
                     
 class rawsp(object):
-    """
+    """Statistics from a set of structures
     
-    """
+    :param str pdbset: the name of the set of PDB or decoy structures
+    :param str features: the name of the features, see :mod:`feature`
+    :param str decoy: True if the :attr:`rawsp.pdbset` represent decoys
+    :param dict model: the parameters for this class can also be passed by a dict"""
     
     def __init__(self,pdbset='',features='',genmethod='',tlib=None,decoy=False,routine='calc_sp_all', model={}):
         if model:
@@ -1318,6 +1321,23 @@ class rawsp(object):
         m.write_hdf5(path,gzip=True)
         
 class scaledsp(rawsp):
+    """
+    Processed statistics table from a set of structures
+    
+    :param rawsp rspo: class :class:`rawsp` object
+    :param str pm: the method for processing the raw talbe :attr:`scaledsp.rspo`
+    :param dict model: the parameters for this class can also be passed by a dict
+    
+    pm definition mini language::
+      
+        pm => spm [,+,spm]
+        spm  => [pp[0-9]+] [,(gps|ks)\number],[npend|npsum]
+        
+        pp[0-9]+ : add number to raw table
+        (gps|ks)\number : gaussian process or kernal smoothing with strength \number.
+        npend|npsum : normalize the count by the last bin or by the sum of the distribution (results in a proper discrete probalistic distribution).
+        
+    """    
     def __init__(self, pm='',rspo=[],model=[],previouspm=''):
         if model:
             ns=copy.deepcopy(model)

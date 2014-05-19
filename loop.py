@@ -408,7 +408,7 @@ class sprefine(object):
             m.use_parallel_job(self.j)   
         m.make()
         resultlist=[]
-        nativescore=m.ors.assess_dope()
+        #nativescore=m.ors.assess_dope()
         loopoutput=m.loop.outputs
         #pdb.set_trace()
         for i in range(0,len(loopoutput)):
