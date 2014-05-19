@@ -58,42 +58,88 @@
   <div class="section" id="benchmark-soap-s-performance-using-a-set-of-criteria">
 <h1>Benchmark SOAP&#8217;s performance using a set of criteria<a class="headerlink" href="#benchmark-soap-s-performance-using-a-set-of-criteria" title="Permalink to this headline">¶</a></h1>
 <span class="target" id="module-benchmark"></span><p>SOAP benchmark module, calcualting statistics on the scores.</p>
-<dl class="function">
-<dt id="benchmark.random_number">
-<tt class="descclassname">benchmark.</tt><tt class="descname">random_number</tt><big>(</big><big>)</big><a class="headerlink" href="#benchmark.random_number" title="Permalink to this definition">¶</a></dt>
-<dd><p>random_sample(size=None)</p>
-<p>Return random floats in the half-open interval [0.0, 1.0).</p>
-<p>Results are from the &#8220;continuous uniform&#8221; distribution over the
-stated interval.  To sample <span class="math">\(Unif[a, b), b &gt; a\)</span> multiply
-the output of <cite>random_sample</cite> by <cite>(b-a)</cite> and add <cite>a</cite>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="p">(</span><span class="n">b</span> <span class="o">-</span> <span class="n">a</span><span class="p">)</span> <span class="o">*</span> <span class="n">random_sample</span><span class="p">()</span> <span class="o">+</span> <span class="n">a</span>
-</pre></div>
-</div>
-<dl class="docutils">
-<dt>size <span class="classifier-delimiter">:</span> <span class="classifier">int or tuple of ints, optional</span></dt>
-<dd>Defines the shape of the returned array of random floats. If None
-(the default), returns a single float.</dd>
+<dl class="class">
+<dt id="benchmark.dsscorestats">
+<em class="property">class </em><tt class="descclassname">benchmark.</tt><tt class="descname">dsscorestats</tt><big>(</big><em>dslist=</em><span class="optional">[</span><span class="optional">]</span>, <em>dsscore=&lt;rankScores.dsscore object at 0x5345590&gt;</em><big>)</big><a class="reference internal" href="_modules/benchmark.html#dsscorestats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#benchmark.dsscorestats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Summarize the ranking results based on RMSDs and scores.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>dslist</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; the names of decoy sets used for benchmark, for retrieving the RMSD values</li>
+<li><strong>dsscore</strong> (<em>dsscore</em>) &#8211; the score object <tt class="xref py py-class docutils literal"><span class="pre">rankScores.dsscore</span></tt>, with the socres</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="benchmark.dsscorestats.analyze_enrichment">
+<tt class="descname">analyze_enrichment</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/benchmark.html#dsscorestats.analyze_enrichment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#benchmark.dsscorestats.analyze_enrichment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the enrichment score</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="benchmark.dsscorestats.analyze_score">
+<tt class="descname">analyze_score</tt><big>(</big><em>slevel='NativeSelection'</em>, <em>dsscoreo=</em><span class="optional">[</span><span class="optional">]</span>, <em>score=</em><span class="optional">[</span><span class="optional">]</span>, <em>report='single'</em><big>)</big><a class="reference internal" href="_modules/benchmark.html#dsscorestats.analyze_score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#benchmark.dsscorestats.analyze_score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calcualte the performance measure.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>slevel</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; benchmark criteria/performace measure</li>
+<li><strong>dsscoreo</strong> (<em>dsscore</em>) &#8211; the score object <tt class="xref py py-class docutils literal"><span class="pre">rankScores.dsscore</span></tt>, with the socres</li>
+<li><strong>score</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; the socres</li>
+<li><strong>report</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; single|full, report single number summarizing the performance or detailed measures</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="benchmark.dsscorestats.initialize_topmodels">
+<tt class="descname">initialize_topmodels</tt><big>(</big><em>slevel</em><big>)</big><a class="reference internal" href="_modules/benchmark.html#dsscorestats.initialize_topmodels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#benchmark.dsscorestats.initialize_topmodels" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>slevel: define the stats we want to calculateate</dt>
+<dd>top+(cn)+&#8217;_&#8217;+(cp)+_+(cv)+_+(cf)</dd>
 </dl>
+<p>cn: number of top models to look at
+cf: top model filter: defines which part of the top model we are looking at</p>
+<blockquote>
+<div>lessthan: bool values whether the rmsd is less than the specified value,&#8221;rmsd10&#8221;
+First:take the property of the first model
+None: or no filter</div></blockquote>
 <dl class="docutils">
-<dt>out <span class="classifier-delimiter">:</span> <span class="classifier">float or ndarray of floats</span></dt>
-<dd>Array of random floats of shape <cite>size</cite> (unless <tt class="docutils literal"><span class="pre">size=None</span></tt>, in which
-case a single float is returned).</dd>
+<dt>cp: propertis of the filtered top model set</dt>
+<dd>(rmsd,rank,rmsddiff,irmsd,rrank,rrankr,rlrank,rlrankr,&#8221;&#8221;)</dd>
+<dt>cs: combine the propertite, default</dt>
+<dd>(mean,min,sum,max)
+&#8220;&#8221;: the value itself, only for first pass models.
+len:len()
+nonempty: len&gt;0
+perc: percentage in total</dd>
+<dt>Examples:</dt>
+<dd>top1000_nonempty__rmsd10ORirmsd4 # whether there is a model sastifi
+top1000_len__rmsd10ORirmsd4 # the number of such models
+top1000_sum_revrank_rmsd10ORirmsd4FIRST</dd>
+<dt>cv: the values to look at for those models.</dt>
+<dd><blockquote class="first">
+<div><p>The values of certain rmsd
+The value diff of certain rmsd
+The rank</p>
+<blockquote>
+<div>Certain values combine the rank and the rmsd...</div></blockquote>
+<p>The filter values</p>
+</div></blockquote>
+<p class="last">rmsd</p>
+</dd>
 </dl>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random_sample</span><span class="p">()</span>
-<span class="go">0.47108547995356098</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random_sample</span><span class="p">())</span>
-<span class="go">&lt;type &#39;float&#39;&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random_sample</span><span class="p">((</span><span class="mi">5</span><span class="p">,))</span>
-<span class="go">array([ 0.30220482,  0.86820401,  0.1654503 ,  0.11659149,  0.54323428])</span>
-</pre></div>
-</div>
-<p>Three-by-two array of random numbers from [-5, 0):</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="mi">5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random_sample</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">-</span> <span class="mi">5</span>
-<span class="go">array([[-3.99149989, -0.52338984],</span>
-<span class="go">       [-2.99091858, -0.79479508],</span>
-<span class="go">       [-1.23204345, -1.75224494]])</span>
-</pre></div>
-</div>
+</dd></dl>
+
 </dd></dl>
 
 </div>

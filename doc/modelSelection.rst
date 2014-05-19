@@ -35,18 +35,22 @@ Define the features for the statistics calcualtion from a set of structures, a15
 
     sfeature=[rfeature[0],'a158','as158']
     
-Define the processing method of the probablistic table, 'npend' means normalized by the last bin value::
+Define the processing method of the probablistic table, 'npend' means normalized by the last bin value, see :class:`statsTable.scaledsp`::
 
     pm=['','npend']
+    
+Processing method can be defined using either list or string, list defintion will be converted into string defintion on the fly.
+
 
 Define the probabilistic table using for scoring::
 
-    scaledsp1={'type':'scaledsp','pdbset':'X2_2.2A_0.25rfree','features':sfeature,'genmethod':'cs1','pm':pm,'refs':[ref1],'ratio':[1.0]}
+    scaledsp1={'type':'scaledsp','pdbset':'X_2.2A_0.25rfree','features':sfeature,'genmethod':'cs1','pm':pm,'refs':[ref1],'ratio':[1.0]}
 
 
 The benchmark criteria, defines how the statistical potentials are benchmarked::
 
     bmtype={'type':'dsscore','dslist':['fpdb','fpdu'],'criteria':'3xtop1_rmsdallif_mean_+2xtop3_rmsdallif_mean_','combine':'scoresum','bm':'cs1'}
+
 
 Parameters to optimize::
 

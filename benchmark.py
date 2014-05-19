@@ -7,6 +7,13 @@ from decoys import decoysets
 from rankScores import dsscore
 
 class dsscorestats(object):
+    """
+    Summarize the ranking results based on RMSDs and scores.
+    
+    :param list dslist: the names of decoy sets used for benchmark, for retrieving the RMSD values
+    :param dsscore dsscore: the score object :class:`rankScores.dsscore`, with the socres
+    
+    """
     def __init__(self,dslist=[],dsscore=dsscore()):
         self.dsscore=dsscore
         self.score=dsscore.score
@@ -29,6 +36,15 @@ class dsscorestats(object):
             self.ds.sa=copy.deepcopy(self.ds.sa)
  
     def analyze_score(self,slevel='NativeSelection',dsscoreo=[],score=[], report='single'):
+	"""
+	Calcualte the performance measure.
+	
+	:param str slevel: benchmark criteria/performace measure
+	:param dsscore dsscoreo: the score object :class:`rankScores.dsscore`, with the socres
+	:param list score: the socres
+	:param str report: single|full, report single number summarizing the performance or detailed measures
+
+	"""	
         #reported result are the large the better
         if len(score)>0:
             self.score=score    

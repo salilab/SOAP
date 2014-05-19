@@ -58,7 +58,7 @@
 <span class="kn">from</span> <span class="nn">decoys</span> <span class="kn">import</span> <span class="n">decoysets</span>
 <span class="kn">from</span> <span class="nn">rankScores</span> <span class="kn">import</span> <span class="n">dsscore</span>
 
-<span class="k">class</span> <span class="nc">dsscorestats</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="dsscorestats"><a class="viewcode-back" href="../benchmark.html#benchmark.dsscorestats">[docs]</a><span class="k">class</span> <span class="nc">dsscorestats</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">dslist</span><span class="o">=</span><span class="p">[],</span><span class="n">dsscore</span><span class="o">=</span><span class="n">dsscore</span><span class="p">()):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dsscore</span><span class="o">=</span><span class="n">dsscore</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="o">=</span><span class="n">dsscore</span><span class="o">.</span><span class="n">score</span>
@@ -80,7 +80,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">sa</span><span class="o">.</span><span class="n">flags</span><span class="p">[</span><span class="s">&#39;OWNDATA&#39;</span><span class="p">]:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">sa</span><span class="o">=</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">sa</span><span class="p">)</span>
  
-    <span class="k">def</span> <span class="nf">analyze_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">slevel</span><span class="o">=</span><span class="s">&#39;NativeSelection&#39;</span><span class="p">,</span><span class="n">dsscoreo</span><span class="o">=</span><span class="p">[],</span><span class="n">score</span><span class="o">=</span><span class="p">[],</span> <span class="n">report</span><span class="o">=</span><span class="s">&#39;single&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="dsscorestats.analyze_score"><a class="viewcode-back" href="../benchmark.html#benchmark.dsscorestats.analyze_score">[docs]</a>    <span class="k">def</span> <span class="nf">analyze_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">slevel</span><span class="o">=</span><span class="s">&#39;NativeSelection&#39;</span><span class="p">,</span><span class="n">dsscoreo</span><span class="o">=</span><span class="p">[],</span><span class="n">score</span><span class="o">=</span><span class="p">[],</span> <span class="n">report</span><span class="o">=</span><span class="s">&#39;single&#39;</span><span class="p">):</span>
         <span class="c">#reported result are the large the better</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">score</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="o">=</span><span class="n">score</span>    
@@ -110,7 +110,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;Do not know how to analyze score with criteria: &#39;</span><span class="o">+</span><span class="n">slevel</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">report_stats</span><span class="p">(</span><span class="n">report</span><span class="p">)</span>
-        
+        </div>
     <span class="k">def</span> <span class="nf">report_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">report</span><span class="p">):</span>
         <span class="n">csa</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">statsarray</span><span class="p">)</span>
         <span class="c">#print csa</span>
@@ -249,7 +249,7 @@
                 	<span class="n">prmsdcutoff</span><span class="o">=</span><span class="n">rmsdcutoff</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">rmsdbinlist</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">raindex</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ramean</span><span class="p">)])</span>
 
-    <span class="k">def</span> <span class="nf">initialize_topmodels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">slevel</span><span class="p">):</span>
+<div class="viewcode-block" id="dsscorestats.initialize_topmodels"><a class="viewcode-back" href="../benchmark.html#benchmark.dsscorestats.initialize_topmodels">[docs]</a>    <span class="k">def</span> <span class="nf">initialize_topmodels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">slevel</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        slevel: define the stats we want to calculateate</span>
 <span class="sd">            top+(cn)+&#39;_&#39;+(cp)+_+(cv)+_+(cf)</span>
@@ -321,7 +321,7 @@
                 <span class="c">#bni=np.nonzero(bool)[0] # index for the sortind</span>
                 <span class="n">ctd</span><span class="p">[</span><span class="s">&#39;cfn&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="nb">bool</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span><span class="o">+</span><span class="mf">0.00000000000001</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ctd</span>
-                    
+                    </div>
     <span class="k">def</span> <span class="nf">initialize_topmodels_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">top_numarray</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">indexlist</span><span class="p">),</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">criteriadict</span><span class="p">[</span><span class="s">&#39;top&#39;</span><span class="p">])</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ds</span><span class="o">.</span><span class="n">indexlist</span><span class="p">)):</span>
@@ -507,7 +507,7 @@
             <span class="n">ta</span><span class="o">=</span><span class="p">(</span><span class="mi">500</span><span class="o">-</span><span class="n">rmsds</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">sind</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">statsarray</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">ai</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="n">ta</span><span class="p">[</span><span class="n">ta</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">analyze_enrichment</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="dsscorestats.analyze_enrichment"><a class="viewcode-back" href="../benchmark.html#benchmark.dsscorestats.analyze_enrichment">[docs]</a>    <span class="k">def</span> <span class="nf">analyze_enrichment</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	    Calculate the enrichment score</span>
 <span class="sd">	&quot;&quot;&quot;</span>
@@ -525,7 +525,7 @@
                 <span class="n">sind</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">score</span><span class="p">)</span>
 	    <span class="n">va</span><span class="o">=-</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">rmsds</span><span class="p">[</span><span class="n">sind</span><span class="p">])[</span><span class="mi">0</span><span class="p">])</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">statsarray</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">ai</span><span class="p">]</span><span class="o">=</span><span class="n">va</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">va</span><span class="p">)</span>
-                
+                </div>
     <span class="k">def</span> <span class="nf">analyze_lbslope</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="c">#calculate the slope of the lower bond line in the score vs rmsd file.</span>
     	<span class="c"># the lower bond rmsd bins are precalcualted as saved in self.rmsdbins</span>
@@ -591,7 +591,7 @@
         <span class="n">sdict</span><span class="p">[</span><span class="s">&#39;string&#39;</span><span class="p">]</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dsscore</span><span class="o">.</span><span class="n">scorename</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">statsstring</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sdict</span><span class="o">=</span><span class="n">sdict</span>
         <span class="n">runenv</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">sdict</span><span class="p">)</span>
-    
+    </div>
 </pre></div>
 
           </div>

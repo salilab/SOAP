@@ -13,8 +13,17 @@ class rawsp(object):
     
     :param str pdbset: the name of the set of PDB or decoy structures
     :param str features: the name of the features, see :mod:`feature`
+    :param str genmethod: the filters used for generating the table, see :func:`utility.decode_genmethod` for more detail.
     :param str decoy: True if the :attr:`rawsp.pdbset` represent decoys
-    :param dict model: the parameters for this class can also be passed by a dict"""
+    :param dict model: the parameters for this class can also be passed by a dict
+    
+    .. _genmethod:
+    
+    Example genmethod:
+        * `bs2dsp`: bond separaion 2 with disulfide bond take into consideration
+        * `cs1`: chain speration >=1
+        * `ss1`: sequence separation >=1
+    """
     
     def __init__(self,pdbset='',features='',genmethod='',tlib=None,decoy=False,routine='calc_sp_all', model={}):
         if model:
@@ -1329,9 +1338,9 @@ class scaledsp(rawsp):
 
     pm definition::
 
-        pm  => [pp[0-9]+] ,[(gps|ks)\number] ,[npend|npsum]
+        pm  => [pp[0-9]+,+] ,[(gps|ks)\\number,+] ,npend|npsum
         pp[0-9]+ : add number to raw table
-        (gps|ks)\number : gaussian process or kernal smoothing with strength \number.
+        (gps|ks)\\number : gaussian process or kernal smoothing with strength \\number.
         npend|npsum : normalize the count by the last bin or by the sum of the distribution (results in a proper discrete probalistic distribution).
     
         
