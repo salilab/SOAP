@@ -85,6 +85,8 @@
 spl.find_best_par()
 spl.log()</dd>
 </dl>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
 <p>The model and model space are defined using python lists and dictionaries.</p>
 <p>Define the recovery function features, distance only, from 0 to 20A with bin size 0.05, see the <tt class="xref py py-mod docutils literal"><span class="pre">features</span></tt>.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">rfeature</span><span class="o">=</span><span class="p">[[</span><span class="s">&#39;d&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mf">0.05</span><span class="p">]]</span> <span class="c"># &#39;d&#39; - distance, 0 - start position, 20 - end position, 0.05 - bin size</span>
@@ -199,7 +201,7 @@ spl.log()</dd>
 </dl>
 </dd>
 </dl>
-<ul class="simple">
+<ul class="last simple">
 <li>&#8216;scorers&#8217;: scoring terms</li>
 <li>&#8216;bmtype&#8217; : benchmark criteria for juding a statistical potential</li>
 <li>&#8216;searches&#8217; : parameters to optimzie</li>
@@ -211,6 +213,7 @@ spl.log()</dd>
 <li>&#8216;fold&#8217; : n fold cross validation</li>
 <li>&#8216;testperc&#8217;: if included, this percentage of decoys will be left out for final validation.</li>
 </ul>
+</div>
 </dd></dl>
 
 </div>

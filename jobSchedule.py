@@ -1,5 +1,5 @@
 """
-   SOAP job control(local parallel or SGE parallel).
+   SOAP job control(local parallel or SGE parallel). 
 
 """
 
