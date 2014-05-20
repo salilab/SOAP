@@ -538,6 +538,8 @@ class sprefine(object):
             loop_assess_methods=(assess.DOPE)
             energytrace=False
         if self.refinetype=='original':
+            from modeller import soap_loop
+            loop_assess_methods=(assess.DOPE, soap_loop.Scorer())
             m = ORLoop(env,
                    inimodel=modelfile, # initial model of the target
                    sequence=modelname,loop_assess_methods=loop_assess_methods,

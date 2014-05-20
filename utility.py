@@ -903,3 +903,27 @@ class MemoryMonitor(object):
             time.sleep(5)
             fh.flush()
         fh.close()
+        
+def load_log(path):
+    from collections import defaultdict
+    from operator import itemgetter
+    dl=os.listdir(path)
+    logs=[]
+    ld=defaultdict(list)
+    for d in dl:
+        logpath=os.path.join(path,d,'log')
+        if os.path.isfile(logpath):
+            ll=open(logpath).read().split('\n')
+            for l in ll:
+                if re.match('-[1-9]+.*',l) and (l.split()[0],l.split('0.000  ')[-1]) not in logs:
+                    logs.append((l.split()[0],l.split('0.000  ')[-1]))
+                    
+                    #ld[l.split()[0]].append(l)
+    logs.sort(key=itemgetter(0),reverse=True)
+    #for key in ld:
+    #    print key
+    #    for v in ld[key]:
+    #        print v
+    for l in logs:
+        print '    '.join(l)
+    return None
