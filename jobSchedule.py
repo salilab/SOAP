@@ -357,7 +357,7 @@ class task(object):
         for (fjn, fjf) in djl:
             if self.runstatus[int(fjn)-1]>0:
                 self.runstatus[int(fjn)-1]=0
-                print os.system('rm '+os.path.join(self.logpath,'*.'+fjn))
+                print os.system('ssh '+runenv.jobserver+' '+'rm '+os.path.join(self.logpath,'*.'+fjn))
         print os.system('ssh '+runenv.jobserver+' '+'\'cd '+self.rdirname+'; rm '+filelist+'\'')
                     
     def get_runtimestats(self):

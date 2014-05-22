@@ -611,7 +611,7 @@ class sprefine(object):
         os.mkdir(self.rundir)
         os.chdir(self.dir+self.rundir)
         if self.assess_method=='SOAP':
-            freememory=2
+            freememory=2.6
         else:
             freememory=1
         self.freememory=freememory

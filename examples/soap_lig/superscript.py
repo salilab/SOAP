@@ -35,7 +35,7 @@ dsearchbm={'object':bmtype,'key':'bm','valueset':['bs2dsp','bs4dsp','bs9dsp','bs
 ssl={} # scorers searches dictionary, specify which pair to use later
 
 ####Distance features for dsearch
-dfeature=[['dl',0,7,0.05]]
+dfeature=[['dl',0,20,0.05]]
 dsfeature=[dfeature[0],'al184','asl184']
 dpm=['pp1','npend']
 dpdbset=['ligX']
@@ -142,8 +142,8 @@ if False:
         #define the final mode
 
 ####Distance discrete searches
-ddsCutoff={'object':dfeature[0],'key':2,'valueset':[20,15,10,7,6]}
-ddsBinsize={'object':dfeature[0],'key':3,'valueset':[0.05,0.1,0.2]}
+ddsCutoff={'object':dfeature[0],'key':2,'valueset':[20,10,8,7,6]}
+ddsBinsize={'object':dfeature[0],'key':3,'valueset':[0.05,0.1,0.2,0.4]}
 ddsGenmethod={'object':dgenmethod,'key':0,'valueset':['bs2dsp','bs4dsp','bs9dsp','bs15dsp','bs20dsp','bs30dsp']}
 ddsPdbset={'object':dpdbset,'key':0,'valueset':['X_2.2A_0.25rfree','X_2.2A_0.25rfree_95','X_2.2A_0.25rfree_60','X_2.2A_0.25rfree_30']}
 ddsPm0={'object':dpm,'key':0,'valueset':['','pp5','pp1']}#'gps0.5','gps0.2'
@@ -289,13 +289,13 @@ daadsPm0={'object':daapm,'key':0,'valueset':['','pp5','pp1']}#'gps0.5','gps0.2'
 ssmodel={'index':'d','valueset':ssl}
 
 #dsSc defines the scorers to try
-dsSs={'object':ssmodel,'key':'index','valueset':['d','dsvd20','od','odp','dss','d+b','daa','daass']}#'d','b'
+dsSs={'object':ssmodel,'key':'index','valueset':['d','dsvd20','dss','d+b','daa','daass']}#'d','b','od','odp',
 
 #dsList defins the model space to search for
-dsList=[dsSs]#[dsSs,ddsPm0,ddsPm1]#ddsSf,ddsCutoff,ddsBinsize,ddsSf
+dsList=[dsSs,ddsCutoff,ddsBinsize,ddsPm0,ddsPm1,ddsSf]#[dsSs,ddsPm0,ddsPm1]#ddsSf,ddsCutoff,ddsBinsize,ddsSf
 
 ##########optimization method section ##############
-step=1001
+step=200
 if True:
     inner={'improved':2,'maxloop':100,'minloop':2}
     outer={'improved':4,'maxloop':5023}

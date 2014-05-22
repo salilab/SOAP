@@ -790,13 +790,25 @@ class Mymodel(model):
         print os.system('gunzip '+tdir+'pdb'+code+'.ent.gz ')
 
     def clash_contact(self,code):
-        if os.path.isdir('clashtemp'):
-            print os.system('rm -r clashtemp')
-        os.mkdir('clashtemp')
-        os.chdir('clashtemp')
+        os.chdir('/bell2/gqdong/loopsp/tmp')
+        if os.path.isdir('clashtemp'+code):
+            print os.system('rm -r clashtemp'+code)
+        os.mkdir('clashtemp'+code)
+        os.chdir('clashtemp'+code)
         self.copy_native(code,'./')
-        print os.system('cp ~/Dropbox/Code/crystal_contacts.py ./')
-        print os.system('chimera --nogui crystal_contacts.py')
+        print os.system('cp ~/Dropbox/Code/crystal_contacts.py ./')    
+
+        ssh = subprocess.Popen(['chimera','--nogui', 'crystal_contacts.py'],
+           shell=False,
+           stdout=subprocess.PIPE)
+        
+        for i in range(1200):
+            ssh.poll()
+            if ssh.returncode is None:
+                time.sleep(0.1)
+            else:
+                break
+        #
         fh=open('selfclash','r')
         scs=fh.read()
         fh.close()
@@ -818,7 +830,7 @@ class Mymodel(model):
         for item in allcontacts:
             contactlist.append([[item[0],item[3],item[2],item[1],item[4]],[item[5],item[8],item[7],item[6],item[9]],item[10],item[11]]) 
         os.chdir('..')
-        print os.system('rm -r clashtemp')
+        print os.system('rm -r clashtemp'+code)
         return clashlist,contactlist
 
     def select(self,loops):
