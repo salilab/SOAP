@@ -18,7 +18,8 @@ class MyLoop(loopmodel):
                  deviation=None, library_schedule=None, csrfile=None,
                  inifile=None, assess_methods=None, loop_assess_methods=None,
                  refinepot=['$(LIB)/atmcls-mf.lib','$(LIB)/dist-mf.lib'],
-                 loops=[],calcrmsds='111',nonbond_spine=0.1,contact_shell=12.0,deviations=50,energytrace=False):
+                 loops=[],calcrmsds='111',nonbond_spine=0.1,contact_shell=12.0,
+                 deviations=50,energytrace=False,assess_trace=False):
         loopmodel.__init__(self, env, sequence, alnfile, knowns, inimodel,
                  deviation, library_schedule, csrfile,
                  inifile, assess_methods, loop_assess_methods)
@@ -28,6 +29,7 @@ class MyLoop(loopmodel):
         self.calc_rmsds=calcrmsds
         self.deviations=deviations
         self.energytrace=energytrace
+        self.assess_trace=assess_trace
         self.loop.env.schedule_scale = physical.values(default=1.0,
                                                        nonbond_spline=nonbond_spine)#0.6
         edat = self.loop.env.edat
@@ -40,8 +42,6 @@ class MyLoop(loopmodel):
         #self.loop.library_schedule
         self.loop.library_schedule=loopschedule()
         self.rmsd_calc_initialized=False
-
-
 
     def initilialize_rmsd_calcualtion(self):
         ormdl=Mymodel(self.env)
@@ -205,7 +205,8 @@ class MyLoop(loopmodel):
     def get_loop_actions(self):
         """Get actions to carry out during loop optimization"""
         act = []
-        act.append(checkRMSD(20,self))
+        if self.assess_trace:
+            act.append(checkRMSD(20,self))
         return act
 
     def multiple_loop_models(self, atmsel, ini_model, num, sched):
@@ -233,7 +234,7 @@ class ORLoop(loopmodel):
         self.calc_rmsds=calcrmsds
         self.deviations=deviations
         self.energytrace=energytrace
-       
+        self.assess_trace=assess_trace
         self.rmsd_calc_initialized=False
 
     def initilialize_rmsd_calcualtion(self):
@@ -361,14 +362,15 @@ class ORLoop(loopmodel):
     def get_loop_actions(self):
         """Get actions to carry out during loop optimization"""
         act = []
-        act.append(checkRMSD(20,self))
+        if self.assess_trace:
+            act.append(checkRMSD(20,self))
         return act
                
 class sprefine(object):
     """
     SOAP loop refinement benchmark class
     """
-    def __init__(self,dslist='101',bm='loop.100.8',criteria='bestrmsd',nonbond_spline=0.1,contact_shell=12.0,deviations=50,assess='',mcrmsdonly=False,spmodel=None,refineProtocal=None):
+    def __init__(self,dslist='101',bm='loop.100.8',criteria='bestrmsd',nonbond_spline=0.1,contact_shell=12.0,deviations=50,assess='',mcrmsdonly=False,spmodel=None,refineProtocal=None,trace=True):
         self.mcrmsdonly=mcrmsdonly
         if refineProtocal!=None:
             self.refineProtocal=refineProtocal
@@ -381,6 +383,8 @@ class sprefine(object):
                 assess=refineProtocal['assess']
             if 'report' in refineProtocal and refineProtocal['report']=='mcrmsd':
                 self.mcrmsdonly=True
+            if 'trace' in refineProtocal:
+                trace=refineProtocal['trace']                
         #use statistical potential to refine loops/strutures, and analyze the refine results to judge the statistical potential.
         if spmodel: #needfix???
             if spmodel['scoretype']!='sprefine':
@@ -390,6 +394,7 @@ class sprefine(object):
             criteria=model['criteria']
         self.bm=bm
         self.dslist=dslist
+        self.trace=trace
         self.assess_method=assess
         self.criteria=criteria
         #self.codelist=decoysets(self.dslist).get_nativelist()  not applicalbel for loops    
@@ -550,12 +555,12 @@ class sprefine(object):
             loop_assess_methods=(assess.DOPE, soap_loop.Scorer())
             m = ORLoop(env,
                    inimodel=modelfile, # initial model of the target
-                   sequence=modelname,loop_assess_methods=loop_assess_methods,
+                   sequence=modelname,loop_assess_methods=loop_assess_methods,assess_trace=self.trace,
                    refinepot=self.refpot,loops=loops, nonbond_spine=self.nonbond_spline,contact_shell=self.contact_shell,deviations=self.deviations,energytrace=energytrace)
         else:
             m = MyLoop(env,
                    inimodel=modelfile, # initial model of the target
-                   sequence=modelname,loop_assess_methods=loop_assess_methods,
+                   sequence=modelname,loop_assess_methods=loop_assess_methods,assess_trace=self.trace,
                    refinepot=self.refpot,loops=loops, nonbond_spine=self.nonbond_spline,contact_shell=self.contact_shell,deviations=self.deviations,energytrace=energytrace)
         #m.load_native_model()
         m.loop.starting_model= self.startNum           # index of the first loop model
@@ -808,7 +813,9 @@ class sprefine(object):
             for key in result:
                 ra[k,:,:]=np.array(result[key])[:mn,:]
                 k+=1            
-            self.averageRMSD=ra[:,:,0].min(axis=1).mean()+ra[:,:,1].min(axis=1).mean()
+            self.averageRMSD=ra[:,:,1].min(axis=1).mean()
+            if not self.mcrmsdonly:
+                self.averageRMSD+=ra[:,:,0].min(axis=1).mean()
             print 'mcrmsd',np.mean(mcrmsds) 
         print self.averageRMSD
         if self.cv!=None:
