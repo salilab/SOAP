@@ -129,14 +129,15 @@ class MyLoop(loopmodel):
             out['rmsd']=min(r.rms,out['rmsd'])
         if len(rt)>=2 and rt[-2]=='1':
             r=self.ors.only_mainchain().superpose(self, self.aln,fit=False,refine_local=False)
-            out['mcrmsd']=min(r.rms,out['rmsd'])
+            mcrmsd=r.rms
+            out['mcrmsd']=min(r.rms,out['mcrmsd'])
         if len(rt)>=3 and rt[-3]=='1':
             r=self.ors.only_sidechain().superpose(self, self.aln,fit=False,refine_local=False)
             out['scrmsd']=r.rms
         if self.energytrace:
             if not 'trace' in out:
                 out['trace']=[]
-            out['trace'].append((out['mcrmsd'],self.loop.assess_methods[0](self.s2)[1],self.loop.assess_methods[1](self.s2)[1]))                
+            out['trace'].append((mcrmsd,self.loop.assess_methods[0](self.s2)[1],self.loop.assess_methods[1](self.s2)[1]))                
         print r.rms
         return r.rms
     
@@ -363,7 +364,8 @@ class sprefine(object):
     """
     SOAP loop refinement benchmark class
     """
-    def __init__(self,dslist='101',bm='loop.100.8',criteria='bestrmsd',nonbond_spline=0.1,contact_shell=12.0,deviations=50,assess='',spmodel=None,refineProtocal=None):
+    def __init__(self,dslist='101',bm='loop.100.8',criteria='bestrmsd',nonbond_spline=0.1,contact_shell=12.0,deviations=50,assess='',mcrmsdonly=False,spmodel=None,refineProtocal=None):
+        self.mcrmsdonly=mcrmsdonly
         if refineProtocal!=None:
             self.refineProtocal=refineProtocal
             dslist=refineProtocal['dslist']
@@ -373,6 +375,8 @@ class sprefine(object):
             deviations=refineProtocal['deviations']
             if 'assess' in refineProtocal:
                 assess=refineProtocal['assess']
+            if 'report' in refineProtocal and refineProtocal['report']=='mcrmsd':
+                self.mcrmsdonly=True
         #use statistical potential to refine loops/strutures, and analyze the refine results to judge the statistical potential.
         if spmodel: #needfix???
             if spmodel['scoretype']!='sprefine':
@@ -774,8 +778,12 @@ class sprefine(object):
         if self.assess_method=='SOAP':
             self.averageRMSD=ra[:,:,0].min(axis=1).mean()
             print "min rmsd",self.averageRMSD
+            print "min 2", ra[:,:,0].min(axis=1).mean()+ra[:,:,1].min(axis=1).mean()
             minind=ra[:,:,1].argmin(axis=1)
-            print "soap min rmsd",np.mean(ra[np.arange(ra.shape[0]),minind,np.zeros(ra.shape[0],dtype=np.int)])
+            minind2=ra[:,:,2].argmin(axis=1)
+            print "dope min rmsd",np.mean(ra[np.arange(ra.shape[0]),minind,np.zeros(ra.shape[0],dtype=np.int)])
+            print "soap min rmsd",np.mean(ra[np.arange(ra.shape[0]),minind2,np.zeros(ra.shape[0],dtype=np.int)])
+
         else:
             self.averageRMSD=ra[:,:,0].min(axis=1).mean()+ra[:,:,1].min(axis=1).mean()
         print self.averageRMSD

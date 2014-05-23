@@ -354,10 +354,12 @@ class task(object):
                 raise Exception('can not untar file ')
         else:
             print os.system('rm *.tar.gz')
+        logfilelist=[]
         for (fjn, fjf) in djl:
             if self.runstatus[int(fjn)-1]>0:
                 self.runstatus[int(fjn)-1]=0
-                print os.system('ssh '+runenv.jobserver+' '+'rm '+os.path.join(self.logpath,'*.'+fjn))
+                logfilelist.append('*.'+fjn)
+        print os.system('ssh '+runenv.jobserver+' '+'\'cd '+os.path.join(self.logpath)+'; rm '+' '.join(logfilelist)+'\'')
         print os.system('ssh '+runenv.jobserver+' '+'\'cd '+self.rdirname+'; rm '+filelist+'\'')
                     
     def get_runtimestats(self):

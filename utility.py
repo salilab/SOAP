@@ -939,3 +939,4 @@ def load_log(path):
     for l in logs:
         print '    '.join(l)
     return None
+
