@@ -137,7 +137,9 @@ class MyLoop(loopmodel):
         if self.energytrace:
             if not 'trace' in out:
                 out['trace']=[]
-            out['trace'].append((mcrmsd,self.loop.assess_methods[0](self.s2)[1],self.loop.assess_methods[1](self.s2)[1]))                
+            dopescore=self.loop.assess_methods[0](self.s2)[1]
+            soapscore=self.loop.assess_methods[1](self.s2)[1]
+            out['trace'].append((mcrmsd,dopescore,soapscore))                
         print r.rms
         return r.rms
     
@@ -301,7 +303,9 @@ class ORLoop(loopmodel):
         if self.energytrace:
             if not 'trace' in out:
                 out['trace']=[]
-            out['trace'].append((out['mcrmsd'],self.loop.assess_methods[0](self.s2)[1],self.loop.assess_methods[1](self.s2)[1]))                
+            out['trace'].append((out['mcrmsd'],0,0))                
+
+            #out['trace'].append((out['mcrmsd'],self.loop.assess_methods[0](self.s2)[1],self.loop.assess_methods[1](self.s2)[1]))                
         print r.rms
         return r.rms
 
@@ -727,11 +731,10 @@ class sprefine(object):
                 fh.close()
                 if not res.keys()[0] in rd:
                     rd[res.keys()[0]]=[]
-                if self.assess_method=='SOAP':
-                    for item in res.values()[0]:
-                        rd[res.keys()[0]].extend(item[-1])
-                else:
-                    rd[res.keys()[0]].extend(res.values()[0])
+                #if self.assess_method=='SOAP':
+                #    for item in res.values()[0]:
+                #        rd[res.keys()[0]].extend(item[-1])
+                rd[res.keys()[0]].extend(res.values()[0])
         #print os.system('rm -r '+self.dir+self.rundir)
         #del self.clusters
         self.result=rd
@@ -763,35 +766,55 @@ class sprefine(object):
             return self.analyze_loop_modeling_results(result)        
 
     def analyze_loop_modeling(self):
-        mn=9999999999
-        result=self.result
-        for key in result:
-            if len(result[key])<mn:
-                mn=len(result[key])
-        print "min n "+str(mn)
-        #mn=1000
-        ra=np.zeros([len(result.keys()),mn,3])
-        k=0
-        for key in result:
-            ra[k,:,:]=np.array(result[key])[:mn,:]
-            k+=1
-        if self.assess_method=='SOAP':
-            self.averageRMSD=ra[:,:,0].min(axis=1).mean()
-            print "min rmsd",self.averageRMSD
-            print "min 2", ra[:,:,0].min(axis=1).mean()+ra[:,:,1].min(axis=1).mean()
-            minind=ra[:,:,1].argmin(axis=1)
-            minind2=ra[:,:,2].argmin(axis=1)
-            print "dope min rmsd",np.mean(ra[np.arange(ra.shape[0]),minind,np.zeros(ra.shape[0],dtype=np.int)])
-            print "soap min rmsd",np.mean(ra[np.arange(ra.shape[0]),minind2,np.zeros(ra.shape[0],dtype=np.int)])
-
+        if self.assess_method=='SOAP':            
+            result=self.result
+            mcrmsds=[]
+            mcrmsds2=[]
+            dopemins=[]
+            soapmins=[]
+            ral=[]
+            from itertools import chain
+            for key in result:
+                mcrmsds.append(min([item[1] for item in result[key]]))
+                flist=list(chain.from_iterable([item[-1] for item in result[key]]))
+                ra=np.array(flist)
+                ral.append(ra)
+                mcrmsds2.append(ra[:,0].min())
+                dopeMinInd=np.argmin(ra[:,1])
+                soapMinInd=np.argmin(ra[:,2])
+                dopemins.append(ra[dopeMinInd,0])
+                soapmins.append(ra[soapMinInd,0])
+                print ra.shape
+            pdb.set_trace()
+            print mcrmsds
+            print mcrmsds2
+            print 'mcrmsd',np.mean(mcrmsds)
+            print 'mcrmsd2',np.mean(mcrmsds2)
+            print 'dope',np.mean(dopemins)
+            print 'soap',np.mean(soapmins)
+            self.averageRMSD=np.mean(mcrmsds)
         else:
+            mn=9999999999
+            result=self.result
+            mcrmsds=[]
+            for key in result:
+                mcrmsds.append(min([item[1] for item in result[key]]))
+                if len(result[key])<mn:
+                    mn=len(result[key])
+            print "min n "+str(mn)
+            #mn=1000
+            ra=np.zeros([len(result.keys()),mn,3])
+            k=0
+            for key in result:
+                ra[k,:,:]=np.array(result[key])[:mn,:]
+                k+=1            
             self.averageRMSD=ra[:,:,0].min(axis=1).mean()+ra[:,:,1].min(axis=1).mean()
+            print 'mcrmsd',np.mean(mcrmsds) 
         print self.averageRMSD
         if self.cv!=None:
             self.cv.resultsummary=-self.averageRMSD
             self.cv.resultarray[-1]=-self.averageRMSD
             self.cv.write2logshelve(self.model)
-
         return self.averageRMSD
 
     def analyze_loop_modeling_results(self,result):

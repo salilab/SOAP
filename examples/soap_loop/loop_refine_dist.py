@@ -130,22 +130,6 @@ sml=[ssm20,ssm2,ssm0,ssm,ssm0,ssm,ssm0,ssm, ssm1]
 #define the final model
 #
 
-rfeature=[['b',0,1.0,0.1]]
-
-
-sfeature=[rfeature[0],'a158']
-pm=['pp5','','npend']
-sratio=[3.8]
-scaledsp2={'type':'scaledsp','pdbset':'X_2.2A_0.25rfree','features':sfeature,'genmethod':'','pm':'nbsum','refs':[],'ratio':sratio,'bm':'ss1'}
-
-ref2={'type':'sf','features':rfeature,'sftype':'bins','par':range(10),'parvalue':[1 for i in range(10)],'bm':'','ratio':sratio}
-
-search3={'object':ref2,'key':'parvalue','pos':range(0,10),'InitialGenerator':{'type':'dfire','values':list(np.zeros(40))}}
-
-search4={'object':scaledsp2,'key':'ratio','pos':[0],'InitialGenerator':[[3.8] for i in range(40)]}
-
-#dsearch15={'object':sratio,'key':0,'valueset':np.arange(3.5,4.5,0.1)}
-
 
 
 
