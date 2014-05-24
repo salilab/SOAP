@@ -126,11 +126,11 @@ class MyLoop(loopmodel):
         rt=str(self.calc_rmsds)
         if rt[-1]=='1':
             r = self.ors.superpose(self, self.aln,fit=False,refine_local=False)
-            out['rmsd']=min(r.rms,out['rmsd'])
+            out['rmsd']=min(r.rms,out['rmsd']) if 'rmsd' in out  else r.rms
         if len(rt)>=2 and rt[-2]=='1':
             r=self.ors.only_mainchain().superpose(self, self.aln,fit=False,refine_local=False)
             mcrmsd=r.rms
-            out['mcrmsd']=min(r.rms,out['mcrmsd'])
+            out['mcrmsd']=min(r.rms,out['mcrmsd']) if 'mcrmsd' in out  else r.rms
         if len(rt)>=3 and rt[-3]=='1':
             r=self.ors.only_sidechain().superpose(self, self.aln,fit=False,refine_local=False)
             out['scrmsd']=r.rms
@@ -139,6 +139,9 @@ class MyLoop(loopmodel):
                 out['trace']=[]
             dopescore=self.loop.assess_methods[0](self.s2)[1]
             soapscore=self.loop.assess_methods[1](self.s2)[1]
+            dopescore=999999999 if np.isnan(dopescore) else dopescore
+            soapscore=999999999 if np.isnan(soapscore) else soapscore
+            
             out['trace'].append((mcrmsd,dopescore,soapscore))                
         print r.rms
         return r.rms
@@ -674,7 +677,7 @@ class sprefine(object):
         inputlist.write(','.join([str(i)+'.pickle' for i in range(1,nors+1)]))
         inputlist.close()
         makemdt=open('runme.py','w')#nonbond_spline=0.1,contact_shell=12.0,deviations=50
-        makemdt.write('from SOAP.loop import *\nimport sys \n \nspopt=sprefine(sys.argv[1],"'+self.bm+'","'+self.criteria+'",'+str(self.nonbond_spline)+','+str(self.contact_shell)+','+str(self.deviations)+')\nspopt.runpath=\''+self.runpath+'\'\nspopt.refpot[1]="'+self.refpot[1]+'"\n\nspopt.assess_method="'+self.assess_method+'"\n\nspopt.initialize_dslist()'+'\n'+'\nspopt.assess_cluster_node()\n')
+        makemdt.write('from SOAP.loop import *\nimport sys \n \nspopt=sprefine(sys.argv[1],"'+self.bm+'","'+self.criteria+'",'+str(self.nonbond_spline)+','+str(self.contact_shell)+','+str(self.deviations)+')\nspopt.runpath=\''+self.runpath+'\'\nspopt.refpot[1]="'+self.refpot[1]+'"\n\nspopt.assess_method="'+self.assess_method+'"\n\nspopt.trace='+str(self.trace)+'\n\nspopt.initialize_dslist()'+'\n'+'\nspopt.assess_cluster_node()\n')
         makemdt.flush()
         generate_job_submit_script(freememory,self.rundir,runtime,nors,parallel=self.slavenumber)        
         return 0
