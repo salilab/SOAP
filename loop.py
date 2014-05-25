@@ -302,11 +302,11 @@ class ORLoop(loopmodel):
         if len(rt)>=3 and rt[-3]=='1':
             r=self.ors.only_sidechain().superpose(self, self.aln,fit=False,refine_local=False)
             out['scrmsd']=r.rms
-        if self.energytrace and last:
+        if self.energytrace:
             if not 'trace' in out:
                 out['trace']=[]
-            dopescore=self.loop.assess_methods[0](self.s2)[1]
-            soapscore=self.loop.assess_methods[1](self.s2)[1]
+            dopescore=self.loop.assess_methods[0](self.s2)[1] if last else 9999999
+            soapscore=self.loop.assess_methods[1](self.s2)[1] if last else 9999999
             dopescore=999999999 if np.isnan(dopescore) else dopescore
             soapscore=999999999 if np.isnan(soapscore) else soapscore
             out['trace'].append((mcrmsd,dopescore,soapscore))                
