@@ -19,7 +19,7 @@ class MyLoop(loopmodel):
                  inifile=None, assess_methods=None, loop_assess_methods=None,
                  refinepot=['$(LIB)/atmcls-mf.lib','$(LIB)/dist-mf.lib'],
                  loops=[],calcrmsds='111',nonbond_spine=0.1,contact_shell=12.0,
-                 deviations=50,energytrace=False,assess_trace=False):
+                 deviations=50,energytrace=False,assess_trace=True):
         loopmodel.__init__(self, env, sequence, alnfile, knowns, inimodel,
                  deviation, library_schedule, csrfile,
                  inifile, assess_methods, loop_assess_methods)
@@ -773,7 +773,7 @@ class sprefine(object):
         if self.criteria=='bestrmsd':
             return self.analyze_loop_modeling_results(result)        
 
-    def analyze_loop_modeling(self):
+    def analyze_loop_modeling(self,returnDetails=False):
         if self.assess_method=='SOAP':            
             result=self.result
             mcrmsds=[]
@@ -782,8 +782,41 @@ class sprefine(object):
             soapmins=[]
             ral=[]
             from itertools import chain
+            if returnDetails:
+                rrl=[]
+                rl=[]
+                dl=[]
+                sl=[]
             for key in result:
                 mcrmsds.append(min([item[1] for item in result[key]]))
+                if returnDetails:
+                    srrl=[result[key][0][1]]
+                    sa0=np.array(result[key][0][-1])
+                    srl=[sa0[:,0].min()]
+                    md=sa0[:,1].min()
+                    ms=sa0[:,2].min()
+                    sdl=[sa0[np.argmin(sa0[:,1]),0]]
+                    ssl=[sa0[np.argmin(sa0[:,2]),0]]
+                    for item in result[key][1:]:
+                        sa=np.array(item[-1])
+                        srrl.append(min(sa[1],srrl[-1]))
+                        srl.append(min(sa[:,0].min(),srl[-1]))                        
+                        dmi=np.argmin(sa[:,1])
+                        smi=np.argmin(sa[:,2])
+                        if sa[dmi,1]<md:
+                            md=sa[dmi,1]
+                            sdl.append(sa[dmi,0])
+                        else:
+                            sdl.append(sdl[-1])    
+                        if sa[smi,2]<ms:
+                            ms=sa[smi,2]
+                            ssl.append(sa[smi,0])
+                        else:
+                            ssl.append(ssl[-1])                            
+                    rl.append(srl)
+                    rrl.append(srrl)
+                    dl.append(sdl)
+                    sl.append(ssl)
                 flist=list(chain.from_iterable([item[-1] for item in result[key]]))
                 ra=np.array(flist)
                 ral.append(ra)
@@ -793,7 +826,7 @@ class sprefine(object):
                 dopemins.append(ra[dopeMinInd,0])
                 soapmins.append(ra[soapMinInd,0])
                 print ra.shape
-            pdb.set_trace()
+            #pdb.set_trace()
             print mcrmsds
             print mcrmsds2
             print 'mcrmsd',np.mean(mcrmsds)
@@ -801,6 +834,8 @@ class sprefine(object):
             print 'dope',np.mean(dopemins)
             print 'soap',np.mean(soapmins)
             self.averageRMSD=np.mean(mcrmsds)
+            if returnDetails:
+                return rrl,rl,dl,sl
         else:
             mn=9999999999
             result=self.result
