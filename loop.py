@@ -103,7 +103,7 @@ class MyLoop(loopmodel):
     
     def loop_model_analysis(self, atmsel, ini_model, filename, out, id1, num):
         """Energy evaluation and assessment, and write out the loop model"""
-        self.user_after_single_loop_model(out)
+        self.user_after_single_loop_model(out,last=True)
         if self.loop.write_selection_only:
             self.select_loop_atoms().write(file=filename)
         else:
@@ -117,7 +117,7 @@ class MyLoop(loopmodel):
         # Do model assessment if requested
         self.assess(atmsel, self.loop.assess_methods, out)
         
-    def user_after_single_loop_model(self,out):
+    def user_after_single_loop_model(self,out,last=False):
         if not self.calc_rmsds:
             return 0
         if not self.rmsd_calc_initialized:
@@ -137,11 +137,10 @@ class MyLoop(loopmodel):
         if self.energytrace:
             if not 'trace' in out:
                 out['trace']=[]
-            dopescore=self.loop.assess_methods[0](self.s2)[1]
-            soapscore=self.loop.assess_methods[1](self.s2)[1]
+            dopescore=self.loop.assess_methods[0](self.s2)[1] if last else 9999999
+            soapscore=self.loop.assess_methods[1](self.s2)[1] if last else 9999999
             dopescore=999999999 if np.isnan(dopescore) else dopescore
             soapscore=999999999 if np.isnan(soapscore) else soapscore
-            
             out['trace'].append((mcrmsd,dopescore,soapscore))                
         print r.rms
         return r.rms
@@ -232,10 +231,8 @@ class ORLoop(loopmodel):
                  deviation, library_schedule, csrfile,
                  inifile, assess_methods, loop_assess_methods)
         self.loops=loops
-        self.refinepotential=refinepot
         #self.load_native_model()
         self.calc_rmsds=calcrmsds
-        self.deviations=deviations
         self.energytrace=energytrace
         self.assess_trace=assess_trace
         self.rmsd_calc_initialized=False
@@ -274,7 +271,7 @@ class ORLoop(loopmodel):
 
     def loop_model_analysis(self, atmsel, ini_model, filename, out, id1, num):
         """Energy evaluation and assessment, and write out the loop model"""
-        self.user_after_single_loop_model(out)
+        self.user_after_single_loop_model(out,last=True)
         if self.loop.write_selection_only:
             self.select_loop_atoms().write(file=filename)
         else:
@@ -288,7 +285,7 @@ class ORLoop(loopmodel):
         # Do model assessment if requested
         self.assess(atmsel, self.loop.assess_methods, out)
         
-    def user_after_single_loop_model(self,out):
+    def user_after_single_loop_model(self,out,last=False):
         if not self.calc_rmsds:
             return 0
         if not self.rmsd_calc_initialized:
@@ -297,19 +294,22 @@ class ORLoop(loopmodel):
         rt=str(self.calc_rmsds)
         if rt[-1]=='1':
             r = self.ors.superpose(self, self.aln,fit=False,refine_local=False)
-            out['rmsd']=min(r.rms,out['rmsd'])
+            out['rmsd']=min(r.rms,out['rmsd']) if 'rmsd' in out  else r.rms
         if len(rt)>=2 and rt[-2]=='1':
             r=self.ors.only_mainchain().superpose(self, self.aln,fit=False,refine_local=False)
-            out['mcrmsd']=min(r.rms,out['rmsd'])
+            mcrmsd=r.rms
+            out['mcrmsd']=min(r.rms,out['mcrmsd']) if 'mcrmsd' in out  else r.rms
         if len(rt)>=3 and rt[-3]=='1':
             r=self.ors.only_sidechain().superpose(self, self.aln,fit=False,refine_local=False)
             out['scrmsd']=r.rms
-        if self.energytrace:
+        if self.energytrace and last:
             if not 'trace' in out:
                 out['trace']=[]
-            out['trace'].append((out['mcrmsd'],0,0))                
-
-            #out['trace'].append((out['mcrmsd'],self.loop.assess_methods[0](self.s2)[1],self.loop.assess_methods[1](self.s2)[1]))                
+            dopescore=self.loop.assess_methods[0](self.s2)[1]
+            soapscore=self.loop.assess_methods[1](self.s2)[1]
+            dopescore=999999999 if np.isnan(dopescore) else dopescore
+            soapscore=999999999 if np.isnan(soapscore) else soapscore
+            out['trace'].append((mcrmsd,dopescore,soapscore))                
         print r.rms
         return r.rms
 
