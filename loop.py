@@ -724,8 +724,9 @@ class sprefine(object):
                 print os.system('rm '+loopname+'.lrsr')
                 print os.system('rm '+loopname+'.DL*')
                 fl=[f for f in os.listdir('./') if f.startswith(loopname+'.BL')]
+                print os.system('mkdir '+self.dslist)
                 for f in fl:
-                    print os.system('mv '+f+' '+self.dslist+'.'+f)
+                    print os.system('mv '+f+' '+self.dslist+'/'+f)
         return resultdict          
 
     def assess_cluster_node(self):
@@ -734,7 +735,7 @@ class sprefine(object):
         #if self.criteria=='bestrmsd':
         #    result=self.assess_bestrmsd(result)
         pickle.dump(result,open(self.dslist+'.pickle','w'))
-        report_job_runstatus(self.runpath, True, self.dslist, '.',inputname='runme.py',temppath=scratchdir)
+        report_job_runstatus(self.runpath, True, self.dslist, '',inputname='runme.py',temppath=scratchdir)
         
     def afterprocessing(self):
         os.chdir(self.dir+self.rundir)
