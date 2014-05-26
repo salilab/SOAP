@@ -715,7 +715,7 @@ class sprefine(object):
                 loopname=key+str(i)
                 print os.system('rm -r '+'loop.'+loopname)                 
                 #try:
-                if 1:
+                if 1: 
                     res=self.loop_model_single_protein(modelfile='pdb'+key+'.ent',loops=loop, modelname=loopname)
                     resultdict[loopname]=res
                 #except Exception,e:
@@ -727,6 +727,7 @@ class sprefine(object):
                 print os.system('mkdir '+self.dslist)
                 for f in fl:
                     print os.system('mv '+f+' '+self.dslist+'/'+f)
+                print os.system('cd '+self.dslist+';gzip *;cd ..')
         return resultdict          
 
     def assess_cluster_node(self):
