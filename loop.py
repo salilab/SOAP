@@ -134,12 +134,9 @@ class MyLoop(loopmodel):
         if len(rt)>=3 and rt[-3]=='1':
             r=self.ors.only_sidechain().superpose(self, self.aln,fit=False,refine_local=False)
             out['scrmsd']=r.rms
-        if self.energytrace:
+        if self.energytrace and last:
             if not 'trace' in out:
                 out['trace']=[]
-            if last:
-                from modeller import soap_loop
-                loop_assess_methods=(assess.DOPE, soap_loop.Scorer())
             dopescore=self.loop.assess_methods[0](self.s2)[1] if last else 9999999
             soapscore=self.loop.assess_methods[1](self.s2)[1] if last else 9999999
             dopescore=999999999 if np.isnan(dopescore) else dopescore
@@ -556,6 +553,8 @@ class sprefine(object):
         # Create a new class based on 'loopmodel' so that we can redefine
         # select_loop_atoms (necessary)
         if self.assess_method=='SOAP':
+            from modeller import soap_loop
+            loop_assess_methods=(assess.DOPE, soap_loop.Scorer())            
             energytrace=True
         else:
             loop_assess_methods=(assess.DOPE)
