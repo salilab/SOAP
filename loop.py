@@ -373,7 +373,7 @@ class sprefine(object):
     """
     SOAP loop refinement benchmark class
     """
-    def __init__(self,dslist='101',bm='loop.100.8',criteria='bestrmsd',nonbond_spline=0.1,contact_shell=12.0,deviations=50,assess='',mcrmsdonly=False,spmodel=None,refineProtocal=None,trace=True):
+    def __init__(self,dslist='101',bm='loop.100.8',criteria='bestrmsd',nonbond_spline=0.1,contact_shell=12.0,deviations=50,assess='',mcrmsdonly=False,spmodel=None,refineProtocal=None,trace=True,saveStructure=False):
         self.mcrmsdonly=mcrmsdonly
         if refineProtocal!=None:
             self.refineProtocal=refineProtocal
@@ -387,7 +387,9 @@ class sprefine(object):
             if 'report' in refineProtocal and refineProtocal['report']=='mcrmsd':
                 self.mcrmsdonly=True
             if 'trace' in refineProtocal:
-                trace=refineProtocal['trace']                
+                trace=refineProtocal['trace']
+            if 'save' in refineProtocal:
+                saveStructure=True
         #use statistical potential to refine loops/strutures, and analyze the refine results to judge the statistical potential.
         if spmodel: #needfix???
             if spmodel['scoretype']!='sprefine':
@@ -400,6 +402,7 @@ class sprefine(object):
         self.trace=trace
         self.assess_method=assess
         self.criteria=criteria
+        self.saveStructure=saveStructure
         #self.codelist=decoysets(self.dslist).get_nativelist()  not applicalbel for loops    
         self.refpot=['$(LIB)/atmcls-mf.lib','$(LIB)/dist-mf.lib']
         bml=bm.split('.')
@@ -683,7 +686,7 @@ class sprefine(object):
         inputlist.write(','.join([str(i)+'.pickle' for i in range(1,nors+1)]))
         inputlist.close()
         makemdt=open('runme.py','w')#nonbond_spline=0.1,contact_shell=12.0,deviations=50
-        makemdt.write('from SOAP.loop import *\nimport sys \n \nspopt=sprefine(sys.argv[1],"'+self.bm+'","'+self.criteria+'",'+str(self.nonbond_spline)+','+str(self.contact_shell)+','+str(self.deviations)+')\nspopt.runpath=\''+self.runpath+'\'\nspopt.refpot[1]="'+self.refpot[1]+'"\n\nspopt.assess_method="'+self.assess_method+'"\n\nspopt.trace='+str(self.trace)+'\n\nspopt.initialize_dslist()'+'\n'+'\nspopt.assess_cluster_node()\n')
+        makemdt.write('from SOAP.loop import *\nimport sys \n \nspopt=sprefine(sys.argv[1],"'+self.bm+'","'+self.criteria+'",'+str(self.nonbond_spline)+','+str(self.contact_shell)+','+str(self.deviations)+')\nspopt.runpath=\''+self.runpath+'\'\nspopt.refpot[1]="'+self.refpot[1]+'"\n\nspopt.assess_method="'+self.assess_method+'"\n\nspopt.saveStructure="'+str(self.saveStructure)+'"\n\nspopt.trace='+str(self.trace)+'\n\nspopt.initialize_dslist()'+'\n'+'\nspopt.assess_cluster_node()\n')
         makemdt.flush()
         generate_job_submit_script(freememory,self.rundir,runtime,nors,parallel=self.slavenumber)        
         return 0
@@ -723,11 +726,12 @@ class sprefine(object):
                     #pdb.set_trace()
                 print os.system('rm '+loopname+'.lrsr')
                 print os.system('rm '+loopname+'.DL*')
-                fl=[f for f in os.listdir('./') if f.startswith(loopname+'.BL')]
-                print os.system('mkdir '+self.dslist)
-                for f in fl:
-                    print os.system('mv '+f+' '+self.dslist+'/'+f)
-                print os.system('cd '+self.dslist+';gzip *;cd ..')
+                if self.saveStructure:
+                    fl=[f for f in os.listdir('./') if f.startswith(loopname+'.BL')]
+                    print os.system('mkdir '+self.dslist)
+                    for f in fl:
+                        print os.system('mv '+f+' '+self.dslist+'/'+f)
+                    print os.system('cd '+self.dslist+';gzip *;cd ..')
         return resultdict          
 
     def assess_cluster_node(self):
