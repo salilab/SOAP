@@ -389,7 +389,7 @@ class sprefine(object):
             if 'trace' in refineProtocal:
                 trace=refineProtocal['trace']
             if 'save' in refineProtocal:
-                saveStructure=True
+                saveStructure=refineProtocal['save']
         #use statistical potential to refine loops/strutures, and analyze the refine results to judge the statistical potential.
         if spmodel: #needfix???
             if spmodel['scoretype']!='sprefine':
