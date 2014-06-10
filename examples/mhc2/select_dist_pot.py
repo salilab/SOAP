@@ -57,6 +57,8 @@ bmtype={'type':'dsscore','dslist':['mhc2'],'criteria':'3xtop1_rmsdallif_mean_+2x
 
 #define the continous parameter (model parameter) to be optimzied
 search1={'object':ref1,'key':'parvalue','pos':[0,1,2,3],'InitialGenerator':{'type':'dfire','values':initvalues}}
+search2={'object':ref1,'key':'par','pos':[0,1,2,3],'InitialGenerator':{'type':'dfire','values':initvalues}}
+
 
 #define the models to be serached
 dsearch2={'object':rfeature[0],'key':2,'valueset':[20,5.6,5.8,6,7]}#[6,5.4,5,4.8,4.6,4.4,4.2]#15, 7,6,5,4.5,4,3.5,3#,10,8,7,6,5#15,12,10, 8,7,15,12,10, 8,7,6,

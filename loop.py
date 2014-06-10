@@ -686,7 +686,7 @@ class sprefine(object):
         inputlist.write(','.join([str(i)+'.pickle' for i in range(1,nors+1)]))
         inputlist.close()
         makemdt=open('runme.py','w')#nonbond_spline=0.1,contact_shell=12.0,deviations=50
-        makemdt.write('from SOAP.loop import *\nimport sys \n \nspopt=sprefine(sys.argv[1],"'+self.bm+'","'+self.criteria+'",'+str(self.nonbond_spline)+','+str(self.contact_shell)+','+str(self.deviations)+')\nspopt.runpath=\''+self.runpath+'\'\nspopt.refpot[1]="'+self.refpot[1]+'"\n\nspopt.assess_method="'+self.assess_method+'"\n\nspopt.saveStructure="'+str(self.saveStructure)+'"\n\nspopt.trace='+str(self.trace)+'\n\nspopt.initialize_dslist()'+'\n'+'\nspopt.assess_cluster_node()\n')
+        makemdt.write('from SOAP.loop import *\nimport sys \n \nspopt=sprefine(sys.argv[1],"'+self.bm+'","'+self.criteria+'",'+str(self.nonbond_spline)+','+str(self.contact_shell)+','+str(self.deviations)+')\nspopt.runpath=\''+self.runpath+'\'\nspopt.refpot[1]="'+self.refpot[1]+'"\n\nspopt.assess_method="'+self.assess_method+'"\n\nspopt.saveStructure='+str(self.saveStructure)+'\n\nspopt.trace='+str(self.trace)+'\n\nspopt.initialize_dslist()'+'\n'+'\nspopt.assess_cluster_node()\n')
         makemdt.flush()
         generate_job_submit_script(freememory,self.rundir,runtime,nors,parallel=self.slavenumber)        
         return 0
@@ -742,7 +742,7 @@ class sprefine(object):
         pickle.dump(result,open(self.dslist+'.pickle','w'))
         report_job_runstatus(self.runpath, True, self.dslist, '',inputname='runme.py',temppath=scratchdir)
         
-    def afterprocessing(self):
+    def afterprocessing(self,returnDetails=False):
         os.chdir(self.dir+self.rundir)
         rd={}
         print self.nrpl
@@ -767,7 +767,7 @@ class sprefine(object):
             gc.collect()
         except:
             traceback.print_exc()
-        return self.analyze_loop_modeling()
+        return self.analyze_loop_modeling(returnDetails)
     
     def assess(self,refpot=[]):
         if refpot:
@@ -813,7 +813,11 @@ class sprefine(object):
                     ms=sa0[:,2].min()
                     sdl=[sa0[np.argmin(sa0[:,1]),0]]
                     ssl=[sa0[np.argmin(sa0[:,2]),0]]
-                    for item in result[key][2::2]:
+                    if result[key][0]==result[key][1]:
+                        ress=result[key][2::2]
+                    else:
+                        ress=result[key][1:]
+                    for item in ress:
                         sa=np.array(item[-1][rastart:])
                         srrl.append(min(item[1],srrl[-1]))
                         srl.append(min(sa[:,0].min(),srl[-1]))                        
@@ -850,7 +854,8 @@ class sprefine(object):
             print 'soap',np.mean(soapmins)
             self.averageRMSD=np.mean(mcrmsds)
             if returnDetails:
-                return np.array(rrl),np.array(rl),np.array(dl),np.array(sl)
+                rlen=min([len(r) for r in rrl])
+                return np.array([r[:rlen] for r in rrl]),np.array([r[:rlen] for r in rl]),np.array([r[:rlen] for r in dl]),np.array([r[:rlen] for r in sl])
         else:
             mn=9999999999
             result=self.result
@@ -921,6 +926,12 @@ class sprefine(object):
                     rmsdlist.append(rmsddict[key])
             brmsdlist.append(np.array(rmsdlist).min())
         return brmsdlist
+
+    def generate_refine_decoys(self,dsname=''):
+        dspath=os.path.join(runenv.decoysbasedir,'loop',dsname)
+        os.makedirs(dspath)
+        #need to be finished
+        
 
 def sgmd(atmsel, actions):
     """Very slow MD annealing"""

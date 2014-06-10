@@ -22,7 +22,7 @@ for f in fl:
     if not os.path.isdir(os.path.join(originalDecoyPath,f)):
         continue
     print os.system('rm -rf '+os.path.join(preparedDecoyPath,f))
-    os.mkdir(os.path.join(preparedDecoyPath,f))
+    os.makedirs(os.path.join(preparedDecoyPath,f))
     os.chdir(os.path.join(preparedDecoyPath,f))
     print os.system('cp '+os.path.join(originalDecoyPath,f,'selected_peptides','*')+' ./')
     print os.system('mv pMHC_'+f+'.pdb base.pdb')
