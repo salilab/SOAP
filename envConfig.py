@@ -44,7 +44,7 @@ class SOAPenv(object):
     .. note::
         the statpot directory must contains:
         
-        1. file rsn with a 5-6 digit number in it, eg. 10000
+        1. file rsn with a 5-6 digit number in it (run serial number), eg. 10000
         
         2. folder results for storing optimization results
         3. folder Decoys for storing decoys metadata used during training

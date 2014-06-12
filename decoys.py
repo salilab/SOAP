@@ -547,14 +547,14 @@ class decoys4single(object):
         fh.close()
         print 'building docking decoys'
         fl=os.listdir('./')
-        pf=[item for item in fl if re.search('_r_',item)][0]
-        lf=[item for item in fl if re.search('_l_',item)][0]
+        #pf=[item for item in fl if re.search('_r_',item)][0]
+        #lf=[item for item in fl if re.search('_l_',item)][0]
         resfile=[item for item in fl if item[-3:]=='res'][0]
         #renaming the chains
-        print os.system('PatchDock/mainchain.pl '+sd['rpdb'][:-3]+' A')
-        print os.system('PatchDock/mainchain.pl '+sd['lpdb'][:-3]+' B')
+        #print os.system('PatchDock/mainchain.pl '+sd['rpdb'][:-3]+' A')
+        #print os.system('PatchDock/mainchain.pl '+sd['lpdb'][:-3]+' B')
         #combine the two files
-        print os.system(' cat '+sd['rpdb'][:-3]+' '+sd['lpdb'][:-3]+' > '+self.dsname+'.'+self.code+'.base.pdb') 
+        print os.system(' cat '+sd['rpdb']+' '+sd['lpdb']+' > '+self.dsname+'.'+self.code+'.base.pdb') 
         #generate pir file for the base structure
         self.make_basepir(self.dsname+'.'+self.code+'.base.pdb')
         #Read in the rmad, transformation matrix
