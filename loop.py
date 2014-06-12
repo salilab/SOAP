@@ -930,6 +930,15 @@ class sprefine(object):
     def generate_refine_decoys(self,dsname=''):
         dspath=os.path.join(runenv.decoysbasedir,'loop',dsname)
         os.makedirs(dspath)
+        os.chdir(self.dir+self.rundir)
+        rd={}
+        print self.nrpl
+        print self.nors
+        for i in range(self.nors):
+            if os.path.isfile(str(i+1)+'.pickle'):
+                fh=open(str(i+1)+'.pickle','rb')
+                res=pickle.load(fh)
+                fh.close()        
         #need to be finished
         
 

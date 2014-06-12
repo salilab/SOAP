@@ -51,7 +51,7 @@ class SOAPenv(object):
         4. folder pdbpir for storing the filtered pir sequence files for PDB structures
         
     .. warning::
-        All paths defined in this file must exist before SOAP can be run.
+        All paths defined in this file as well as the database file must exist before SOAP can be run.
     """
     
     

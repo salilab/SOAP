@@ -868,7 +868,6 @@ class Mymodel(model):
         return rl
     
      
-
     def gen_base_file(self,chain,residuerange,basefilename,othername):
         selfstartpos=self.get_residue_index(chain,residuerange[0])[2]
         selfendpos=self.get_residue_index(chain,residuerange[1])[3]
