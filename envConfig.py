@@ -1,9 +1,9 @@
 """
 SOAP env module, defining the computing environments.
    
-Dependence: numpy, scipy, bottleneck, modeller, mdt, h5py, pymc,filelock (https://github.com/dmfrey/FileLock), matplotlib.
+Dependence (in both local host and sgeserver): numpy, scipy, bottleneck, modeller, mdt, h5py, pymc,filelock (https://github.com/dmfrey/FileLock), matplotlib.
 
-If the installation paths for these packages are not in the python search path, please add the pathes to sys.path.
+If the installation paths for these packages are not in the python search path (in both local host and sgeserver), please add the pathes to $PYTHONPATH or sys.path.
 
 You might need to run "module load modeller" to load modeller and MDT.
 
@@ -49,9 +49,13 @@ class SOAPenv(object):
         2. folder results for storing optimization results
         3. folder Decoys for storing decoys metadata used during training
         4. folder pdbpir for storing the filtered pir sequence files for PDB structures
+
+    .. warning::
+        The paths in lib/universal_script.sh also need to be configured correctly for SOAP to run on SGE cluster.
         
     .. warning::
         All paths defined in this file as well as the database file must exist before SOAP can be run.
+        
     """
     
     
