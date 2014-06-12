@@ -26,7 +26,9 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="SOAP 0.1 documentation" href="index.html" /> 
+    <link rel="top" title="SOAP 0.1 documentation" href="index.html" />
+    <link rel="next" title="Calcualte SOAP poential for ranking small molecule ligands." href="soaplig.html" />
+    <link rel="prev" title="Welcome to SOAP’s documentation!" href="index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -38,6 +40,12 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
+        <li class="right" >
+          <a href="soaplig.html" title="Calcualte SOAP poential for ranking small molecule ligands."
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to SOAP’s documentation!"
+             accesskey="P">previous</a> |</li>
         <li><a href="index.html">SOAP 0.1 documentation</a> &raquo;</li> 
       </ul>
     </div>  
@@ -78,7 +86,7 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">originalDecoyPath</span><span class="p">,</span><span class="n">f</span><span class="p">)):</span>
         <span class="k">continue</span>
     <span class="k">print</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&#39;rm -rf &#39;</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">preparedDecoyPath</span><span class="p">,</span><span class="n">f</span><span class="p">))</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">preparedDecoyPath</span><span class="p">,</span><span class="n">f</span><span class="p">))</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">preparedDecoyPath</span><span class="p">,</span><span class="n">f</span><span class="p">))</span>
     <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">preparedDecoyPath</span><span class="p">,</span><span class="n">f</span><span class="p">))</span>
     <span class="k">print</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&#39;cp &#39;</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">originalDecoyPath</span><span class="p">,</span><span class="n">f</span><span class="p">,</span><span class="s">&#39;selected_peptides&#39;</span><span class="p">,</span><span class="s">&#39;*&#39;</span><span class="p">)</span><span class="o">+</span><span class="s">&#39; ./&#39;</span><span class="p">)</span>
     <span class="k">print</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">&#39;mv pMHC_&#39;</span><span class="o">+</span><span class="n">f</span><span class="o">+</span><span class="s">&#39;.pdb base.pdb&#39;</span><span class="p">)</span>
@@ -161,10 +169,12 @@
 <span class="n">scaledsp1</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;scaledsp&#39;</span><span class="p">,</span><span class="s">&#39;pdbset&#39;</span><span class="p">:</span><span class="s">&#39;X2_2.2A_0.25rfree&#39;</span><span class="p">,</span><span class="s">&#39;features&#39;</span><span class="p">:</span><span class="n">sfeature</span><span class="p">,</span><span class="s">&#39;genmethod&#39;</span><span class="p">:</span><span class="s">&#39;cs1&#39;</span><span class="p">,</span><span class="s">&#39;pm&#39;</span><span class="p">:</span><span class="n">pm</span><span class="p">,</span><span class="s">&#39;refs&#39;</span><span class="p">:[</span><span class="n">ref1</span><span class="p">],</span><span class="s">&#39;ratio&#39;</span><span class="p">:[</span><span class="mf">1.0</span><span class="p">]}</span>
 
 <span class="c">#define the benchmark scheme</span>
-<span class="n">bmtype</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;dsscore&#39;</span><span class="p">,</span><span class="s">&#39;dslist&#39;</span><span class="p">:[</span><span class="s">&#39;mhc2&#39;</span><span class="p">],</span><span class="s">&#39;criteria&#39;</span><span class="p">:</span><span class="s">&#39;3xtop1_rmsdallif_mean_+2xtop3_rmsdallif_mean_&#39;</span><span class="p">,</span><span class="s">&#39;combine&#39;</span><span class="p">:</span><span class="s">&#39;scoresum&#39;</span><span class="p">,</span><span class="s">&#39;bm&#39;</span><span class="p">:</span><span class="s">&#39;cs1&#39;</span><span class="p">}</span>
+<span class="n">bmtype</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;dsscore&#39;</span><span class="p">,</span><span class="s">&#39;dslist&#39;</span><span class="p">:[</span><span class="s">&#39;mhc2&#39;</span><span class="p">],</span><span class="s">&#39;criteria&#39;</span><span class="p">:</span><span class="s">&#39;dcg&#39;</span><span class="p">,</span><span class="s">&#39;combine&#39;</span><span class="p">:</span><span class="s">&#39;scoresum&#39;</span><span class="p">,</span><span class="s">&#39;bm&#39;</span><span class="p">:</span><span class="s">&#39;cs1&#39;</span><span class="p">}</span>
 
 <span class="c">#define the continous parameter (model parameter) to be optimzied</span>
 <span class="n">search1</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;object&#39;</span><span class="p">:</span><span class="n">ref1</span><span class="p">,</span><span class="s">&#39;key&#39;</span><span class="p">:</span><span class="s">&#39;parvalue&#39;</span><span class="p">,</span><span class="s">&#39;pos&#39;</span><span class="p">:[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span><span class="s">&#39;InitialGenerator&#39;</span><span class="p">:{</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;dfire&#39;</span><span class="p">,</span><span class="s">&#39;values&#39;</span><span class="p">:</span><span class="n">initvalues</span><span class="p">}}</span>
+<span class="n">search2</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;object&#39;</span><span class="p">:</span><span class="n">ref1</span><span class="p">,</span><span class="s">&#39;key&#39;</span><span class="p">:</span><span class="s">&#39;par&#39;</span><span class="p">,</span><span class="s">&#39;pos&#39;</span><span class="p">:[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span><span class="s">&#39;InitialGenerator&#39;</span><span class="p">:{</span><span class="s">&#39;type&#39;</span><span class="p">:</span><span class="s">&#39;dfire&#39;</span><span class="p">,</span><span class="s">&#39;values&#39;</span><span class="p">:</span><span class="n">initvalues</span><span class="p">}}</span>
+
 
 <span class="c">#define the models to be serached</span>
 <span class="n">dsearch2</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;object&#39;</span><span class="p">:</span><span class="n">rfeature</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="s">&#39;key&#39;</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span><span class="s">&#39;valueset&#39;</span><span class="p">:[</span><span class="mi">20</span><span class="p">,</span><span class="mf">5.6</span><span class="p">,</span><span class="mf">5.8</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">]}</span><span class="c">#[6,5.4,5,4.8,4.6,4.4,4.2]#15, 7,6,5,4.5,4,3.5,3#,10,8,7,6,5#15,12,10, 8,7,15,12,10, 8,7,6,</span>
@@ -938,6 +948,12 @@
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to SOAP&#8217;s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="soaplig.html"
+                        title="next chapter">Calcualte SOAP poential for ranking small molecule ligands.</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/mhc2.txt"
@@ -969,6 +985,12 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
+        <li class="right" >
+          <a href="soaplig.html" title="Calcualte SOAP poential for ranking small molecule ligands."
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to SOAP’s documentation!"
+             >previous</a> |</li>
         <li><a href="index.html">SOAP 0.1 documentation</a> &raquo;</li> 
       </ul>
     </div>
