@@ -19,7 +19,7 @@ class task(object):
     """
     def __init__(self,dir='',rdirname='',afterprocessing=None, preparing=None, targetfile=''):
         self.dir=dir
-        self.rdirname=rdirname
+        self.rdirname=rdirname.replace('#','\#')
         if '#' in self.rdirname:# '#' is not recoginized by sge as valid filename
             self.logpath=os.path.join(runenv.serverLogPath, self.rdirname.replace('#',''))
         else:
@@ -69,7 +69,7 @@ class task(object):
             rsn=rsn+1
             rsnf.write(str(rsn))
             rsnf.close()
-            print os.system('rm '+runenv.basedir+'rsnlock')
+            print os.system('rm -f '+runenv.basedir+'rsnlock')
             self.rsn=rsn
         
     def get_tasksn(self):
@@ -147,7 +147,7 @@ class task(object):
    
     def submit_task(self):
         try:
-            print os.system('ssh '+runenv.jobserver+' \' rm -r '+self.rdirname+' ;mkdir '+self.rdirname+'; mkdir '+self.rdirname+'/output''\'') 
+            print os.system('ssh '+runenv.jobserver+' \' rm -rf '+self.rdirname+' ;mkdir '+self.rdirname+'; mkdir '+self.rdirname+'/output''\'') 
             os.chdir(self.dir)
             print os.system('gzip -r -1 *')
             rc1=1
@@ -161,13 +161,13 @@ class task(object):
                        stdout=subprocess.PIPE)
                     result = ssh.communicate()#ssh.stdout.readlines()
                     if not hf in result[0]:
-                        print os.system('scp '+hf+' '+runenv.jobserver+':'+runenv.jobserverhdf5path) 
+                        print os.system('scp '+hf+' '+runenv.jobserver+':\''+runenv.jobserverhdf5path+'\'') 
                     print os.system('mv '+hf+' ../temp')
-                    rc1=os.system('scp -r * '+runenv.jobserver+':~/'+self.rdirname+'/')
+                    rc1=os.system('scp -r * '+runenv.jobserver+':\'~/'+self.rdirname+'/\'')
                     print os.system('mv ../temp'+' ./'+hf)
                     print os.system('ssh '+runenv.jobserver+' \' ln -s '+runenv.jobserverhdf5path+hf+' ~/'+self.rdirname+'/'+hf+'\'')
                 else:
-                    rc1=os.system('scp -r * '+runenv.jobserver+':~/'+self.rdirname+'/')
+                    rc1=os.system('scp -r * '+runenv.jobserver+':\'~/'+self.rdirname+'/\'')
                  
                 time.sleep(0.1)
             rc2=os.system('ssh '+runenv.jobserver+' \'cd '+self.rdirname+';gunzip *gz;qsub '+self.queues+' ./'+self.runname+'\'')#
@@ -192,8 +192,8 @@ class task(object):
             runmdt2.write(runmdt2s)
             runmdt2.flush()
             os.chdir(self.dir)
-            rc1=os.system('scp '+self.runname[:-3]+jn+'.sh'+' '+runenv.jobserver+':~/'+self.rdirname+'/')
-            print os.system('rm '+self.runname[:-3]+jn+'.sh')
+            rc1=os.system('scp '+self.runname[:-3]+jn+'.sh'+' '+runenv.jobserver+':\'~/'+self.rdirname+'/\'')
+            print os.system('rm -f '+self.runname[:-3]+jn+'.sh')
             #rc2=os.system('scp -r '+self.inputlist[int(jn)-1]+' '+runenv.jobserver+':~/'+self.rdirname+'/')
             rc3=os.system('ssh '+runenv.jobserver+' '+'\'qsub -p 0 '+self.queues+' ./'+self.rdirname+'/'+self.runname[:-3]+jn+'.sh\'')
             if rc3:
@@ -349,18 +349,18 @@ class task(object):
         if tr:
             tr=os.system('for i in *.tar.gz; do tar -xvzf $i; done')
             if not tr:
-                print os.system('rm *.tar.gz')
+                print os.system('rm -f *.tar.gz')
             else:
                 raise Exception('can not untar file ')
         else:
-            print os.system('rm *.tar.gz')
+            print os.system('rm -f *.tar.gz')
         logfilelist=[]
         for (fjn, fjf) in djl:
             if self.runstatus[int(fjn)-1]>0:
                 self.runstatus[int(fjn)-1]=0
                 logfilelist.append('*.'+fjn)
-        print os.system('ssh '+runenv.jobserver+' '+'\'cd '+os.path.join(self.logpath)+'; rm '+' '.join(logfilelist)+'\'')
-        print os.system('ssh '+runenv.jobserver+' '+'\'cd '+self.rdirname+'; rm '+filelist+'\'')
+        print os.system('ssh '+runenv.jobserver+' '+'\'cd '+os.path.join(self.logpath)+'; rm -f '+' '.join(logfilelist)+'\'')
+        print os.system('ssh '+runenv.jobserver+' '+'\'cd '+self.rdirname+'; rm -f '+filelist+'\'')
                     
     def get_runtimestats(self):
         #if not (runtimetest and os.path.isfile(self.dir+'pdbs1')):
@@ -396,9 +396,9 @@ class task(object):
         #    self.get_runtimestats()
         #except Exception,e:
         #    traceback.print_exc()
-        print os.system('ssh '+runenv.jobserver+' \'rm -r '+self.rdirname+' \'')
+        print os.system('ssh '+runenv.jobserver+' \'rm -rf '+self.rdirname+' \'')
         if not self.logpath in [runenv.serverUserPath+'output',runenv.serverUserPath+'output/']:
-            print os.system('ssh '+runenv.jobserver+' \'rm -r '+self.logpath+' \'')
+            print os.system('ssh '+runenv.jobserver+' \'rm -rf '+self.logpath+' \'')
         #if runtimetest:
         #    np.save("../runtime"+str(self.rsn),self.runtime)
         if self.afterprocessing:
@@ -466,7 +466,7 @@ class task(object):
             runstatus=proc1.communicate()[0]
             if proc1.returncode==255:
                 raise NetworkError('Network problem')
-            proc2=subprocess.Popen('ssh '+runenv.jobserver+' '+'\' ls ~/'+self.rdirname+'/job*; rm ~/'+self.rdirname+'/jobfailed* \'',shell=True,stdout=subprocess.PIPE)
+            proc2=subprocess.Popen('ssh '+runenv.jobserver+' '+'\' ls ~/'+self.rdirname+'/job*; rm -f ~/'+self.rdirname+'/jobfailed* \'',shell=True,stdout=subprocess.PIPE)
             jobstatlist=proc2.communicate()[0]
             if proc1.returncode==255:
                 raise NetworkError('Network problem')
@@ -628,8 +628,8 @@ class task(object):
             elif len(runnum)>5:
                 print os.system('ssh '+runenv.jobserver+' '+'qdel -f '+runnum+' &')
         if delete:
-            print os.system('ssh '+runenv.jobserver+' \'rm -r '+self.rdirname+' \'')
-            print os.system('rm -r '+self.dir)
+            print os.system('ssh '+runenv.jobserver+' \'rm -rf '+self.rdirname+' \'')
+            print os.system('rm -rf '+self.dir)
 
     def process_keyboard_interrupt(self,e, pos='task-monitor'):
         print '@@@@@@@@ '+pos
@@ -950,7 +950,7 @@ class tasklist(task):
                 return self.afterprocessing(self.resultlist,self.tasklist,self.other)
             else:
                 return self.resultlist
-        except FatalError,e:
+        except FatalError,e: 
             self.qdel_jobs(delete=True)
             sys.exit(str(e))
         except KeyboardInterrupt,e:
@@ -981,7 +981,7 @@ def report_job_runstatus(runpath, runsuccess, runnumber, outputname,inputname='r
                 print fl
                 runsuccess=False
                 #if temppath!=runpath:
-                #    print os.system('rm -rf '+temppath)
+                #    print os.system('rm -rff '+temppath)
             else:
                 tr=os.system('tar cvzf '+fjf+'.tar.gz '+fjf+'* --remove-files')
                 if tr:
@@ -998,7 +998,7 @@ def report_job_runstatus(runpath, runsuccess, runnumber, outputname,inputname='r
                             cr=os.system('mv '+fjf+'.tar.gz '+runpath)
                         if cr:
                             cr=os.system('mv '+fjf+'.tar.gz'+runpath)
-                        #print os.system('rm -rf '+temppath)
+                        #print os.system('rm -rff '+temppath)
                         if cr:
                             print os.system('rm -f '+runpath+fjf+'.tar.gz')
                             print 'FatalError: can not copy the result file, netapp disk quota full?'

@@ -18,9 +18,9 @@ import cPickle
 import pickle
 from operator import itemgetter, attrgetter
 import copy
-import sp
+import SOAP 
 import traceback
-from sp import *
+from SOAP import *
 
 basedir='/bell2/gqdong/statpot/'
 pfd=basedir+'pdbpir/'

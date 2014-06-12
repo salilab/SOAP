@@ -53,7 +53,7 @@ ref1={'type':'sf','features':rfeature,'sftype':slo,'par':slo,'parvalue':slo,'rat
 scaledsp1={'type':'scaledsp','pdbset':'X2_2.2A_0.25rfree','features':sfeature,'genmethod':'cs1','pm':pm,'refs':[ref1],'ratio':[1.0]}
 
 #define the benchmark scheme
-bmtype={'type':'dsscore','dslist':['mhc2'],'criteria':'3xtop1_rmsdallif_mean_+2xtop3_rmsdallif_mean_','combine':'scoresum','bm':'cs1'}
+bmtype={'type':'dsscore','dslist':['mhc2'],'criteria':'dcg','combine':'scoresum','bm':'cs1'}
 
 #define the continous parameter (model parameter) to be optimzied
 search1={'object':ref1,'key':'parvalue','pos':[0,1,2,3],'InitialGenerator':{'type':'dfire','values':initvalues}}
