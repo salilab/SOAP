@@ -26,13 +26,7 @@ class SOAPenv(object):
         self.localHost=''#local server for storing results and tables, and running SOAP 
         self.sgeServer=''#for submitting jobs on sge cluster, ssh key authencation needed for passwordless access both way (local host<->server)
         self.userName="" # username on local host and sge server, must use RSA Key for passwordless SSH Authentication
-        self.localStatPotPath=''# the root path of statistical potential files in local host (could take TB of spaces)
-        .. note::
-            the statpot directory must contains:
-            #. file rsn with a 5-6 digit number in it, eg. 10000
-            #. folder results for storing optimization results
-            #. folder Decoys for storing decoys metadata used during training
-            #. folder pdbpir for storing the filtered pir sequence files for PDB structures 
+        self.localStatPotPath=''# the root path of statistical potential files in local host (could take TB of spaces)            
         self.localDecoysPath='' # the directory for storing decoys on local host
         self.localProcessedPDBPaths=['',''] # paths to preprocessed pdb files on local host
         self.serverProcessedPDBPaths=['',''] # paths to processed pdb files on sge server
@@ -46,9 +40,18 @@ class SOAPenv(object):
         self.serverScrathPath=''# for storing temporary results on sge cluster
         self.localRunCachePath='' # temporary run path on local host
         self.localResultDB='x.sql3'  # database file location on local host
+
+    .. note::
+        the statpot directory must contains:
+        
+        1. file rsn with a 5-6 digit number in it, eg. 10000
+        
+        2. folder results for storing optimization results
+        3. folder Decoys for storing decoys metadata used during training
+        4. folder pdbpir for storing the filtered pir sequence files for PDB structures
         
     .. warning::
-        All paths defined in this file should exist.
+        All paths defined in this file must exist before SOAP can be run.
     """
     
     
