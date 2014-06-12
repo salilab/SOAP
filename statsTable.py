@@ -1389,7 +1389,7 @@ class scaledsp(rawsp):
             self.rundir=self.sspname
             self.runpath=runenv.serverUserPath+self.rundir+'/'
             self.task.dir=self.dir+self.rundir+'/'
-            self.task.rdirname=self.rundir
+            self.task.rdirname=self.rundir.replace('#','\#')
             return self.task
         else:
             return localtask(func=self.scalesp,inputlist=[])

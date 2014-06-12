@@ -936,9 +936,11 @@ class sprefine(object):
         print self.nors
         for i in range(self.nors):
             if os.path.isfile(str(i+1)+'.pickle'):
+                inputdict=pickle.load(gzip.open(str(i+1)+'.pickle.gz'))
                 fh=open(str(i+1)+'.pickle','rb')
                 res=pickle.load(fh)
-                fh.close()        
+                fh.close()
+                pdb.set_trace()
         #need to be finished
         
 
