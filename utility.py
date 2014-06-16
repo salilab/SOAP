@@ -866,7 +866,6 @@ class Mymodel(model):
                 print 'clash with '+','.join(item)+'  '
                 rl.append('clash with '+','.join(item)+'  ')
         return rl
-    
      
     def gen_base_file(self,chain,residuerange,basefilename,othername):
         selfstartpos=self.get_residue_index(chain,residuerange[0])[2]
@@ -879,13 +878,15 @@ class Mymodel(model):
         self.atomlines=otheratomlines
         self.save_model(othername)
         self.gen_atomlist()
-
+        
+    def get_part(self,chain,residuerange):
+        selfstartpos=self.get_residue_index(chain,residuerange[0])[2]
+        selfendpos=self.get_residue_index(chain,residuerange[1])[3]
+        otheratomlines=self.atomlines[selfstartpos:selfendpos+1]
+        return otheratomlines
 
 def load_pickle(fn):
     pass
-
-
-
 
 class MemoryMonitor(object):
     """Monitor the memory usage of the current program"""

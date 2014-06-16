@@ -928,7 +928,8 @@ class sprefine(object):
         return brmsdlist
 
     def generate_refine_decoys(self,dsname=''):
-        dspath=os.path.join(runenv.decoysbasedir,'loop',dsname)
+        #dpath=os.path.join(runenv.decoysbasedir,'loop',dsname)
+        dspath=os.path.join(runenv.localDecoysPath,'loop',dsname)
         os.makedirs(dspath)
         os.chdir(self.dir+self.rundir)
         rd={}
@@ -937,11 +938,47 @@ class sprefine(object):
         for i in range(self.nors):
             if os.path.isfile(str(i+1)+'.pickle'):
                 inputdict=pickle.load(gzip.open(str(i+1)+'.pickle.gz'))
+                del inputdict['runenv']
                 fh=open(str(i+1)+'.pickle','rb')
                 res=pickle.load(fh)
                 fh.close()
+                l=inputdict.values()[0][0]
+                code=inputdict.keys()[0]
+                dsname=code+str(l[1])+('A' if l[0]=='' else l[0])+str(l[2])
+
+                sdspath=os.path.join(dspath,dsname)
+                if not os.path.isdir(sdspath):
+                    os.makedirs(sdspath)
+                    rmsddict={}
+                    scoredict={}
+                else:
+                    rmsddict=pickle.load(open(os.path.join(sdspath,'rmsd.pickle')))
+                    scoredict=pickle.load(open(os.path.join(sdspath,'score.pickle')))
+                env=environ()
+                env.io.atom_files_directory = [os.path.join(runenv.loopStructurePath,self.dslist),scratchdir,runenv.opdbdir,'.']
+                basem=Mymodel(env)
+                basem.load_model_file(os.path.join(runenv.opdbdir,code[1:3],'pdb'+code+'.ent.gz'))
+                #basem.gen_atomlist()
+                basem.gen_chainlist()
+                cc=l[0] if len(l[0])>0 else 'A'
+                basem.gen_base_file(cc,l[2:],os.path.join(sdspath,dsname+'.base'),'backup')
+                fl=os.listdir(str(i+1))
                 pdb.set_trace()
-        #need to be finished
+                for f,r in zip(fl,res.values()[0]):  
+                    dpn='.'.join(f.split('.')[1:])
+                    dn=dpn.split('.')[0]
+                    m2=Mymodel(env)
+                    m2.load_model_file(str(i+1)+'/'+f)
+                    nl=basem.transfer_model_atoms(m2)
+                    gzip.open(os.path.join(sdspath,dpn),'w').write('\n'.join(basem.get_part(cc,l[2:])))
+                    rmsddict[dn]=[r[1],r[0]]
+                    scoredict[dn]=r[2]
+                    pdb.set_trace()
+                                
+                print os.system('touch '+os.path.join(sdspath,'needcombinewithbase'))
+                pickle.dump(rmsddict,open(os.path.join(sdspath,'rmsd.pickle'),'w'))
+                pickle.dump(scoredict,open(os.path.join(sdspath,'score.pickle'),'w'))
+                pickle.dump([('mcrmsd','f4')],open(os.path.join(sdspath,'extrapar.pickle'),'w'))
         
 
 def sgmd(atmsel, actions):
