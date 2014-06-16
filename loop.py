@@ -962,23 +962,24 @@ class sprefine(object):
                 basem.gen_chainlist()
                 cc=l[0] if len(l[0])>0 else 'A'
                 basem.gen_base_file(cc,l[2:],os.path.join(sdspath,dsname+'.base'),'backup')
+                basem.load_model_file(os.path.join(runenv.opdbdir,code[1:3],'pdb'+code+'.ent.gz'))
                 fl=os.listdir(str(i+1))
-                pdb.set_trace()
                 for f,r in zip(fl,res.values()[0]):  
                     dpn='.'.join(f.split('.')[1:])
                     dn=dpn.split('.')[0]
                     m2=Mymodel(env)
                     m2.load_model_file(str(i+1)+'/'+f)
-                    nl=basem.transfer_model_atoms(m2)
+                    basem.transfer_model_atoms(m2)
+                    nl=basem.get_part(cc,l[2:])
                     gzip.open(os.path.join(sdspath,dpn),'w').write('\n'.join(basem.get_part(cc,l[2:])))
                     rmsddict[dn]=[r[1],r[0]]
                     scoredict[dn]=r[2]
-                    pdb.set_trace()
-                                
                 print os.system('touch '+os.path.join(sdspath,'needcombinewithbase'))
                 pickle.dump(rmsddict,open(os.path.join(sdspath,'rmsd.pickle'),'w'))
                 pickle.dump(scoredict,open(os.path.join(sdspath,'score.pickle'),'w'))
                 pickle.dump([('mcrmsd','f4')],open(os.path.join(sdspath,'extrapar.pickle'),'w'))
+        do=decoyset(dsname=dsname, sourcedir=dspath)
+        do.build()
         
 
 def sgmd(atmsel, actions):
