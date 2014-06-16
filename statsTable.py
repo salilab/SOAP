@@ -1351,6 +1351,11 @@ class scaledsp(rawsp):
             rspo=rawsp(model=ns)
             pm=model['pm']
         self.opm=pm
+        if pm.endswith('.unsym'):
+            pm=pm[:-6]
+            self.unsym=True
+        else:
+            self.unsym=False
         self.pm=pm.replace('+','.')
         if 'i1' in self.pm:
             self.ifl=[0]
@@ -1500,8 +1505,9 @@ class scaledsp(rawsp):
         if self.permute:
             ma=np.transpose(ma,self.rs1)
         ms=ma.shape   
-        if pm!='savema':          
-            self.make_symetry(ma)         
+        if pm!='savema':
+            if not self.unsym:
+                self.make_symetry(ma)         
             dvdim=1
             for i in range(0,ifpos):
                 dvdim=dvdim*ms[i]
