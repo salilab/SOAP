@@ -28,7 +28,7 @@
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="SOAP 0.1 documentation" href="index.html" />
     <link rel="next" title="Recovery Functions" href="recoveryFucntion.html" />
-    <link rel="prev" title="Features" href="feature.html" /> 
+    <link rel="prev" title="Decoys" href="decoys.html" /> 
   </head>
   <body>
     <div class="related">
@@ -44,7 +44,7 @@
           <a href="recoveryFucntion.html" title="Recovery Functions"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="feature.html" title="Features"
+          <a href="decoys.html" title="Decoys"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">SOAP 0.1 documentation</a> &raquo;</li> 
       </ul>
@@ -57,6 +57,68 @@
             
   <div class="section" id="calcualte-statistics-from-a-set-of-structures">
 <h1>Calcualte statistics from a set of structures<a class="headerlink" href="#calcualte-statistics-from-a-set-of-structures" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-statsTable"></span><p>SOAP statistical table</p>
+<dl class="class">
+<dt id="statsTable.rawsp">
+<em class="property">class </em><tt class="descclassname">statsTable.</tt><tt class="descname">rawsp</tt><big>(</big><em>pdbset=''</em>, <em>features=''</em>, <em>genmethod=''</em>, <em>tlib=None</em>, <em>decoy=False</em>, <em>routine='calc_sp_all'</em>, <em>model={}</em><big>)</big><a class="reference internal" href="_modules/statsTable.html#rawsp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#statsTable.rawsp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Statistics from a set of structures</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>pdbset</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; the name of the set of PDB or decoy structures</li>
+<li><strong>features</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; the name of the features, see <tt class="xref py py-mod docutils literal"><span class="pre">feature</span></tt></li>
+<li><strong>genmethod</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; the filters used for generating the table, see <a class="reference internal" href="utility.html#utility.decode_genmethod" title="utility.decode_genmethod"><tt class="xref py py-func docutils literal"><span class="pre">utility.decode_genmethod()</span></tt></a> for more detail.</li>
+<li><strong>decoy</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; True if the <tt class="xref py py-attr docutils literal"><span class="pre">rawsp.pdbset</span></tt> represent decoys</li>
+<li><strong>model</strong> (<a class="reference external" href="http://docs.python.org/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; the parameters for this class can also be passed by a dict</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils" id="genmethod">
+<dt>Example genmethod:</dt>
+<dd><ul class="first last simple">
+<li><cite>bs2dsp</cite>: bond separaion 2 with disulfide bond take into consideration</li>
+<li><cite>cs1</cite>: chain speration &gt;=1</li>
+<li><cite>ss1</cite>: sequence separation &gt;=1</li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="statsTable.rawsp.calc_sp_all">
+<tt class="descname">calc_sp_all</tt><big>(</big><em>runnumber</em><big>)</big><a class="reference internal" href="_modules/statsTable.html#rawsp.calc_sp_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#statsTable.rawsp.calc_sp_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Methods to generate the statistical potential from PDB files  in the currnt directory.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="statsTable.scaledsp">
+<em class="property">class </em><tt class="descclassname">statsTable.</tt><tt class="descname">scaledsp</tt><big>(</big><em>pm=''</em>, <em>rspo=</em><span class="optional">[</span><span class="optional">]</span>, <em>model=</em><span class="optional">[</span><span class="optional">]</span>, <em>previouspm=''</em><big>)</big><a class="reference internal" href="_modules/statsTable.html#scaledsp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#statsTable.scaledsp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Processed statistics table from a set of structures</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>rspo</strong> (<em>rawsp</em>) &#8211; class <a class="reference internal" href="#statsTable.rawsp" title="statsTable.rawsp"><tt class="xref py py-class docutils literal"><span class="pre">rawsp</span></tt></a> object</li>
+<li><strong>pm</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; the method for processing the raw talbe <tt class="xref py py-attr docutils literal"><span class="pre">scaledsp.rspo</span></tt></li>
+<li><strong>model</strong> (<a class="reference external" href="http://docs.python.org/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; the parameters for this class can also be passed by a dict</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>pm definition:</p>
+<div class="highlight-python"><pre>pm  =&gt; [pp[0-9]+,+] ,[(gps|ks)\number,+] ,npend|npsum
+pp[0-9]+ : add number to raw table
+(gps|ks)\number : gaussian process or kernal smoothing with strength \number.
+npend|npsum : normalize the count by the last bin or by the sum of the distribution (results in a proper discrete probalistic distribution).</pre>
+</div>
+</dd></dl>
+
 </div>
 
 
@@ -66,8 +128,8 @@
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="feature.html"
-                        title="previous chapter">Features</a></p>
+  <p class="topless"><a href="decoys.html"
+                        title="previous chapter">Decoys</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="recoveryFucntion.html"
                         title="next chapter">Recovery Functions</a></p>
@@ -106,7 +168,7 @@
           <a href="recoveryFucntion.html" title="Recovery Functions"
              >next</a> |</li>
         <li class="right" >
-          <a href="feature.html" title="Features"
+          <a href="decoys.html" title="Decoys"
              >previous</a> |</li>
         <li><a href="index.html">SOAP 0.1 documentation</a> &raquo;</li> 
       </ul>
