@@ -55,81 +55,8 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="module-loop">
-<span id="loop-modeling"></span><h1>Loop modeling<a class="headerlink" href="#module-loop" title="Permalink to this headline">¶</a></h1>
-<p>SOAP loop model.</p>
-<dl class="class">
-<dt id="loop.MyLoop">
-<em class="property">class </em><tt class="descclassname">loop.</tt><tt class="descname">MyLoop</tt><big>(</big><em>env, sequence, alnfile=None, knowns=[], inimodel=None, deviation=None, library_schedule=None, csrfile=None, inifile=None, assess_methods=None, loop_assess_methods=None, refinepot=['$(LIB)/atmcls-mf.lib', '$(LIB)/dist-mf.lib'], loops=[], calcrmsds='111', nonbond_spine=0.1, contact_shell=12.0, deviations=50, energytrace=False, assess_trace=True</em><big>)</big><a class="reference internal" href="_modules/loop.html#MyLoop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#loop.MyLoop" title="Permalink to this definition">¶</a></dt>
-<dd><p>SOAP loop modeling class</p>
-<dl class="method">
-<dt id="loop.MyLoop.get_loop_actions">
-<tt class="descname">get_loop_actions</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/loop.html#MyLoop.get_loop_actions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#loop.MyLoop.get_loop_actions" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get actions to carry out during loop optimization</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="loop.MyLoop.loop_model_analysis">
-<tt class="descname">loop_model_analysis</tt><big>(</big><em>atmsel</em>, <em>ini_model</em>, <em>filename</em>, <em>out</em>, <em>id1</em>, <em>num</em><big>)</big><a class="reference internal" href="_modules/loop.html#MyLoop.loop_model_analysis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#loop.MyLoop.loop_model_analysis" title="Permalink to this definition">¶</a></dt>
-<dd><p>Energy evaluation and assessment, and write out the loop model</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="loop.MyLoop.multiple_loop_models">
-<tt class="descname">multiple_loop_models</tt><big>(</big><em>atmsel</em>, <em>ini_model</em>, <em>num</em>, <em>sched</em><big>)</big><a class="reference internal" href="_modules/loop.html#MyLoop.multiple_loop_models"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#loop.MyLoop.multiple_loop_models" title="Permalink to this definition">¶</a></dt>
-<dd><p>Build all loop models for a given initial model</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="loop.MyLoop.single_loop_model">
-<tt class="descname">single_loop_model</tt><big>(</big><em>atmsel</em>, <em>ini_model</em>, <em>num</em>, <em>id1</em>, <em>sched</em>, <em>parallel=False</em><big>)</big><a class="reference internal" href="_modules/loop.html#MyLoop.single_loop_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#loop.MyLoop.single_loop_model" title="Permalink to this definition">¶</a></dt>
-<dd><p>Build a single loop model</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="loop.ORLoop">
-<em class="property">class </em><tt class="descclassname">loop.</tt><tt class="descname">ORLoop</tt><big>(</big><em>env, sequence, alnfile=None, knowns=[], inimodel=None, deviation=None, library_schedule=None, csrfile=None, inifile=None, assess_methods=None, loop_assess_methods=None, refinepot=['$(LIB)/atmcls-mf.lib', '$(LIB)/dist-mf.lib'], assess_trace=False, loops=[], calcrmsds='111', nonbond_spine=0.1, contact_shell=12.0, deviations=50, energytrace=False</em><big>)</big><a class="headerlink" href="#loop.ORLoop" title="Permalink to this definition">¶</a></dt>
-<dd><p>Original loop modeling class</p>
-<dl class="method">
-<dt id="loop.ORLoop.get_loop_actions">
-<tt class="descname">get_loop_actions</tt><big>(</big><big>)</big><a class="headerlink" href="#loop.ORLoop.get_loop_actions" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get actions to carry out during loop optimization</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="loop.ORLoop.loop_model_analysis">
-<tt class="descname">loop_model_analysis</tt><big>(</big><em>atmsel</em>, <em>ini_model</em>, <em>filename</em>, <em>out</em>, <em>id1</em>, <em>num</em><big>)</big><a class="headerlink" href="#loop.ORLoop.loop_model_analysis" title="Permalink to this definition">¶</a></dt>
-<dd><p>Energy evaluation and assessment, and write out the loop model</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="loop.ORLoop.single_loop_model">
-<tt class="descname">single_loop_model</tt><big>(</big><em>atmsel</em>, <em>ini_model</em>, <em>num</em>, <em>id1</em>, <em>sched</em>, <em>parallel=False</em><big>)</big><a class="headerlink" href="#loop.ORLoop.single_loop_model" title="Permalink to this definition">¶</a></dt>
-<dd><p>Build a single loop model</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="loop.checkRMSD">
-<em class="property">class </em><tt class="descclassname">loop.</tt><tt class="descname">checkRMSD</tt><big>(</big><em>skip</em>, <em>loopObj</em>, <em>first=False</em>, <em>last=False</em>, <em>start=0</em><big>)</big><a class="reference internal" href="_modules/loop.html#checkRMSD"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#loop.checkRMSD" title="Permalink to this definition">¶</a></dt>
-<dd><p>calcualte the RMSDs of intermediate loops</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="loop.sgmd">
-<tt class="descclassname">loop.</tt><tt class="descname">sgmd</tt><big>(</big><em>atmsel</em>, <em>actions</em><big>)</big><a class="reference internal" href="_modules/loop.html#sgmd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#loop.sgmd" title="Permalink to this definition">¶</a></dt>
-<dd><p>Very slow MD annealing</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="loop.sprefine">
-<em class="property">class </em><tt class="descclassname">loop.</tt><tt class="descname">sprefine</tt><big>(</big><em>dslist='101'</em>, <em>bm='loop.100.8'</em>, <em>criteria='bestrmsd'</em>, <em>nonbond_spline=0.1</em>, <em>contact_shell=12.0</em>, <em>deviations=50</em>, <em>assess=''</em>, <em>mcrmsdonly=False</em>, <em>spmodel=None</em>, <em>refineProtocal=None</em>, <em>trace=True</em>, <em>saveStructure=False</em><big>)</big><a class="reference internal" href="_modules/loop.html#sprefine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#loop.sprefine" title="Permalink to this definition">¶</a></dt>
-<dd><p>SOAP loop refinement benchmark class</p>
-</dd></dl>
-
+  <div class="section" id="loop-modeling">
+<h1>Loop modeling<a class="headerlink" href="#loop-modeling" title="Permalink to this headline">¶</a></h1>
 </div>
 
 
