@@ -978,6 +978,7 @@ class sprefine(object):
                 pickle.dump(rmsddict,open(os.path.join(sdspath,'rmsd.pickle'),'w'))
                 pickle.dump(scoredict,open(os.path.join(sdspath,'score.pickle'),'w'))
                 pickle.dump([('mcrmsd','f4')],open(os.path.join(sdspath,'extrapar.pickle'),'w'))
+        from decoys import decoyset
         do=decoyset(dsname=dsname, sourcedir=dspath)
         do.build()
         
