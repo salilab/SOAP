@@ -1366,8 +1366,8 @@ class scaledsp(rawsp):
             if previouspm:
                 self.sppath=self.sppath+'.'+previouspm
                 self.spname=self.spname+'.'+previouspm
-            self.ssppath=self.sppath+'.'+pm.replace('+','.')
-            self.sspname=self.spname+'.'+pm.replace('+','.')
+            self.ssppath=self.sppath+'.'+self.opm.replace('+','.')
+            self.sspname=self.spname+'.'+self.opm.replace('+','.')
             self.array=[]
             self.justwait=False
         self.nors=400
