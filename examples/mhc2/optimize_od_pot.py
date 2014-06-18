@@ -17,7 +17,7 @@ slo={'key':'sacnfflex',
                         'psn4':{'sftype':'psn','par':range(1,15,4),'parvalue':range(4)},
                         'psn5':{'sftype':'psn','par':range(1,15,3),'parvalue':range(5)},
                     'psn8':{'sftype':'psn','par':range(0,15,2),'parvalue':range(8)},
-                        }} 
+                        }}
 
 sfeature=[rfeature[0],'g6#180','gs6#180','h12#180#-180','t306','ts306']
 pm=['','nbsum']
@@ -79,7 +79,7 @@ search25={'object':ref24,'key':'parvalue','pos':[0,1,2,3],'InitialGenerator':{'t
 search9={'object':scaledsp2,'key':'ratio','pos':[0],'InitialGenerator':[[0.99] for i in range(40)]}
 
 search31={'object':ref31,'key':'parvalue','pos':[0,1,2,3],'InitialGenerator':{'type':'random'}}
-search32={'object':ref31,'key':'ratio','pos':[0],'InitialGenerator':[[0.99] for i in range(ni)]}
+#search32={'object':ref31,'key':'ratio','pos':[0],'InitialGenerator':[[0.99] for i in range(ni)]}
 
 #discrete search options
 dsearch1={'object':[scaledsp1,bmtype],'key':['genmethod','bm'],'valueset':[['bs1','bs1'],['bs2','bs2'],['bs3','bs3']
@@ -163,13 +163,13 @@ ssm3={'sm':'powell','blockupdate':False}
 
 sml=[ssm20,ssm2,ssm0,ssm,ssm0,ssm,ssm0,ssm, ssm1]
 #sml=[ssm3,ssm1]
-#sml=[ssm0] 
+#sml=[ssm0]
 
 dsearch99={'object':[ssm,ssm2],'key':['blockupdate','blockupdate'],'valueset':[[False]*2]}#,
 
 
 
-model1={'scorers':[scaledsp1,ref1,ref2,ref3,ref4,scaledsp2,ref21,ref22,ref23,ref24,ref31],'bmtype':bmtype,'searches':[search1,search2,search3,search4,search5,search21,search22,search23,search24,search25,search9,search31,search32], 'runsperscorer':ni,#number of replicas per scorers
+model1={'scorers':[scaledsp1,ref1,ref2,ref3,ref4,scaledsp2,ref21,ref22,ref23,ref24,ref31],'bmtype':bmtype,'searches':[search1,search2,search3,search4,search5,search21,search22,search23,search24,search25,search9,search31], 'runsperscorer':ni,#number of replicas per scorers
     #'initialmodelpath':inipath,
     'dsearches':[dsearch4],#[dsearch4,dsearch2,dsearch9],,dsearch2,dsearch9
 'sml':sml,#search schedule
@@ -188,6 +188,3 @@ spl.eval_allpars()
 #spl.find_best_par()#find the best paramters on discrete and continuous vairables.
 spl.log()
 pdb.set_trace()
-
-
-
