@@ -768,8 +768,8 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
                 print os.system('cp '+os.path.join(fd,fid['olpdbAB'])+' ./')               
                 fl=''
                 for tm, i in zip(sml, range(len(sml))):
-                    print os.system(runenv.serverUserPath+'bin/pdb_trans64 '+tm+' <'+fid['lpdb']+'.AB'+' >ltemp.pdb')
-                    print os.system('cat '+fid['rpdb']+'.AB'+' ltemp.pdb > '+str(i)+'.pdb')
+                    print os.system(runenv.serverUserPath+'bin/pdb_trans64 '+tm+' <'+fid['lpdb']+' >ltemp.pdb')
+                    print os.system('cat '+fid['rpdb']+' ltemp.pdb > '+str(i)+'.pdb')
                     fl=fl+str(i)+'.pdb\n'
                 fh=open('pdblist','w')
                 fh.write(fl)
