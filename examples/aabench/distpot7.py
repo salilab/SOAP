@@ -8,6 +8,8 @@ import numpy as np
 rfeature=[['d',0,15,0.5]]
 #'sftype':'psn3','par':range(1,15,3),'parvalue':range(4)
 runenv.otherrun=False
+
+# uniform refers to the number of anchor points in the recovery function
 par2={'uniform':2,'featurebins':rfeature[0],'distribute':'lownumberpriority','firstpoint':2.25}
 par3={'uniform':3,'featurebins':rfeature[0],'distribute':'lownumberpriority','firstpoint':2.25}
 par4={'uniform':4,'featurebins':rfeature[0],'distribute':'lownumberpriority','firstpoint':2.25}
@@ -16,7 +18,7 @@ par6={'uniform':6,'featurebins':rfeature[0],'distribute':'lownumberpriority','fi
 par7={'uniform':7,'featurebins':rfeature[0],'distribute':'lownumberpriority','firstpoint':2.25}
 par8={'uniform':8,'featurebins':rfeature[0],'distribute':'lownumberpriority','firstpoint':2.25}
 
-
+# recovery function details
 slo={'key':'sacnfflex4',
     'valueset':{
                     'sacnfflex3':{'sftype':'sacnf','par':par3,'parvalue':[1,1,1,1,1]},
@@ -27,7 +29,7 @@ slo={'key':'sacnfflex4',
                     'sacnfflex8':{'sftype':'sacnf','par':par8,'parvalue':[1,1,1,1,1,1,1,1,1,1]},
                     'ig':{'sftype':'sacnf','par':[0],'parvalue':[2.0]},
                     'dfire':{'sftype':'sacnf','par':[0],'parvalue':[2.0]},
-                        }} 
+                        }}
 if 0:
                     for valuetype in ['aon','aoo','acn','aco','1oo','1cn','0oo']:
                             if valuetype.startswith('a'):
@@ -42,36 +44,51 @@ if 0:
                                 slo[splinetype+'3']={'sftype':splinetype,'par':[2.25,3.75,4.75]}
                                 slo[splinetype+'4']={'sftype':splinetype,'par':[1.75,2.75,3.75,4.75]}
 
+# atom typs
 sfeature=[rfeature[0],'a158','as158']
-pm=['','npend.unsym']#unsym for generate unsymmetrical potential
+pm=['','npendunsym']#unsym for generate unsymmetrical potential
 
+# number of parallel tempering runs
 ni=40
 
+# initial values for the recovery functions
 initvalues=list(np.arange(0,ni)/10.0+1)
 
 initvalues=np.array(initvalues)
 
 #decoyset(dsname='ppd4s',sourcedir='/bell2/gqdong/rawdecoyfiles/ppd/ppd4s/').update_ppdt_pir()
 
+# dictionary for the recovery function
 ref1={'type':'sf','features':rfeature,'sftype':slo,'par':slo,'parvalue':slo,'ratio':[1.0]}
 
+# input PDB table definitions
 scaledsp1={'type':'scaledsp','pdbset':'X_2.2A_0.25rfree','features':sfeature,'genmethod':'bs9dsp','pm':pm,'refs':[ref1],'ratio':[1.0]}
 #define the benchmark scheme
-#dslist=['DecoysRUS','casp58']+2xtop3_rmsd_mean_ 
 #dslist=['DecoysRUS','casp58']+2xtop3_rmsd_mean_
-looplist=['mgl'+str(i) for i in range(4,21)]
+#dslist=['DecoysRUS','casp58']+2xtop3_rmsd_mean_
+#looplist=['mgl'+str(i) for i in range(4,21)]
 
+# defines criteria for optimization
+# optimizes area under the curve for 2 curves:
+# 1. success rate vs. DB size for acceptable quality top1000 models on log scale
+# 1. success rate vs. DB size for medium quality top1000 models on log scale
 bmtype={'type':'dsscore','dslist':['aabench'],'criteria':'top1000_rlrank__rmsd10ORirmsd4FIRST+top1000_rlrank__rmsd5ORirmsd2FIRST',
     'combine':'scoresum','bm':'cs1','filters':[{'criteria':'has','criteriadict':{'rmsd':10,'irmsd':4}}],'finalcriteria':'top10__nonempty_rmsd10ORirmsd4'}#,{'criteria':'rep500'}
 #top10_rmsd10_irmsd4  10xtop10_rmsd10_irmsd4+10xtop10_rmsd5_irmsd2+  +100xtop10_rmsd5_irmsd2+top10_rmsd+top10_irmsd top10_rmsd10_irmsd4+top20_rmsd+
 #define the search positions #3xtop1_rmsd_mean_+NativeSelection+2xtop3_rmsd_mean_
+
+# search for recovery function parameters
 search1={'object':ref1,'key':'parvalue','pos':[0,1,2,3],'InitialGenerator':{'type':'dfire','values':initvalues}}
 search2={'object':ref1,'key':'par','pos':[0,1,2,3],'InitialGenerator':{'type':'dfire','values':initvalues}}
 
+# search for discreete variables
+
 dsearch1={'object':[scaledsp1,bmtype],'key':['genmethod','bm'],'valueset':[['bs1dsp','bs1dsp'],['bs2dsp','bs2dsp'],['bs3dsp','bs3dsp'],['bs4dsp','bs4dsp'],['bs6dsp','bs6dsp'],['bs8dsp','bs8dsp'],['bs9dsp','bs9dsp'],['bs10dsp','bs10dsp'],['ss1','ss1'],['ss2','ss2'],['ss3','ss3'],['ss4','ss4'],['ss9','ss9']]}#'bs4dsp','bs5dsp','bs9dsp',,'bs2dsp'
 
+# distance cut-off
 dsearch2={'object':rfeature[0],'key':2,'valueset':[20,17,15,12,10,8]}#[6,5.4,5,4.8,4.6,4.4,4.2]#15, 7,6,5,4.5,4,3.5,3#,10,8,7,6,5#15,12,10, 8,7,15,12,10, 8,7,6,
 
+# bin size
 dsearch3={'object':[rfeature[0],sfeature[0]],'key':[3,3],'valueset':[[0.05,0.05],[0.1,0.1]]}
 #dsearch4={'object':par,'key':'uniform','valueset':[10,9,8,7,6]}
 
@@ -85,16 +102,20 @@ dsearch6={'object':slo,'key':'key','valueset':slo['valueset'].keys()}#slo['value
 
 #dsearch6={'object':[rfeature[0],slo],'key':[2,'key'],'valueset':[[7,'sacnf73'], [7,'sacnf74'],[7,'sacnf75'],[5,'sacnf52'], [5,'sacnf53'],[6,'sacnf64'], [6,'sacnf63'],[6,'sacnf62'],]}
 
-dsearch7={'object':pm,'key':0,'valueset':['','gps0.1','gps0.2','gps0.3','gps0.6','gps1.0','gps2.0','ks0.1','ks0.2','ks0.3','ks0.6','ks1.0','ks2.0']}
+# smoothing - not important
+#dsearch7={'object':pm,'key':0,'valueset':['','gps0.1','gps0.2','gps0.3','gps0.6','gps1.0','gps2.0','ks0.1','ks0.2','ks0.3','ks0.6','ks1.0','ks2.0']}
 
 #dsearch10={'object':scaledsp1,'key':'pdbset','valueset':['X_2.1A_0.25rfree','X_2.1A_0.25rfree_30','X_2.1A_0.25rfree_60','X_2.1A_0.25rfree_95']}
 
+# how to normalize the table
 dsearch8={'object':pm,'key':1,'valueset':['npend.unsym','nbsum.unsym']}
 
+# changing the genration method and the PDB set
 dsearch9={'object':[scaledsp1,scaledsp1],'key':['genmethod','pdbset'],'valueset':[['cs1','X2_2.2A_0.25rfree'],['bs9','X_2.2A_0.25rfree'],['bs8','X_2.2A_0.25rfree'],['bs4','X_2.2A_0.25rfree'],['bs3','X_2.2A_0.25rfree'],['bs2','X_2.2A_0.25rfree'],['bs1','X_2.2A_0.25rfree'],['bs9','X_2.2A_0.25rfree_95'],['bs9','X_2.2A_0.25rfree_60'],['bs9','X_2.2A_0.25rfree_30']]}#,,'cs1'
 
 #dsearch9={'object':scaledsp1,'key':'pdbset','valueset':['X_2.2A_0.25rfree','X_2.2A_0.25rfree_95','X_2.2A_0.25rfree_60','X_2.2A_0.25rfree_30']}#,,'cs1'
 
+# sampling parameters - do not change
 inner={'improved':2,'maxloop':30,'minloop':2}
 outer={'improved':4,'maxloop':5018}
 
@@ -134,12 +155,15 @@ sml=[ssm20,ssm2,ssm0,ssm,ssm0,ssm,ssm0,ssm, ssm1]
 #define the final model
 #
 
+# parameters for SAS term search
+
+# fraction of atom SAS
 rfeature=[['b',0,1.0,0.1]]
 
 
 sfeature=[rfeature[0],'a158']
-pm=['pp5','','npend']
-sratio=[3.8]
+pm=['pp5','','npend'] #simple smoothing?
+sratio=[3.8] # weight for the scoring term
 scaledsp2={'type':'scaledsp','pdbset':'X_2.2A_0.25rfree','features':sfeature,'genmethod':'','pm':'nbsum','bm':'ss1','refs':[],'ratio':sratio}
 
 ref2={'type':'sf','features':rfeature,'sftype':'bins','par':range(10),'parvalue':[1 for i in range(10)],'bm':'','ratio':sratio}
@@ -152,13 +176,20 @@ search4={'object':scaledsp2,'key':'ratio','pos':[0],'InitialGenerator':[[3.8] fo
 
 
 
-
+# different scoring functions
+# distance - distance on atom pairs, same for recovery function
+# distancefixed - same as above, vary recovery function values
+# distanceacc - distance and surface accessaibility
 ssl={'distance':[[scaledsp1,ref1],[search1,search2]],'distancefixed':[[scaledsp1,ref1],[search1]],'distanceacc':[[scaledsp1,ref1,scaledsp2,ref2],[search1,search2,search3,search4]]}
 
 ssmodel={'index':'distanceacc','valueset':ssl}
 
 dsearch21={'object':ssmodel,'key':'index','valueset':ssl.keys()}
 
+
+# the model to optimize
+# scorers = different scoring function options (different terms)
+# bmtype = success criteria
 model1={'scorers':ssmodel,'bmtype':bmtype,'searches':ssmodel, 'runsperscorer':ni,
     'dsearches':[dsearch21,dsearch2,dsearch9],'sml':sml,'cvk':2,'repeat':1,'fold':3}#,dsearch2,dsearch5,dsearch6,dsearch7 #,'testperc':0.33
 #dsearch1,dsearch2,dsearch6,dsearch7
@@ -166,7 +197,7 @@ model1={'scorers':ssmodel,'bmtype':bmtype,'searches':ssmodel, 'runsperscorer':ni
 #so=scorer(model=convert2old(model1))
 #print so.assess_ideal()
 #print so.assess_worst()
-#print so.assess_sascore(slevel='top1_rmsdbbif_mean_')  
+#print so.assess_sascore(slevel='top1_rmsdbbif_mean_')
 #pdb.set_trace()
 
 #opt=optimizer(scorer=so)
@@ -195,4 +226,3 @@ spl.currentcutoffpercratio=0.0
 spl.maximumround=1
 spl.find_best_par()
 spl.log()
-

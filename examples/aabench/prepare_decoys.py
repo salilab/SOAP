@@ -2,7 +2,7 @@ from SOAP.decoys import *
 
 
 #define the paths for the decoys
-workingPath='/bell2/gqdong/rawdecoyfiles/ppd/'
+workingPath='/bell3/dina/rawdecoyfiles/ppd/'
 originalDecoyPath='/bell3/dina/AAbench/'
 preparedDecoyPath=os.path.join(workingPath,'aabench/')
 decoySetName='aabench'
@@ -19,7 +19,7 @@ for f in fl:
     print os.system('cp '+os.path.join(originalDecoyPath,f,'docking.res')+' ./')
     print os.system('cp '+os.path.join(originalDecoyPath,f,'*pdb')+' ./')
     print os.system('touch needtransformation')
-        
+
 #pre-prepare the decoys
 
 def replace_end(lpdb):
@@ -37,7 +37,7 @@ def replace_end(lpdb):
     fh.close()
 
 bd=preparedDecoyPath
-        
+
 fl=os.listdir(bd)
 wd={}
 for d in fl:
@@ -63,7 +63,7 @@ for d in fl:
         sd['switched']='False'
     else:
         pdb.set_trace()
-        raise Exception('Do not know how to handle pdbs')     
+        raise Exception('Do not know how to handle pdbs')
     env=environ()
     env.io.hetatm=False
     env.io.hydrogen=True
@@ -87,7 +87,7 @@ for d in fl:
     except:
         pdb.set_trace()
     sd['orcl']=m1cl
-    sd['olcl']=m2cl    
+    sd['olcl']=m2cl
     m1.write(sd['orpdb'],no_ter=True)
     m2.write(sd['olpdb'],no_ter=True)
     #m1=model(env)
@@ -97,11 +97,11 @@ for d in fl:
     sd['orpdbAB']=sd['orpdb']+'.AB'
     sd['olpdbAB']=sd['olpdb']+'.AB'
     #print os.system('/bell1/home/gqdong/Download/PatchDock/mainchain.pl '+sd['orpdbAB']+' A')
-    #print os.system('/bell1/home/gqdong/Download/PatchDock/mainchain.pl '+sd['olpdbAB']+' B')     
+    #print os.system('/bell1/home/gqdong/Download/PatchDock/mainchain.pl '+sd['olpdbAB']+' B')
     #m1.read(sd['orpdbAB'])
     #m2.read(sd['olpdbAB'])
     #m1.write(sd['orpdbAB'],no_ter=True)
-    #m2.write(sd['olpdbAB'],no_ter=True)    
+    #m2.write(sd['olpdbAB'],no_ter=True)
     complextype=re.search('receptorSeg\t\(Str\)\t(.*)\n',fc).group(1) #receptorSeg     (Str)   10.0 20.0 1.5 1 1 1 2
     if complextype[-1]=='0':
         ct='other'
@@ -112,7 +112,7 @@ for d in fl:
     sd['rpdb']=rpdb
     sd['lpdb']=lpdb
     #complete_pdbfile(rpdb)
-    #complete_pdbfile(lpdb)    
+    #complete_pdbfile(lpdb)
     sd['complextype']=ct
     fh2=open('firedockinput.pickle','w')
     pickle.dump(sd,fh2)
@@ -126,4 +126,3 @@ for d in fl:
 do=decoyset(dsname=decoySetName, sourcedir=preparedDecoyPath)
 do.build()
 pdb.set_trace()
-    

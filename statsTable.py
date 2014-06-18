@@ -1351,8 +1351,8 @@ class scaledsp(rawsp):
             rspo=rawsp(model=ns)
             pm=model['pm']
         self.opm=pm
-        if pm.endswith('.unsym'):
-            pm=pm[:-6]
+        if pm.endswith('unsym'):
+            pm=pm[:-5]
             self.unsym=True
         else:
             self.unsym=False
