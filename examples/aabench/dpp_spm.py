@@ -1,4 +1,4 @@
-from sps import *
+from SOAP import *
 import os
 import profile
 import sys
@@ -13,7 +13,7 @@ rfeature=[['d',0,15,0.5]]
 par={'object':rfeature, 'index1':0,'index2':2,'typelist':[['fixbin',0,1],['fixbin',1,2],['fixbin',1,3],['numafter',[1,3],2]],'parindex':0}
 
 sfeature=[rfeature[0],'a158','as158']
-pm=['pp5','','npend']
+pm=['pp5','','npendunsym']
 
 
 slo={'key':'sacnf13',
@@ -56,7 +56,7 @@ initvalues=list(np.arange(0,ni)/10.0+1)
 initvalues=np.array(initvalues)
 #,'zdock' 'top1000_rlrank__rmsd10ORirmsd4FIRST+top1000_rlrank__rmsd5ORirmsd2FIRST'
 #top10__nonempty_rmsd10ORirmsd4FIRST
-bmtype={'type':'dsscore','dslist':['ppd4s'],'criteria':'top1000_rlrank__rmsd10ORirmsd4FIRST+top1000_rlrank__rmsd5ORirmsd2FIRST',
+bmtype={'type':'dsscore','dslist':['aabench'],'criteria':'top1000_rlrank__rmsd10ORirmsd4FIRST+top1000_rlrank__rmsd5ORirmsd2FIRST',
     'combine':'scoresum','bm':'cs1','filters':[{'criteria':'has','criteriadict':{'rmsd':10,'irmsd':4}}],'finalcriteria':'top10__nonempty_rmsd10ORirmsd4'}#,{'criteria':'rep500'}
 blocks=[]
 kk=0
@@ -129,13 +129,7 @@ ssm1s={'sm':'mcs','reset_betweenruns':2,'blockupdate':False, 'using_globalbest':
       'stepmethod':'mxmp2.0','tune_interval':201,'add_bias':False,'temperature_distribution':np.zeros(ni)+2}
 
 sml=[ssm20,ssm2,ssm0,ssm,ssm0,ssm,ssm0,ssm, ssm1]
-#sml=[ssm1]
-#sml=[ssm]
-ssm3={'sm':'powell','blockupdate':False}
     
-#sml=[ssm3,ssm1]
-sml=[ssm3, ssm1s]
-sml=[ssm2, ssm1s]
 
 
 dsearch6={'object':ssm,'key':'temperature_distribution','valueset':[np.sqrt(np.linspace(1,float(10)**2,ni)),
@@ -178,15 +172,6 @@ dsearch17={'object':[ssm2,ssm20,ssm,ssm0,ssm1],'key':['blockupdate','blockupdate
     'valueset':[[True,True,True,True,True],[False,False,False,False,False],[True,True,False,False,False]]}
 
 
-fd='/bell3/gqdong/statpot/results/ppd4s/top1000_rlrank__rmsd10ORirmsd4FIRST/runs/35122-nan,nan_nan+nan_nan+nan_1.723_0.000/'
-#fd='/bell3/gqdong/statpot/results/ppd4s/top1000_rlrank__rmsd10ORirmsd4FIRST/runs/35449-nan,nan_nan+nan_nan+nan_1.729_0.000/'
-
-#bm=get_best_model(fd)
-#so=scorer(model=bm)
-#print so.assess_model()
-#pdb.set_trace()
-
-
 scorerlist=ssl['full'][0]
 
 #scorerlist=bm['scorers']
@@ -219,8 +204,19 @@ model1={'scorers':scorerlist,'bmtype':bmtype,'searches':searchlist,'thread':4,
         'dsearches':[dsearch6],'sml':sml,'cvk':0,'fold':2,'repeat':3,'initialpars':'all','runsperscorer':40,'testperc':0.0}#,
 #dsearch1,searches,dsearch4,dsearch6,dsearch7,dsearch8, ,'testperc':0.333
 
-
 if 1:
+    spl=spss(model=model1)
+
+    spl.currentcutoffpercinitial=0.0
+    spl.currentcutoffpercratio=0.0
+    spl.maximumround=200
+    #spl.eval_allpars()
+    spl.find_best_par()
+    spl.log()
+    pdb.set_trace()
+
+
+elif 1:
 
     nm=convert2old(model1)
 
