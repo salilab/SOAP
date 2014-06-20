@@ -1351,11 +1351,11 @@ class scaledsp(rawsp):
             rspo=rawsp(model=ns)
             pm=model['pm']
         self.opm=pm
-        if pm.endswith('unsym'):
-            pm=pm[:-5]
-            self.unsym=True
-        else:
-            self.unsym=False
+        #if pm.endswith('unsym'):
+        #    pm=pm[:-5]
+        #    self.unsym=True
+        #else:
+        #    self.unsym=False
         self.pm=pm.replace('+','.')
         if 'i1' in self.pm:
             self.ifl=[0]
@@ -1506,7 +1506,7 @@ class scaledsp(rawsp):
             ma=np.transpose(ma,self.rs1)
         ms=ma.shape   
         if pm!='savema':
-            if not self.unsym:
+            if not self.pm.endswith('unsym'):
                 self.make_symetry(ma)         
             dvdim=1
             for i in range(0,ifpos):
@@ -1556,6 +1556,8 @@ class scaledsp(rawsp):
         return pa[...].reshape(ms)        
    
     def decode_pm(self,pm,ma):
+        if pm.endswith('unsym'):
+            pm=pm[:-5]
         if pm.endswith('i1'):
             pm=pm[:-2]
         if pm.endswith('nolog'):
