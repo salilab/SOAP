@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 Job scheduler (local and on SGE cluster)
-================================
+========================================
 
 .. automodule:: jobSchedule
    :members:

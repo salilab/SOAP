@@ -1,0 +1,2 @@
+Dummy implementations of Python modules that SOAP needs, to allow the docs
+to be built.

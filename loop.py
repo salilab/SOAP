@@ -4,7 +4,9 @@
 """
 from env import *
 from modeller import physical
+from modeller.automodel import loopmodel
 from modeller.schedule import schedule, step
+from modeller.optimizers import actions
 from modeller.optimizers import conjugate_gradients as CG
 from modeller.automodel.autosched import *
 log.none()

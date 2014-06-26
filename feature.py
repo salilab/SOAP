@@ -10,7 +10,7 @@ from env import *
              
 class feature(object):
     """
-    Define the features for calcualting statistics from structures
+    Define the features for calculating statistics from structures
     
     :param str features: the string representation of features.
     

@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 Cross Validation of a model
-================================
+===========================
 
 .. automodule:: crossValidate
    :members:

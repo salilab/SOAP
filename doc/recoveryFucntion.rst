@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 Recovery Functions
-================================
+==================
 
 .. automodule:: recoveryFunction
    :members:

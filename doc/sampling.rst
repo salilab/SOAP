@@ -4,10 +4,7 @@
    contain the root `toctree` directive.
 
 Optimize and sample the parameters in SOAP
-================================
+==========================================
 
 .. automodule:: sampling
-   :members:
-
-.. automodule:: MCMC
    :members:

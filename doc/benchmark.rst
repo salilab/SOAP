@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 Benchmark SOAP's performance using a set of criteria
-================================
+====================================================
 
 .. automodule:: benchmark
    :members:

@@ -1,5 +1,5 @@
 """
-   SOAP benchmark module, calcualting statistics on the scores.
+   SOAP benchmark module, calculating statistics on the scores.
 
 """
 from env import *

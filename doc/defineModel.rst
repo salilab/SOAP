@@ -4,5 +4,5 @@
    contain the root `toctree` directive.
 
 Define statistical potential model and model space 
-================================
+==================================================
 

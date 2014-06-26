@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 Select the best model and generate statistical potentials
-================================
+=========================================================
 
 
 .. automodule:: modelSelection

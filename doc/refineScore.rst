@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 Structure Refinement using SOAP
-================================
+===============================
 
 .. automodule:: refineScores
    :members:

@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 Decoys
-================================
+======
 
 .. automodule:: decoys
    :members:

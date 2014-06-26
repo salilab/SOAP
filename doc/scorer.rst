@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 Combined scores from multiple scoring terms
-================================
+===========================================
 
 .. automodule:: scorer
    :members:

@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 Collection of sequences for known structures or decoys
-================================
+======================================================
 
 .. automodule:: sequences
    :members:

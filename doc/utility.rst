@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 Utility classes and functions
-================================
+=============================
 
 .. automodule:: utility
    :members:
