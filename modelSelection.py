@@ -283,7 +283,7 @@ class spss(object):
 
         * 'type' can be 'dsscore' or 'refinescore' (use SOAP for refine).
         * 'combine' can only be 'scoresum' at the moment.
-        * 'bm' has the same meaning as 'genmethod' :ref:`genmethod`.
+        * 'bm' has the same meaning as :ref:`genmethod <genmethod>`.
 
         Parameters to optimize::
 

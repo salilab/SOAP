@@ -21,7 +21,7 @@ import threading
 
 class SOAPenv(object):
     """This class defines the directory and other enviroment variables for all the other classes.
-    These varialbes needs to be defined::
+    These variables needs to be defined::
 
         self.localHost=''#local server for storing results and tables, and running SOAP
         self.sgeServer=''#for submitting jobs on sge cluster, ssh key authencation needed for passwordless access both way (local host<->server)

@@ -355,13 +355,13 @@ class decoys4single(object):
         Build the decoys4single object from the files in the directory, and copy the built decoys into SGE cluster.
 
         The directory should have the following files:
-            Decoy struture files
+            Decoy structure files
                 * structure pdbs
-                * needtransformation: a base pdb file \*base\* and a transformation file \*res, see :meth:`decoys4single.build_dockingdecoys_withtransformation()`
-                * needattachtobase: a base pdb file \*base\* and files with the remaining parts of decoy structures, the final decoy structure files are assembled on the fly by attaching the decoy file to the base file.
-                * needcombinewithbase: a base pdb file \*base\* and files with the remaining parts of decoy structures. The base file should contains "replacethis" str, which will be replaced by the decoy file on the fly.
+                * needtransformation: a base pdb file *base* and a transformation file *res*, see :meth:`decoys4single.build_dockingdecoys_withtransformation()`
+                * needattachtobase: a base pdb file *base* and files with the remaining parts of decoy structures, the final decoy structure files are assembled on the fly by attaching the decoy file to the base file.
+                * needcombinewithbase: a base pdb file *base* and files with the remaining parts of decoy structures. The base file should contains "replacethis" str, which will be replaced by the decoy file on the fly.
             .. note::
-                Example: \*base\* can be the receptor file shared by all decoys/ligands/peptides
+                Example: *base* can be the receptor file shared by all decoys/ligands/peptides
             rmsd.pickle | rosetta sc file |  a native structure \*native\*, see :meth:`decoys4single.calc_rmsd`
         """
         #pdb.set_trace()
@@ -802,15 +802,17 @@ class decoyset(object):
         """
         Build the decoy set.
 
-        The pre-prepared decoys directory should looks like the following:
-        root:
-            decoySet1: could use the PDB code of the receptor here
-                Decoy files
-                rmsd file
-            .. seealso::
-                :meth:`decoys4single.build`
-            decoySet2
-            ...
+        The pre-prepared decoys directory should look like the following::
+
+          root/
+              decoySet1/ could use the PDB code of the receptor here
+                  Decoy files
+                  rmsd file
+              decoySet2/
+              ...
+
+        .. seealso::
+            :meth:`decoys4single.build`
         """
         dir=self.sourcedir
         self.mkdir()

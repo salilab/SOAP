@@ -392,7 +392,7 @@ class sprefine(object):
                 trace=refineProtocal['trace']
             if 'save' in refineProtocal:
                 saveStructure=refineProtocal['save']
-        #use statistical potential to refine loops/strutures, and analyze the refine results to judge the statistical potential.
+        #use statistical potential to refine loops/structures, and analyze the refine results to judge the statistical potential.
         if spmodel: #needfix???
             if spmodel['scoretype']!='sprefine':
                 raise Exception('You can not call sprefinescore with this type of model, wrong data type')

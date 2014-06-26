@@ -20,8 +20,8 @@ class rawsp(object):
     .. _genmethod:
 
     Example genmethod:
-        * `bs2dsp`: bond separaion 2 with disulfide bond take into consideration
-        * `cs1`: chain speration >=1
+        * `bs2dsp`: bond separation 2 with disulfide bond taken into consideration
+        * `cs1`: chain separation >=1
         * `ss1`: sequence separation >=1
     """
 
@@ -1333,15 +1333,15 @@ class scaledsp(rawsp):
     """Processed statistics table from a set of structures
 
     :param rawsp rspo: class :class:`rawsp` object
-    :param str pm: the method for processing the raw talbe :attr:`scaledsp.rspo`
+    :param str pm: the method for processing the raw table :attr:`scaledsp.rspo`
     :param dict model: the parameters for this class can also be passed by a dict
 
     pm definition::
 
         pm  => [pp[0-9]+,+] ,[(gps|ks)\\number,+] ,npend|npsum
         pp[0-9]+ : add number to raw table
-        (gps|ks)\\number : gaussian process or kernal smoothing with strength \\number.
-        npend|npsum : normalize the count by the last bin or by the sum of the distribution (results in a proper discrete probalistic distribution).
+        (gps|ks)\\number : gaussian process or kernel smoothing with strength \\number.
+        npend|npsum : normalize the count by the last bin or by the sum of the distribution (results in a proper discrete probabilistic distribution).
 
 
     """

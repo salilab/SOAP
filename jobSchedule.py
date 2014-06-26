@@ -429,12 +429,12 @@ class task(object):
 
     def monitor(self):
         """
-        The of task is started on remote SGE cluster, monitored until all tasks finish, after whcih the `afterprocessing` will be called.
+        The task is started on a remote SGE cluster, monitored until all tasks finish, after which `afterprocessing` will be called.
 
-        Some error will be handled automately, but others will casue the program to pause, see :ref:`taskmonitor`
+        Some errors will be handled automatically, but others will cause the program to pause, see :ref:`taskmonitor`
 
         .. note::
-            It is better to wrap the task in a tasklist object and call :method:`tasklist.monitor2end`.
+            It is better to wrap the task in a tasklist object and call :meth:`tasklist.monitor2end`.
 
         """
         try:
