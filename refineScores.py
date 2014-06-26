@@ -1,11 +1,11 @@
 """
-   SOAP RefineScore module 
+   SOAP RefineScore module
 
 """
 
 from env import *
 
-    
+
 class sprefinescore(object):
     """
     Benchmark SOAP based on refinement of structures.
@@ -21,13 +21,13 @@ class sprefinescore(object):
         self.dslist=dslist
         self.criteria=criteria
         self.codelist=decoysets(self.dslist).get_nativelist()
-        
+
     def get_refprotein_list(self):
         pass
-    
+
     def get_ds_part(self):
         pass
-    
+
     def prepare_task_input(self):
         os.chdir(self.dir)
         os.system('rm -r '+self.scorename)
@@ -58,7 +58,7 @@ class sprefinescore(object):
         submdtf=submdtf.replace('undefinedlist','('+' '.join(self.codelist)+')')
         runmdt.write(submdtf)
         runmdt.flush()
-    
+
     def process_task_output(self):
         os.chdir(self.dir+self.scorename)
         self.score=np.zeros(len(self.codelist),dtype=[('codeposn','i2'),('nativetotalscore','f4'),('nativescscore','f4')
@@ -92,14 +92,14 @@ class sprefinescore(object):
         self.prepare_task_input()
         sj=task(self.scorepath+'/',self.scorename)
         sj.run_task_cluster()
-     
+
     def calc_score_cluster(self):
         self.prepare_task_input()
         sj=task(self.scorepath+'/',self.scorename)
         sj.run_task_cluster()
         self.process_task_output()
         self.save()
-        
+
     def calc_score_local(self):
         self.prepare_task_input()
         sj=task(self.scorepath+'/',self.scorename)
@@ -118,44 +118,44 @@ class sprefinescore(object):
             print 0
 
     def mdrefine(self,code,templ=[],samplits=0, step=0):
-	log.verbose()	
-	env = environ()
-	env.io.atom_files_directory = [runenv.ddbdir,'./']
-	env.libs.topology.read(file='$(LIB)/top_heav.lib')
-	env.libs.parameters.read(file='$(LIB)/par.lib')
-	env.edat.contact_shell = 15.0 
-	env.edat.excl_local=(True, True, True, True)
-	env.edat.dynamic_coulomb =  False 
-	env.edat.dynamic_lennard = False 
-	env.edat.dynamic_sphere = False   
-	env.edat.dynamic_modeller = True	
-	aln=alignment(env)
+        log.verbose()
+        env = environ()
+        env.io.atom_files_directory = [runenv.ddbdir,'./']
+        env.libs.topology.read(file='$(LIB)/top_heav.lib')
+        env.libs.parameters.read(file='$(LIB)/par.lib')
+        env.edat.contact_shell = 15.0
+        env.edat.excl_local=(True, True, True, True)
+        env.edat.dynamic_coulomb =  False
+        env.edat.dynamic_lennard = False
+        env.edat.dynamic_sphere = False
+        env.edat.dynamic_modeller = True
+        aln=alignment(env)
         pir( code).make_pir_single_forautomodel()
-	aln.append(file= code+'.pir')
-	mdl=automodel.automodel(env, alnfile=code+'.pir', knowns=code, sequence=code+'.refine.ini')
+        aln.append(file= code+'.pir')
+        mdl=automodel.automodel(env, alnfile=code+'.pir', knowns=code, sequence=code+'.refine.ini')
         mdl.clear_topology()
-	mdl.generate_topology(aln[code+'decoys'],patch_default=True)
-	print "generating topology finished"
-	mdl.patch_ss_templates(aln)
+        mdl.generate_topology(aln[code+'decoys'],patch_default=True)
+        print "generating topology finished"
+        mdl.patch_ss_templates(aln)
         mdl.transfer_xyz(aln, cluster_cut=-1.0)
-	mdl.build(initialize_xyz=False, build_method='INTERNAL_COORDINATES')
+        mdl.build(initialize_xyz=False, build_method='INTERNAL_COORDINATES')
         mdl.write(code+'.refine.native.pdb')
-	atmsel = selection(mdl)
-	rsr = mdl.restraints
-	rsr.clear()
-	#charm restraint
-	rsr.make(atmsel, restraint_type='stereo',spline_on_site=True)
-	gprsr = group_restraints(env, classes='$(LIB)/atmcls-mf.lib', parameters=self.sspname+'.lib')
-	mdl.group_restraints = gprsr
-	# Generate restraints on non standard residues:
-	mdl.nonstd_restraints(aln)	
-	# save restraints
-	mdl.restraints.condense()
-	scoref=open(code+'.refine.score','w')
-	(totalscore,terms) = atmsel.energy()
+        atmsel = selection(mdl)
+        rsr = mdl.restraints
+        rsr.clear()
+        #charm restraint
+        rsr.make(atmsel, restraint_type='stereo',spline_on_site=True)
+        gprsr = group_restraints(env, classes='$(LIB)/atmcls-mf.lib', parameters=self.sspname+'.lib')
+        mdl.group_restraints = gprsr
+        # Generate restraints on non standard residues:
+        mdl.nonstd_restraints(aln)
+        # save restraints
+        mdl.restraints.condense()
+        scoref=open(code+'.refine.score','w')
+        (totalscore,terms) = atmsel.energy()
         stereoscore=terms[physical.bond]+terms[physical.angle]+terms[physical.dihedral]+terms[physical.improper]
-	scoref.write(code+' score: '+str(totalscore)+','+str(stereoscore)+','+str(terms[physical.nonbond_spline])+'\n')
-        timestep=10.0           
+        scoref.write(code+' score: '+str(totalscore)+','+str(stereoscore)+','+str(terms[physical.nonbond_spline])+'\n')
+        timestep=10.0
         equil_its=200
         equil_equil=20
         equil_temps=(150.0, 250.0, 400.0, 700.0, 1000.0,1500.0)
@@ -191,7 +191,7 @@ class sprefinescore(object):
         atmstl=selection(mdl)
         (totalscore,terms) = atmsel.energy()
         stereoscore=terms[physical.bond]+terms[physical.angle]+terms[physical.dihedral]+terms[physical.improper]
-	scoref.write(code+'.refine.pdb score: '+str(totalscore)+','+str(stereoscore)+','+str(terms[physical.nonbond_spline])+'\n')
+        scoref.write(code+'.refine.pdb score: '+str(totalscore)+','+str(stereoscore)+','+str(terms[physical.nonbond_spline])+'\n')
         mdl2=model(env)
         mdl2.read(code)
         r = atmsel.superpose(mdl2, aln)
@@ -203,14 +203,14 @@ class sprefinescore(object):
         m=model(env)
         for mf in mdfilelist:
             m.read(mf)
-            aln.append_model(mdl=m,align_codes=mf[:-4],atom_files=mf[:-4])  
+            aln.append_model(mdl=m,align_codes=mf[:-4],atom_files=mf[:-4])
         aln.malign3d(gap_penalties_3d=(0, 3), fit=False)
         aln.append_model(mdl, align_codes='cluster',
                          atom_files='cluster.opt')
         mdl.transfer_xyz(aln,cluster_cut=cluster_cut)
         mdl.write(file='cluster.ini')
         atmsel=selection(mdl)
-        cg = optimizers.conjugate_gradients()            
+        cg = optimizers.conjugate_gradients()
         cg.optimize(atmsel, max_iterations=5000, output=mdl.optimize_output, min_atom_shift=0.01)
 
 class refinemodel(model):
@@ -224,16 +224,16 @@ class refinemodel(model):
 
     def get_cgschedule(self):
         pass
-    
+
     def get_mdschedule(self):
         pass
-    
+
     def select_atoms(self):
         """Select atoms to be optimized in the model building procedure. By
            default, this selects all atoms, but you can redefine this routine
            to select a subset instead."""
         return selection(self)
-    
+
     def homcsr(self, exit_stage):
         """Construct the initial model and restraints"""
         # Check the alignment
@@ -272,19 +272,19 @@ class refinemodel(model):
         # Special restraints have to be called last so that possible cis-proline
         # changes are reflected in the current restraints:
         self.special_restraints(aln)
-        
+
     def make_initial_model(self, aln):
         """Make initial model topology and build/read the atom coordinates"""
         self.generate_method(self, aln)
         self.write(file=self.inifile)
-        self._check_model_hetatm_water()    
+        self._check_model_hetatm_water()
 
     def randomize_initial_structure(self, atmsel):
         """Get and randomize the initial structure"""
         self.read_initial_model()
         if self.rand_method:
             self.rand_method(atmsel)
-    
+
     def single_model(self, atmsel, num, parallel=False):
         """Build a single optimized model from the initial model"""
         self.tracefile = self.new_trace_file(num)
@@ -307,7 +307,7 @@ older versions of Modeller""")
         fh = open(self.schfile, "w")
         sched.write(fh)
         fh.close()
-                
+
     def single_model_pass(self, atmsel, num, sched):
         """Perform a single pass of model optimization"""
         actions = self.get_optimize_actions()
@@ -360,4 +360,3 @@ older versions of Modeller""")
             casel = selection(self)
             casel.superpose(mdl2, aln)
             modfile.delete('TO_BE_REFINED.TMP')
- 

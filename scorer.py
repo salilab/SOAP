@@ -7,12 +7,12 @@ from rankScores import *
 from benchmark import dsscorestats
 from refineScores import *
 from loop import sprefine
-        
+
 class scorer(object):
     """
     Calculate benchmark score/value given a model
     """
-    
+
     def __init__(self,model=[]):
         self.bmtype=model['bmtype']
         self.model=model
@@ -24,11 +24,11 @@ class scorer(object):
         self.searchlists=[]
         self.searchlistspos=[0]
         self.clean=True
-        self.searchscorerlist=[[] for i in range(len(self.model['searches']))]# the index of the scorers affected by the searches        
+        self.searchscorerlist=[[] for i in range(len(self.model['searches']))]# the index of the scorers affected by the searches
         self.scorersearchlist=[[] for i in range(len(self.model['scorers']))]
         if len(self.bmtype['dslist'])>0:
-            self.initialize_stats()        
-            self.initialize_searches()        
+            self.initialize_stats()
+            self.initialize_searches()
             self.initialize_scores()
             self.loadfilter=None # filters to apply when loading data
             self.blockind=-999# no block update
@@ -85,14 +85,14 @@ class scorer(object):
                     proparr=self.dsss.ds.sa[propname][spos[0]:spos[1]]
                     cfa=np.zeros(spos[1]-spos[0],dtype=np.bool)
                     cfa[proparr>lb]=1
-                    safilter[spos[0]:spos[1]]=np.logical_and(cfa, safilter[spos[0]:spos[1]])                
+                    safilter[spos[0]:spos[1]]=np.logical_and(cfa, safilter[spos[0]:spos[1]])
             elif filter['criteria'].startswith('rep'):
                 tn=int(filter['criteria'][3:])+1
                 for spos in self.dsss.ds.indexlist:
                     ai=np.linspace(0,spos[1]-spos[0],tn).astype(np.int)[:-1]
                     cfa=np.zeros(spos[1]-spos[0],dtype=np.bool)
                     cfa[ai]=1
-                    safilter[spos[0]:spos[1]]=np.logical_and(cfa, safilter[spos[0]:spos[1]])                
+                    safilter[spos[0]:spos[1]]=np.logical_and(cfa, safilter[spos[0]:spos[1]])
             elif filter['criteria']=='has':
                 cd=filter['criteriadict']
                 for spos in self.dsss.ds.indexlist:
@@ -128,7 +128,7 @@ class scorer(object):
         self.basescore=self.scorearray[-1,:]
         k=-1
         for i in range(len(self.scorerlist)):
-            st=self.scorertype[i]            
+            st=self.scorertype[i]
             if st==0:
                 continue
             else:
@@ -140,13 +140,13 @@ class scorer(object):
                         self.scorerlist[i].filter(fa, self.scorearray[k,:])
                     elif self.model['scorers'][i]['type']=='scaledsp':
                         pass
-                    
+
     def relink_scorearray(self):
         #relink the score arrays
         self.basescore=self.scorearray[-1,:]
         k=-1
         for i in range(len(self.scorerlist)):
-            st=self.scorertype[i]            
+            st=self.scorertype[i]
             if st==0:
                 continue
             else:
@@ -157,7 +157,7 @@ class scorer(object):
                     if self.model['scorers'][i]['type']=='sf':
                         self.scorerlist[i].score=self.scorearray[k,:]
                     elif self.model['scorers'][i]['type']=='scaledsp':
-                        pass        
+                        pass
 
     def initialize_stats(self):
         #initialize the scorestats object that can be used to analyze score, and give the performance of the score
@@ -250,7 +250,7 @@ class scorer(object):
             self.basescore=nna[-1,:]
             self.scorearray=nna
             self.ratioarray=np.ones(td+1,dtype=np.float32)
-                         
+
     def initialize_searches(self):
         #Initialize the scores need to be searched...
         if not 'searches' in self.model:
@@ -269,7 +269,7 @@ class scorer(object):
                 sl+=len(slist)
                 self.searchlistspos.append(sl+self.searchlistspos[-1]) # the index of the list values in self.parvalues
         self.parvalues=np.zeros(self.searchlistspos[-1])
- 
+
     def find_scorersearch_cluster(self):
         self.searchblocklist=[]
         csi=0
@@ -297,7 +297,7 @@ class scorer(object):
                 raise Exception('searching block is not continuous???????')
             self.searchblocklist.append([searches,scorers,[self.searchlistspos[min(searches)],self.searchlistspos[max(searches)+1]]])
             csi=max(searches)+1
-                        
+
     def get_dsscore(self,scorer):
         if scorer['type']=='scaledsp':
             return self.get_spdsscore(scorer).get_score()
@@ -311,9 +311,9 @@ class scorer(object):
                 sc['bm']=self.bmtype['bm']
             score=sfdsscore(dslist=self.bmtype['dslist'],**sc).get_score()
             return score
-            
+
     def get_spdsscore(self, scorer):
-        sc=copy.deepcopy(scorer)        
+        sc=copy.deepcopy(scorer)
         if 'bm' in sc:
             bmt=sc['bm']
         else:
@@ -322,7 +322,7 @@ class scorer(object):
         ssp=scaledsp(pm=scorer['pm'],rspo=rsp)
         sspscore=spdsscore(dslist=self.bmtype['dslist'],bm=bmt,ssp=ssp)
         return sspscore
-       
+
     def get_sf(self,parlist=[]):
         raise Exception('scorer.get_sf Not working yet')
         sf=[]
@@ -412,7 +412,7 @@ class scorer(object):
             #self.write_potential(type='lib')
             #self.sprefiner.refpot=[self.atomclasslib,self.potlib]
             return -self.sprefiner.assess()
-    
+
     def assess(self,values=[],pos=[],report='single',slevel=''):
         """
         Assess the model based on the given values.
@@ -427,12 +427,12 @@ class scorer(object):
                 print e
                 pdb.set_trace()
         else:
-            if not self.parvalues.flags['WRITEABLE']: 
+            if not self.parvalues.flags['WRITEABLE']:
                 self.parvalues=np.copy(self.parvalues)
             self.parvalues[pos]=values
         self.assign_values2model()
         # do parallel jobs if specified, otherwise do single job
-        #pdb.set_trace()        
+        #pdb.set_trace()
         if report=='single' and runenv.numofthread>0:
             for singlescorer in self.singlescorerlist:
                 runenv.queue.put([singlescorer.assess_model,[report, slevel]])
@@ -443,7 +443,7 @@ class scorer(object):
             if len(self.singlescorerlist)==0:
                 return 0
             else:
-                return scoresum/len(self.singlescorerlist)        
+                return scoresum/len(self.singlescorerlist)
         else:
             return self.assess_model(report,slevel)
 
@@ -464,12 +464,12 @@ class scorer(object):
             scoresum=0
             for singlescorer in self.singlescorerlist:
                 scoresum+=singlescorer.result
-            result=scoresum/len(self.singlescorerlist)        
+            result=scoresum/len(self.singlescorerlist)
         else:
-            result=self.assess_model(report,slevel)        
+            result=self.assess_model(report,slevel)
         self.blockind=-999
         return result
-        
+
     def assign_values2model(self):
         if self.blockind>=0:
             print "block# "+str(self.blockind)
@@ -511,7 +511,7 @@ class scorer(object):
             return noplist
         elif self.bmtype['type']=='sprefine':
             raise Exception('Not implemented yet, scorer.get_ds_list')
-    
+
     def assess_basescore(self,report='single',slevel=''):
         if self.bmtype['type']=='dsscore':
             if not slevel:
@@ -524,7 +524,7 @@ class scorer(object):
         #self.assess(par)
         nm=copy.deepcopy(self.model)
         return nm
-    
+
     def write_potential(self,filetype='hdf5',affix='opt',permute=False):
         atompairclustering=False
         decomposition=False
@@ -546,7 +546,7 @@ class scorer(object):
                 decomposition=True
                 reflist=[]
                 rer=re.search('svd([0-9]',spmodel['bm'])
-                svdilist.append(rer.group(1))                
+                svdilist.append(rer.group(1))
             ref=np.array(0)
             if len(spmodel['refs'])==0:
                 pdb.set_trace()
@@ -599,7 +599,7 @@ class scorer(object):
             res=self.dsss.analyze_score(slevel=slevel,score=self.dsss.ds.sa['score'],report=report)
             print res
             return res
-        
+
     def randomize_score(self):
         poslist=self.dsss.ds.indexlist
         for i in range(0,len(poslist)):
@@ -608,7 +608,7 @@ class scorer(object):
     def assess_randomized_score(self,report='single',slevel=''):
         if self.bmtype['type']=='dsscore':
             if not slevel:
-                slevel=self.bmtype['criteria']            
+                slevel=self.bmtype['criteria']
             res=0
             for i in range(0,100):
                 self.randomize_score()
@@ -624,13 +624,13 @@ class scorer(object):
                 elif report=='full':
                     return [0,'empty']
             if not slevel:
-                slevel=self.bmtype['criteria']    
+                slevel=self.bmtype['criteria']
             self.dsss.getidealvalue=True
             res=self.dsss.analyze_score(slevel=slevel,score=self.dsss.ds.sa['score'],report=report)
             self.dsss.getidealvalue=False
             print res
             return res
-        
+
     def assess_worst(self,report='single',slevel=''):
         if self.bmtype['type']=='dsscore':
             if len(self.dsss.ds.indexlist)==0:
@@ -639,7 +639,7 @@ class scorer(object):
                 elif report=='full':
                     return [0,'empty']
             if not slevel:
-                slevel=self.bmtype['criteria']    
+                slevel=self.bmtype['criteria']
             self.dsss.getworstvalue=True
             res=self.dsss.analyze_score(slevel=slevel,score=self.dsss.ds.sa['score'],report=report)
             self.dsss.getworstvalue=False
@@ -664,7 +664,7 @@ class scorer(object):
         fh.write('\n'.join(scorestr))
         fh.close()
         return score
-        
+
     def calc_structurescore(self,structurepath):
         #Loop through the scorers and calculated score using the routinue for calculating scores from a single alignment file
         os.chdir(structurepath)
@@ -672,7 +672,7 @@ class scorer(object):
         fl=[f for f in fl if not (f.endswith('hdf5') or f.endswith('pickle') or f=='pdbs0')]
         fl=[f for f in fl if f.endswith('pdb')]
         self.calc_structurelistscore(structurepath,fl)
-  
+
     def calc_structurescore_singlescorer(self,scorer,structurepath):
         #Use the routinue for calculating scores from a single alignment file
         if 'bm' in scorer and re.search('ap[0-9]{1,3}n[0-9]{1,3}',scorer['bm']):
@@ -698,7 +698,7 @@ class scorer(object):
                 scorer['dslist']=self.bmtype['dslist']
                 spdss=spdsscore(model=scorer)
                 os.chdir(structurepath)
-                spdss.calc_score(0,reportstatus=False)                
+                spdss.calc_score(0,reportstatus=False)
                 finalscore=spdss.read_singlescorefile('0.score')
         elif scorer['type']=='sf':
             sc=copy.deepcopy(scorer)
@@ -739,4 +739,3 @@ class scorer(object):
                     plt.plot(np.exp(so.get_sf()))
                 elif search['object']['type']=='scaledsp':
                     pass
-              

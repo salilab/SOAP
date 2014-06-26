@@ -82,7 +82,7 @@ def get_sidechainatom_index():
         else:
             na[i]=1 #sidechain
     return na
-                    
+
 def get_ph(code):
     bdir='/salilab/park2/database/pdb/divided/'
     fh=gzip.open(bdir+code[1:3]+'/pdb'+code[0:4]+'.ent.gz')
@@ -110,7 +110,7 @@ def float2int(tbca):
     return na
 
 def metalions():
-    return ['K' , 'Y' , 'ZN', 'CD', 'PA', 'GD', 'PR', 'NA', 'MO', 'RB' ,'YB'   , 'MN'   , 'RE'  , 'HO'   , 'AU'   , 'PU'   , 'AL'   , 'BE'   , 'IR'   , 'PT' ,'FE'   , 'CA'   , 'AG'   , 'CM'   , 'HG'   , 'SI'   , 'CO'   , 'SR'   ,'MG'   , 'PB' ,'GA'   , 'SM'   , 'BA'   , 'CU'   , 'NI'   , 'TE'   , 'CR'   , 'TB'   , 'PD'   , 'OS' ,'EU'   , 'W'   , 'B'   , 'TL'   , 'LI'   , 'U'   , 'V'   , 'RU'   , 'AS'   , 'LU' ,'CS' ]    
+    return ['K' , 'Y' , 'ZN', 'CD', 'PA', 'GD', 'PR', 'NA', 'MO', 'RB' ,'YB'   , 'MN'   , 'RE'  , 'HO'   , 'AU'   , 'PU'   , 'AL'   , 'BE'   , 'IR'   , 'PT' ,'FE'   , 'CA'   , 'AG'   , 'CM'   , 'HG'   , 'SI'   , 'CO'   , 'SR'   ,'MG'   , 'PB' ,'GA'   , 'SM'   , 'BA'   , 'CU'   , 'NI'   , 'TE'   , 'CR'   , 'TB'   , 'PD'   , 'OS' ,'EU'   , 'W'   , 'B'   , 'TL'   , 'LI'   , 'U'   , 'V'   , 'RU'   , 'AS'   , 'LU' ,'CS' ]
 
 def isfirstlowest(array1):
     al=len(array1)
@@ -143,7 +143,7 @@ def filter_lib(atomtype='CA',ofp='atmcls-mf.lib',ffp='caatm.lib'):
     nls='ATMGRP'+'ATMGRP'.join(nfcl)
     fh.write(nls)
     fh.close()
-    
+
 def extendsum(array1,array2):
     ref=array1
     reft=array2
@@ -162,11 +162,11 @@ def read_bndgrp(libpath=''):
 class bndsep(object):
     def __init__(self):
         self.load_bndsepdict()
-        
+
     def load_bndsepdict(self):
         fh=open(runenv.libdir+'bndsep.pickle')
         self.bndsepdict=pickle.load(fh)
-    
+
     def get_bndsep(self,atm1n,atm2n,res1, res2,ss):
         if ss<0:
             ss=-ss
@@ -182,7 +182,7 @@ class bndsep(object):
             bs=self.bndsepdict[res1][atm1n+'C']
             bs=bs+(ss-1)*3+self.bndsepdict[res2][atm2n+'N']+1
             return bs
-    
+
 class mypickle(object):
     """ this class will save the numpy array seperately when pickling the object to speed up performance and avoid pickle problems with large array, /////old version: only works when the numpy array is a varialbe of an object. WILL NOT WORK if you have a list of numpy arrays.
     """
@@ -194,7 +194,7 @@ class mypickle(object):
         self.arraysize=0
         self.indexlen=0
         self.indexlist=[]
-    
+
     def dump(self,obj,nameprefix):
         self.arraysize=0
         self.dumpnparray(obj,nameprefix)
@@ -204,7 +204,7 @@ class mypickle(object):
         print "dump finished"
         self.get_array_size(nameprefix)
         return self.arraysize
-        
+
     def dumpnparray(self,obj,nameprefix):
         #print "checking object "+obj.__repr__
         if isinstance(obj,list) or isinstance(obj,tuple):
@@ -214,10 +214,10 @@ class mypickle(object):
         elif isinstance(obj,dict):
             if len(obj)>3000:
                 return 0
-            self.dumpkeys(obj,obj.keys(),nameprefix)          
+            self.dumpkeys(obj,obj.keys(),nameprefix)
         elif '__dict__' in dir(obj) and str(type(obj)).startswith('<class'):
             self.dumpkeys(obj.__dict__,obj.__dict__.keys(),nameprefix)
-        
+
     def dumpkeys(self,od,keys,nameprefix):
         if id(od) in self.classidlist:
             return 0
@@ -234,7 +234,7 @@ class mypickle(object):
                 self.savesinglearray(od,key,nameprefix)
             else:
                 self.dumpnparray(item,nameprefix)
-                
+
     def savesinglearray(self,obj,key,nameprefix):
         dtype=obj[key].dtype
         if not obj[key].flags['OWNDATA']:
@@ -253,7 +253,7 @@ class mypickle(object):
             self.npyobjidlist.append(id(obj[key]))
         obj[key]=savednpy(nameprefix+str(cid))
         obj[key].dtype=dtype
-                
+
     def loadnparray(self,obj):
         if isinstance(obj,list) or isinstance(obj,tuple):
             if len(obj)>1000:
@@ -276,7 +276,7 @@ class mypickle(object):
                 self.loadsinglearray(od,key)
             else:
                 self.loadnparray(item)
-                
+
     def loadsinglearray(self,obj,key):
         sao=obj[key]
         if sao.name in self.npyobjnamelist:
@@ -297,7 +297,7 @@ class mypickle(object):
             self.npyobjlist.append(na)
             ind=len(self.npyobjlist)-1
         obj[key]=self.npyobjlist[ind]
-                
+
     def load_part_indexlist(self,tf,dtype):
         nindexlist=squeeze_indexlist(self.indexlist)
         if tf['na'].shape[0]==self.indexlen:
@@ -313,7 +313,7 @@ class mypickle(object):
         else:
             raise Exception('can not load_part_index in mypickle')
         return na
-                
+
     def load(self,nameprefix):
         print "loading pickle file"
         name=nameprefix if nameprefix.endswith('.pickle') else nameprefix+'.pickle'
@@ -327,13 +327,13 @@ class mypickle(object):
         self.loadnparray(obj)
         print "load finished"
         return obj
-    
+
     def loadpickleonly(self,nameprefix):
         fh=open(nameprefix+'.pickle','rb')
         obj=pickle.load(fh)
         fh.close()
         return obj
-    
+
     def get_array_size(self,nameprefix):
         fl=os.listdir('./')
         fl=[item for item in fl if item.startswith(nameprefix) and item.endswith('pickle')]
@@ -351,7 +351,7 @@ def calc_zscore(sl):
     std=np.std(sl)
     mean=np.mean(sl)
     return (sl-mean)/std
-    
+
 def decode_genmethod(genmethod):
     """
     Decode genmethod str
@@ -359,12 +359,12 @@ def decode_genmethod(genmethod):
     csmin=0
     csmax=99
     if re.search('cs([0-1]+)',genmethod):
-         errsre=re.search('cs([0-1]+)',genmethod)
-         csv=int(errsre.group(1))
-         if csv==0:
-             csmax=0
-         elif csv==1:
-             csmin=1
+        errsre=re.search('cs([0-1]+)',genmethod)
+        csv=int(errsre.group(1))
+        if csv==0:
+            csmax=0
+        elif csv==1:
+            csmin=1
     bs=-1
     bsm=-1
     if re.search('bs([0-9]+)',genmethod):
@@ -415,7 +415,7 @@ def check_remote_file_exist(rs,rd,rfl):
             else:
                 nefl.append(f)
     return efl,nefl
-    
+
 def list2array(tl):
     #This only works if all the element of list have the same length except the most inner list.
     ldim=[]
@@ -440,7 +440,7 @@ def list2array(tl):
     npa=np.zeros(ldim)
     list2array_recursive(lastflat,[],tl,npa)
     return npa.squeeze()
-         
+
 def list2array_recursive(lastflat,cil,cl0,npa):
     if not isinstance(cl0[0],list):
         for i in range(0,len(cl0)):
@@ -461,7 +461,7 @@ def list2array_recursive(lastflat,cil,cl0,npa):
             ncil=copy.deepcopy(cil)
             ncil.append(i)
             list2array_recursive(lastflat,ncil,cl0[i],npa)
-             
+
 
 def make_tmpdir():
     rp='/scratch/gqd'+str(time.time())
@@ -470,7 +470,7 @@ def make_tmpdir():
         rp='/scratch/gqd'+str(time.time())
     os.mkdir(rp)
     return rp+'/'
-        
+
 def get_scaledhsv_colormap_inverted(cscale=0.1):
     cscale=0.1/0.84127
     cdict= {'blue': ((0.0, 0.0, 0.0),
@@ -485,7 +485,7 @@ def get_scaledhsv_colormap_inverted(cscale=0.1):
                     (0.507937*cscale, 1.0, 1.0),
                     (0.666667*cscale, 0.0625, 0.0625),
                     (0.68254*cscale, 0.0, 0.0),
-                    (0.84127*cscale, 0.0, 0.5),                        
+                    (0.84127*cscale, 0.0, 0.5),
                     (1.0, 0.5, 0.5)),
             'red': ((0.0, 1.0, 1.0),
                     (0.15873*cscale, 1.0, 1.0),
@@ -498,7 +498,7 @@ def get_scaledhsv_colormap_inverted(cscale=0.1):
                     (1.0, 0.5, 0.5))}
     my_cmap = matplotlib.colors.LinearSegmentedColormap('my_colormap',cdict,256)
     return my_cmap
-        
+
 def get_scaledhsv_colormap(cscale=0.1):
     s=cscale/(1-0.31745999999999996)
     b=(1-cscale-0.31745999999999996)/(1-0.31745999999999996)
@@ -524,7 +524,7 @@ def get_scaledhsv_colormap(cscale=0.1):
                     (s*0.84127+b, 1.0, 1.0),
                     (1.0, 1.0, 1.0)]}
     my_cmap = matplotlib.colors.LinearSegmentedColormap('my_colormap',cdict,256)
-    return my_cmap        
+    return my_cmap
 
 def convert2ndarray(values):
     if isinstance(values, np.ndarray):
@@ -538,7 +538,7 @@ def convert2ndarray(values):
             return np.array(values)
         except:
             raise Exception('Don\'t know how to convert '+str(values)+' to numpy array')
-            
+
 def dummy(*args):
     pass
 
@@ -566,7 +566,7 @@ def any2str(anything):
     else:
         pdb.set_trace()
         raise Exception('Donot how to convert anything to string: '+str(anything))
-        
+
 def build_scorer(scorerpath='./'):
     os.chdir(scorerpath)
     fh=open(scorerpath+'bestmodel.pickle')
@@ -577,17 +577,17 @@ def build_scorer(scorerpath='./'):
             ssp=scaledsp(model=scorer)
             print os.system('ln -s '+ssp.ssppath+'.hdf5 '+ssp.sspname+'.hdf5')
     print os.system('cp ~/Dropbox/Code/calc_score.py ./')
-    
 
 
-    
+
+
 def sameobjectIn2list(list1,list2):
     for item1 in list1:
         for item2 in list2:
             if item1 is item2:
                 return True
     return False
-    
+
 def findsameobjectkeys(d,list2):
     # find the keys in d, whose values are the same objects in list2
     kl=[]
@@ -600,16 +600,16 @@ def findsameobjectkeys(d,list2):
                 kl.append(key)
                 il.append(i)
     return [kl,il]
-    
+
 def convert2float(l):
     for i in range(len(l)):
         l[i]=float(l[i])
-        
+
 def checknodememory(taskid):
     fl=os.listdir('./')
     fl=[f for f in fl if f.startswith('s.'+str(taskid))]
     runsonsamenode
-    
+
 def get_system_freemem():
     process = subprocess.Popen("free -m | grep buffers/cache",
                                         shell=True,
@@ -617,7 +617,7 @@ def get_system_freemem():
                                         )
     result = process.communicate()[0].split()[3]
     return float(result)
-    
+
 def get_starting_jobs():
     fl=os.listdir(runenv.serverUserPath+'runstatus/')
     fl=[f for f in fl if f.startswith(hcn+'#')]
@@ -655,7 +655,7 @@ def load_scorer(originalscorer,indexlen):
 
 class Mymodel(model):
     """
-    Modeller model class with customized functions. 
+    Modeller model class with customized functions.
     """
     def select_loop_atoms(self,loops):
         s=selection()
@@ -665,7 +665,7 @@ class Mymodel(model):
             for loop in loops:
                 self.add_loop2selection(loop,s)
         return s
-   
+
     def add_loop2selection(self,loop,s):
         if loop[0]=='':
             loop[0]=self.chains[0].name
@@ -673,8 +673,8 @@ class Mymodel(model):
             s.add(selection(self.residue_range(str(loop[2])+':'+loop[0],str(loop[3])+':'+loop[0])))
         except:
             lind=self.residues[str(loop[2])+':'+loop[0]].index
-            s.add(selection(self.residues[lind:(lind+loop[1])]))    
-    
+            s.add(selection(self.residues[lind:(lind+loop[1])]))
+
     def load_model_file(self,nativef):
         if nativef[-2:]=='gz':
             fh=gzip.open(nativef)
@@ -685,7 +685,7 @@ class Mymodel(model):
         self.atomlines=re.findall('\\n(ATOM.*)','\n'+fhc+'\n')
         self.hetatomlines=re.findall('\\n(HETATM.*)','\n'+fhc+'\n')
         self.gen_atomlist()
-        
+
     def gen_atomlist(self):#[chainname,residue number,residue name,atom name, alternative indicator, x,y,x,occupancy, B-factor, elem symbol, charge,index]
         self.atomlist=[]
         k=-1
@@ -701,7 +701,7 @@ class Mymodel(model):
         for atompars in self.atomlist:
             newatomlines.append(self.atomlines[atompars[-1]])
         self.atomlines=newatomlines
-    
+
     def gen_chainlist(self): #get the chain name and pos [chain name, chainstartpos,chainendpos, [[residuename,residue num, residue startpos, residue endpos]...]]
         currentchain=''
         chainlist=[]
@@ -731,7 +731,7 @@ class Mymodel(model):
             traceback.print_exc()
             pdb.set_trace()
         self.chainlist=chainlist
-                
+
     def gen_atomindexdict(self):
         atomindexdict={}
         for k in range(0,len(self.atomlist)):
@@ -739,7 +739,7 @@ class Mymodel(model):
             atomid=atompars[0]+str(atompars[1])+atompars[2]+atompars[3]
             atomindexdict[atompars[0]+str(atompars[1])+atompars[2]+atompars[3]]=k
         self.atomindexdict=atomindexdict
-            
+
     def only_std_residue_heavy_atom(self):
         resatoms=get_residues_atoms()
         atomlines=[]
@@ -751,7 +751,7 @@ class Mymodel(model):
         self.gen_atomlist()
         self.gen_chainlist()
         self.gen_atomindexdict()
-    
+
     def transfer_model_atoms(self,mdl2):
         self.gen_atomindexdict()
         mdl2.gen_atomindexdict()
@@ -761,7 +761,7 @@ class Mymodel(model):
                 self.atomlines[self.atomindexdict[key]]=self.atomlines[self.atomindexdict[key]][0:11]+mdl2.atomlines[mdl2.atomindexdict[key]][11:]
             except:
                 pdb.set_trace()
-        
+
     def transfer_residues(self, mdl2,chain, residuerange):
         #copy coordinates in the residuerange from mdl2 to current model
         selfstartpos=self.get_residue_index(chain,residuerange[0])[2]
@@ -770,12 +770,12 @@ class Mymodel(model):
         mdl2endpos=mdl2.get_residue_index(chain,residuerange[1])[3]
         self.atomlines[selfstartpos:selfendpos+1]=mdl2.atomlines[mdl2startpos:mdl2endpos+1]
         self.gen_atomlist()
-        
+
     def save_model(self,filename):
         fh=open(filename,'w')
         fh.write('\n'.join(self.atomlines))
         fh.close()
-    
+
     def get_residue_index(self,chainid,residuenum):
         for item in self.chainlist:
             if item[0]!=chainid:
@@ -796,12 +796,12 @@ class Mymodel(model):
         os.mkdir('clashtemp'+code)
         os.chdir('clashtemp'+code)
         self.copy_native(code,'./')
-        print os.system('cp ~/Dropbox/Code/crystal_contacts.py ./')    
+        print os.system('cp ~/Dropbox/Code/crystal_contacts.py ./')
 
         ssh = subprocess.Popen(['chimera','--nogui', 'crystal_contacts.py'],
            shell=False,
            stdout=subprocess.PIPE)
-        
+
         for i in range(1200):
             ssh.poll()
             if ssh.returncode is None:
@@ -828,7 +828,7 @@ class Mymodel(model):
             clashlist.append([[item[0],item[3],item[2],item[1],item[4]],[item[5],item[8],item[7],item[6],item[9]],item[10],item[11]])
         contactlist=[]
         for item in allcontacts:
-            contactlist.append([[item[0],item[3],item[2],item[1],item[4]],[item[5],item[8],item[7],item[6],item[9]],item[10],item[11]]) 
+            contactlist.append([[item[0],item[3],item[2],item[1],item[4]],[item[5],item[8],item[7],item[6],item[9]],item[10],item[11]])
         os.chdir('..')
         print os.system('rm -r clashtemp'+code)
         return clashlist,contactlist
@@ -842,10 +842,10 @@ class Mymodel(model):
                 lind=self.residues[str(loop[2])+':'+loop[0]].index
                 s.add(selection(self.residues[lind:(lind+loop[1])]))
         return s
-    
+
     def get_residues(self,loops):
         return [loop[0]+str(lnum) for loop in loops for lnum in range(loop[2],loop[3]+1)]
-    
+
     def has_nonstd(self,loops):
         s=self.select(loops)
         l=self.get_residues(loops)
@@ -866,7 +866,7 @@ class Mymodel(model):
                 print 'clash with '+','.join(item)+'  '
                 rl.append('clash with '+','.join(item)+'  ')
         return rl
-     
+
     def gen_base_file(self,chain,residuerange,basefilename,othername):
         selfstartpos=self.get_residue_index(chain,residuerange[0])[2]
         selfendpos=self.get_residue_index(chain,residuerange[1])[3]
@@ -878,7 +878,7 @@ class Mymodel(model):
         self.atomlines=otheratomlines
         self.save_model(othername)
         self.gen_atomlist()
-        
+
     def get_part(self,chain,residuerange):
         selfstartpos=self.get_residue_index(chain,residuerange[0])[2]
         selfendpos=self.get_residue_index(chain,residuerange[1])[3]
@@ -900,11 +900,11 @@ class MemoryMonitor(object):
                                         shell=True,
                                         stdout=subprocess.PIPE,
                                         )
-        
+
         self.mm = self.process.communicate()[0].split('\n')[0].split()[5]
         print self.mm
         return int(self.mm)
-        
+
     def monitor(self,name,fn='mlog'):
         fh=open(fn,'a+')
         mu=11
@@ -915,7 +915,7 @@ class MemoryMonitor(object):
             time.sleep(5)
             fh.flush()
         fh.close()
-        
+
 def load_log(path):
     from collections import defaultdict
     from operator import itemgetter
@@ -929,7 +929,7 @@ def load_log(path):
             for l in ll:
                 if re.match('-[1-9]+.*',l) and (l.split()[0],l.split('0.000  ')[-1]) not in logs:
                     logs.append((l.split()[0],l.split('0.000  ')[-1]))
-                    
+
                     #ld[l.split()[0]].append(l)
     logs.sort(key=itemgetter(0),reverse=True)
     #for key in ld:
@@ -939,4 +939,3 @@ def load_log(path):
     for l in logs:
         print '    '.join(l)
     return None
-

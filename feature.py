@@ -6,31 +6,31 @@
 import mdt
 import mdt.features
 from env import *
-         
-             
+
+
 class feature(object):
     """
     Define the features for calculating statistics from structures
-    
+
     :param str features: the string representation of features.
-    
+
     Feature definition mini language::
-      
+
         features => feature [,features]
         feature  => type, number of bins, #, range, [,#, start value] #start value will be zero if not defined
-    
-    Example::
-        
-        features='d30#15'# 0-30A, 0.5 bin size    
-            
-    
-    Types are from MDT:
-    
-    .. literalinclude:: ../feature.py 
-       :pyobject: feature._gen_single_feature
-        
 
-        
+    Example::
+
+        features='d30#15'# 0-30A, 0.5 bin size
+
+
+    Types are from MDT:
+
+    .. literalinclude:: ../feature.py
+       :pyobject: feature._gen_single_feature
+
+
+
     """
     def __init__(self,features,mlib=None):#mlib does not need to be supplied anymore
         self.features=features
@@ -67,13 +67,13 @@ class feature(object):
             env = runenv.env
             #log.minimal()
             self.mlib=mdt.Library(env)
-      
+
     def _genfeaturelist(self):
         self.read_lib()
         for f,r,d,s in zip(self.fclist,self.frlist,self.fdlist,self.fslist):
             self.featurelist.append(self._gen_single_feature(f,r,d,s))
         return self.featurelist
-        
+
     def _gen_single_feature(self,sfc,end,numofbin,start):
         mlib=self.mlib
         if end > 0:
@@ -85,7 +85,7 @@ class feature(object):
         elif sfc=='bs2':
             return mdt.features.FractionalAtomAccessibility(mlib,pos2=True, bins=mdt.uniform_bins(1, 0,0.1)+mdt.uniform_bins(1, 0.1,0.9))
         elif sfc[0:1]=='a':
-            return mdt.features.AtomType(mlib)        
+            return mdt.features.AtomType(mlib)
         elif sfc[0:2]=='rs':
             return mdt.features.ResidueType(mlib,delta=numofbin, pos2=True)
         elif sfc[0:1]=='r':
@@ -93,9 +93,9 @@ class feature(object):
         elif sfc in ['dr']:
             return mdt.features.ResidueDistance(mlib, bins=ub)
         elif sfc[0:1]=='m':
-            return mdt.features.MainchainConformation(mlib)  
+            return mdt.features.MainchainConformation(mlib)
         elif sfc[0:2]=='ms':
-            return mdt.features.MainchainConformation(mlib,pos2=True)  
+            return mdt.features.MainchainConformation(mlib,pos2=True)
         elif sfc[0:2]=='ca':
             return mdt.features.AngleType(mlib)
         elif sfc[0:2]=='cb':
@@ -111,7 +111,7 @@ class feature(object):
         elif sfc[0:2]=='ps':
             return mdt.features.PsiDihedral(mlib,bins=ub)
         elif sfc[0:2]=='ph':
-            return mdt.features.PhiDihedral(mlib,bins=ub)        
+            return mdt.features.PhiDihedral(mlib,bins=ub)
         elif sfc in ['d','dca','dmc','dsc','dl']:
             return mdt.features.AtomDistance(mlib,bins=ub)
         elif sfc=='l':
@@ -119,11 +119,11 @@ class feature(object):
         elif sfc=='b':
             return mdt.features.FractionalAtomAccessibility(mlib,bins=ub)
         elif sfc=='bs':
-            return mdt.features.FractionalAtomAccessibility(mlib,bins=ub,pos2=True)               
+            return mdt.features.FractionalAtomAccessibility(mlib,bins=ub,pos2=True)
         elif sfc=='ba30':
             return mdt.features.AtomAccessibility(mlib,bins=mdt.uniform_bins(30, 0, 0.5))
         elif sfc=='bas30':
-            return mdt.features.AtomAccessibility(mlib,bins=mdt.uniform_bins(30, 0, 0.5),pos2=True)    
+            return mdt.features.AtomAccessibility(mlib,bins=mdt.uniform_bins(30, 0, 0.5),pos2=True)
         elif sfc=='s2':
             return mdt.features.ResidueIndexDifference(mlib, bins=mdt.uniform_bins(1, -1,1)+mdt.uniform_bins(1, 1,1), absolute=False)
         elif sfc=='s33':
@@ -136,13 +136,13 @@ class feature(object):
             return mdt.features.TupleAngle2(mlib,bins=ub)
         elif sfc=='h':
             return mdt.features.TupleDihedral1(mlib,bins=ub)
-        elif sfc[0]=='t':            
+        elif sfc[0]=='t':
             return mdt.features.TupleType(mlib)
         elif sfc[:2]=='ts':
             return mdt.features.TupleType(mlib, pos2=True)
         else:
             raise Exception('can not find feature '+sfc+' in module feature._gen_single_feature()')
-        
+
         #remember to update feature type and the getlib feature when adding features
 
     def define_feature_type(self,sfc):
@@ -165,13 +165,13 @@ class feature(object):
         elif re.search('dmc',self.features):
             return 'atmcls-mc.lib'
         elif re.search('dsc',self.features):
-            return 'atmcls-sc.lib'        
+            return 'atmcls-sc.lib'
         elif re.search('cn',self.features):
             return 'anggrp.lib'
         elif re.search('co',self.features):
             return 'bndgrp.lib'
         elif re.search('ci',self.features):
-            return 'impgrp.lib'  
+            return 'impgrp.lib'
         elif self.features[0] in ['h','g','t'] or self.features[0:2] in ['gs','dt']:
             return 'dicls-all.lib'
         else:
@@ -192,7 +192,7 @@ class feature(object):
                 permuteindex.append(nclist.index(f))
                 shrinkindex[fi]=si
         return [shrinkindex,permuteindex]
-        
+
     def issubset_singlefeature(self,r,d,s,r2,d2,s2):
         if r==0:
             return [0]
@@ -210,7 +210,7 @@ class feature(object):
                 return []
         else:
             return []
-   
+
     def get_featurelist(self):
         if self.featurelist:
             return self.featurelist
@@ -229,14 +229,14 @@ class feature(object):
         for pos in range(0,self.get_dimension()):
             allbins.append(self.get_bin_centers(pos))
         return allbins
-    
+
     def get_featurenames(self):
         if self.featurenames:
             return self.featurenames
         for f in self.get_featurelist():
             self.featurenames.append(str(f).split(' ')[0].split('.')[-1])
         return self.featurenames
-    
+
     def get_bins(self,pos=0):
         featurelist=self.get_featurelist()
         #if isinstance(featurelist,(list,tuple)):
@@ -263,7 +263,7 @@ class feature(object):
         if 'l' in self.fclist:
             runmem=1.5
         return runmem
-      
+
     def get_bin_centers(self,pos=0):
         bins=self.get_bins(pos)
         rp=[]
@@ -283,7 +283,7 @@ class feature(object):
         if re.search('dicls',libfile):
             mlibr.tuple_classes.read(runenv.libdir+libfile)
         else:
-            mlibr.atom_classes.read(runenv.libdir+libfile) 
+            mlibr.atom_classes.read(runenv.libdir+libfile)
 
 
     def issymetry(self):
@@ -304,7 +304,7 @@ class feature(object):
             else:
                 print "attention: feature "+self.features+" is not symmetric"
                 return False
-        
+
     def get_featuretypepos(self):
         self.ifp=[]
         self.dfp=[]
@@ -315,13 +315,13 @@ class feature(object):
             elif self.define_feature_type(self.fclist[i])==0:
                 self.ifp.append(i)
         return self.ifp, self.dfp
-     
+
     def get_independent_feature(self):
         fs=''
         for i in self.ifp:
             fs=fs+self.ffclist[i]
         return fs
-     
+
     def get_feature_names(self):
         if len(self.fclist)>1:
             raise Exception('we can only get feature names for single feature')
@@ -331,7 +331,7 @@ class feature(object):
         for bin in m.features[0].bins:
             sl.append(bin.symbol)
         return sl
-       
+
 class atmsprop(object):
     def __init__(self,libfile):
         self.vdrd={'C':1.8,'N':1.64,'O':1.46,'S':1.77,'P':1.88,'F':1.56,'Cl':1.74,'Br':1.98,'I':2.09}
@@ -339,7 +339,7 @@ class atmsprop(object):
         self.atomNameList=self.read_libfile()
         self.atomTypeList=[self.get_atomtype(an) for an in self.atomNameList]
         self.atomrl=[self.vdrd[at] for at in self.atomTypeList]
-        
+
     def get_atomtype(self,atomname):
         if 'Cl' in atomname:
             return 'Cl'
@@ -347,7 +347,7 @@ class atmsprop(object):
             if key in atomname:
                 return key
         raise exception('atom type not known')
-    
+
     def read_libfile(self):
         fh=open(runenv.basedir+'lib/'+self.libfile)
         fhc=fh.read()
@@ -357,7 +357,7 @@ class atmsprop(object):
         elif 'ATMGRP' in fhc:
             agl=[l[8:-1] for l in fhc.split('\n') if l.startswith('ATMGRP')]
         return [a for a in agl if len(a)>0]
-    
+
     def get_repulsion(self,ind,bins):
         atm1ind=ind/len(self.atomTypeList)
         atm2ind=ind%len(self.atomTypeList)

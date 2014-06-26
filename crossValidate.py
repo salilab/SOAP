@@ -15,7 +15,7 @@ class k2cv(object):
         if model:
             so=scorer(model=model)
             spsfo=optimizer(scorer=so)
-        
+
         self.spsfo=copy.deepcopy(spsfo)
         self.ospsfo=spsfo
         self.model=spsfo.scorer.model
@@ -25,7 +25,7 @@ class k2cv(object):
             self.sample=[]
         self.nots=2
 
-        
+
     def partfunc(self,osample,k,i):
         sample=copy.copy(osample)
         sl=len(sample)/k
@@ -42,7 +42,7 @@ class k2cv(object):
             samplelist.append(sample[ci:ci+ll])
             ci=ci+ll
         return samplelist
-    
+
     def evalfunc(self,sample,parvalue):
         #model should be a dictionary defines the type of the model,the parameters, the initial value of parameters, the value range
         #model={type:;par:;parvalue:;parrange:;parsearchbins:;}
@@ -51,7 +51,7 @@ class k2cv(object):
         self.spsfo.scorer=self.testscorer
         validationresult=self.spsfo.calc_score_point(parvalue)
         return validationresult
-    
+
     def trainfunc(self,sample):
         self.spsfo.scorer=copy.deepcopy(self.ospsfo.scorer)
         [self.spsfo.scorer,self.testscorer]=self.spsfo.scorer.get_ds_part(sample)
@@ -62,20 +62,20 @@ class k2cv(object):
         aresult=[]
 #        pdb.set_trace()
         for result in resultlist:
-                tperc=0
-                perc=0
-                for item in result:
-                    try:
-                        tperc=tperc+item[0][1]
-                        perc=perc+item[1]
-                    except Exception,e:
-                        traceback.print_exc()
-                        pdb.set_trace()
-                tperc=tperc/len(result)
-                perc=perc/len(result)
-                aresult.append([tperc,perc])
+            tperc=0
+            perc=0
+            for item in result:
+                try:
+                    tperc=tperc+item[0][1]
+                    perc=perc+item[1]
+                except Exception,e:
+                    traceback.print_exc()
+                    pdb.set_trace()
+            tperc=tperc/len(result)
+            perc=perc/len(result)
+            aresult.append([tperc,perc])
         return aresult
-                    
+
     def pickfunc(self,cvresult):
         pass
 
@@ -84,11 +84,11 @@ class k2cv(object):
             return []
         trainedresulttask=self.trainfunc(input[0])
         return tasklist(tasklist=[trainedresulttask],afterprocessing=self.single_run_after_processing,other=copy.deepcopy(input[1]))
-        
+
     def single_run_after_processing(self,trainedresult,tasklist=[],other=[]):
         testresult=self.evalfunc(other,trainedresult[0])
         return [trainedresult,testresult]
-        
+
     def cross_validation_single_model(self,input):
         k=input['k']
         sample=input['sample']
@@ -106,8 +106,8 @@ class k2cv(object):
         #    srtask=task(self.env).parallel_local_withreturn(self.cross_validation_single_run,inputlist,len(inputlist))
         #else:
         srtask=task().serial_local(self.cross_validation_single_run,inputlist)#parallel_local_withreturn,10
-        return tasklist(tasklist=srtask)    
-    
+        return tasklist(tasklist=srtask)
+
     def get_test_sample(self,sample,testperc=0,testsample=[]):
         if testperc:
             return self.spsfo.scorer.get_sample(perc=testperc)
@@ -117,7 +117,7 @@ class k2cv(object):
                 if not item in testsample:
                     trainsample.append(item)
             return [testsample,trainsample]
-    
+
     def cross_validation_with_test(self,testsample=[],testperc=0):
         sample=self.sample
         #should call this function to do cross validation under every circustance
@@ -125,8 +125,8 @@ class k2cv(object):
         input={'k':self.model['cvk'],'sample':sample,'testsample':testsample}
         srtask=self.cross_validation_single_model(input)
         self.testsample=testsample
-        return tasklist(tasklist=[srtask],afterprocessing=self.analyze_cv) 
-        
+        return tasklist(tasklist=[srtask],afterprocessing=self.analyze_cv)
+
     def analyze_cv(self,rresultlist,tasklist=[],other=[]):
         resultlist=[]
         testresult=[]
@@ -136,7 +136,7 @@ class k2cv(object):
                 trainresult=result[:-1]
             resultlist.append(trainresult)
         return [resultlist,self.process_cv_result(resultlist), testresult]
-    
+
     def load_optarraylist(self,path):
         cr=scipy.io.loadmat(path+'cvresult.mat')
         self.optarraylist=[]
@@ -150,7 +150,7 @@ class k2cv(object):
             nref=squeeze_list(nref)
             na=list2array(nref)
             self.optarraylist.append(na)
-        
+
     def combine_optimization_results(self,optresultlist):
         #analyze the best result from different runs
         na=np.zeros([len(optresultlist),len(optresultlist[0])])
@@ -174,10 +174,10 @@ class k2cv(object):
         self.scorerlist=[]
         for i in range(0,len(self.inputlist)):
             scorer1,scorer2=self.spsfo.scorer.get_ds_part(self.inputlist[i][0])
-            if 'filter' in self.spsfo.scorer.model: 
+            if 'filter' in self.spsfo.scorer.model:
                 scorer1.loadfilter=[{'criteria':fl['criteria'],'parvalue':cvmodel['allresult'][i]['bestpar']}]
             self.scorerlist.append([scorer1,scorer2])
-            
+
     def clustering_optimization_results(self):
         parlist=[]
         resultlist=[]
@@ -191,8 +191,8 @@ class k2cv(object):
         sd={'lastone':lastone,'parlist':parlist,'resultlist':resultlist,'testresultlist':testresultlist,
             'bestpar':bestpar, 'bestresult':resultlist[0],'testresult':testscorer.assess(bestpar),
             'fulltestresult':testscorer.assess(bestpar,report='full'),
-            'pd':pd/k,'rlpd':rlpd}      
-        
+            'pd':pd/k,'rlpd':rlpd}
+
     def analyze_clustering_results(self):
         if self.withlastone:
             self.finaloptresult=self.rdlist[-1]['bestresult']
@@ -202,7 +202,7 @@ class k2cv(object):
                 self.finalfinaltestresult=self.rdlist[-1]['finaltestresult']
             else:
                 self.finalfinaloptresult=0
-                self.finalfinaltestresult=0               
+                self.finalfinaltestresult=0
             tn=len(self.rdlist)-1
             self.lasttestresult=self.rdlist[-1]['testresult']
             self.bestmodelresult=self.rdlist[-1]['bestresult']
@@ -228,7 +228,7 @@ class k2cv(object):
                 finaltestlist[i]=self.rdlist[i]['finaltestresult']
             else:
                 finaloptlist[i]=0
-                finaltestlist[i]=0               
+                finaltestlist[i]=0
             pdlist[i]=self.rdlist[i]['pd']
             rlpdlist[i]=self.rdlist[i]['rlpd']
         self.optresults=optlist
@@ -242,12 +242,12 @@ class k2cv(object):
         self.testmean=testlist.mean()
         self.teststd=testlist.std()/np.sqrt(tn)
         self.finaltestmean=finaltestlist.mean()
-        self.finalteststd=finaltestlist.std()/np.sqrt(tn)        
+        self.finalteststd=finaltestlist.std()/np.sqrt(tn)
         self.resultstr=u"{5:.5f},{6:.3f}, {0:2.3f}\u00B1{1:2.3f}, {2:2.3f}\u00B1{3:2.3f}, {4:2.3f}, {7:2.3f}__{8:2.3f}\u00B1{9:2.3f}, {10:2.3f}\u00B1{11:2.3f}, {12:2.3f}, {13:2.3f} ".format(
             self.optmean,self.optstd,self.testmean,self.teststd,self.finaloptresult,self.pdsum,self.rlpdmean,self.lasttestresult, self.finaloptmean,self.finaloptstd,self.finaltestmean,self.finalteststd,self.finalfinaloptresult,self.finalfinaltestresult)
         self.resultarray=np.array([self.optmean,self.optstd,self.testmean,self.teststd,self.finaloptresult,self.pdsum,self.lasttestresult, self.finaloptmean,self.finaloptstd,self.finaltestmean,self.finalteststd,self.finalfinaloptresult,self.finalfinaltestresult,self.rlpdmean])
         print self.resultstr
-        
+
     def save_optimization_results(self):
         bdir=runenv.basedir+'results/'
         os.chdir(bdir)
@@ -280,7 +280,7 @@ class k2cv(object):
             fh.close()
             fh=open('bestmodel','w')
             fh.write(any2str(self.bestmodel))
-            fh.close()                    
+            fh.close()
             fh=open('bestmodelresult','w')
             fh.write(str(self.bestmodelresult)+'\n'+str(self.rdlist[-1]['fulltestresult']))
             fh.close()
@@ -291,7 +291,7 @@ class k2cv(object):
             fh.close()
             fh=open('bestmodel','w')
             fh.write(any2str(self.bestmodel))
-            fh.close()               
+            fh.close()
         self.write2logshelve()
         self.write2db()
         return self.resultstr
@@ -306,19 +306,19 @@ class k2cv(object):
             if so.model['scorers']['type']!='sf':
                 continue
             sfo=so.scorerlist[i]
-        plt.plot(sfo.sfv)   
+        plt.plot(sfo.sfv)
 
 
     def write2logshelve(self,model=None):
         if model==None:
-            model=self.spsfo.scorer.originalmodel        
+            model=self.spsfo.scorer.originalmodel
         os.chdir(self.logdir)
         with FileLock("log.shelve", timeout=100, delay=2) as lock:
-            print("Lock acquired.")     
+            print("Lock acquired.")
             resultdictlog=shelve.open(self.logdir+'log.shelve')
             del model['str']
-            model['str']=any2str(model)  
-            resultdictlog[model['str']]=[self.resultarray,self.resultstr,self.rundir,self.bestmodel,self.bestmodelresult,self.logpath] 
+            model['str']=any2str(model)
+            resultdictlog[model['str']]=[self.resultarray,self.resultstr,self.rundir,self.bestmodel,self.bestmodelresult,self.logpath]
             resultdictlog.close()
             print("lock released")
 
@@ -329,7 +329,7 @@ class k2cv(object):
         os.chdir(self.logdir)
         if 'str' in model:
             del model['str']
-        model['str']=any2str(model)        
+        model['str']=any2str(model)
         with FileLock("log.shelve", timeout=100, delay=2) as lock:
             print("Lock acquired.")
             if not os.path.isfile(self.logdir+'log.shelve'):
@@ -351,7 +351,7 @@ class k2cv(object):
         else:
             self.resultarray,self.resultstr,self.rundir,self.bestmodel,self.bestmodelresult,self.logpath=nmr
             return True
-        
+
     def write2db(self):
         #create the database if non exist
         import sqlite3
@@ -363,14 +363,14 @@ class k2cv(object):
             pass
         class anyList(list):
             pass
-        
+
         def adapt_slist(s):
             return '; '.join([str(item) for item in s])
 
 
         def adapt_anylist(textList):
             return '; '.join([pickle.dumps(item) for item in textList])
-        
+
         def convert_integerList(s):
             return map(int, s.split("; "))
 
@@ -381,14 +381,14 @@ class k2cv(object):
             return s.split("; ")
 
         def convert_anyList(s):
-            return map(pickle.loads, s.split("; "))        
-        sqlite3.register_adapter(integerList, adapt_slist)        
+            return map(pickle.loads, s.split("; "))
+        sqlite3.register_adapter(integerList, adapt_slist)
         sqlite3.register_converter("integerlist", convert_integerList)
-        sqlite3.register_adapter(realList, adapt_slist)        
+        sqlite3.register_adapter(realList, adapt_slist)
         sqlite3.register_converter("reallist", convert_realList)
-        sqlite3.register_adapter(textList, adapt_slist)        
+        sqlite3.register_adapter(textList, adapt_slist)
         sqlite3.register_converter("textlist", convert_textList)
-        sqlite3.register_adapter(anyList, adapt_anylist)        
+        sqlite3.register_adapter(anyList, adapt_anylist)
         sqlite3.register_converter("anylist", convert_anyList)
         con = sqlite3.connect(runenv.resultdbpath,detect_types=sqlite3.PARSE_DECLTYPES)
         conn= con.cursor()
@@ -399,7 +399,7 @@ class k2cv(object):
         #self.rlpdmean,self.pdsum,
         conn.execute("""create table if not exists Result (result TEXT,
                      dslist textlist,type TEXT,criteria TEXT, bm TEXT,combine TEXT,
-                     filters TEXT, criteria2 TEXT, scorers integerlist, optmethod INTEGER, 
+                     filters TEXT, criteria2 TEXT, scorers integerlist, optmethod INTEGER,
                      optmean REAL, optstd REAL,testmean REAL, teststd REAL, finaloptresult REAL,finaltestresult REAL,
                      optmean2 REAL, optstd2 REAL,testmean2 REAL, teststd2 REAL, finaloptresult2 REAL,finaltestresult2 REAL,
                      pdresultmean REAL, pd REAL,bestpar reallist,runnum INTEGER primary key);""")
@@ -416,7 +416,7 @@ class k2cv(object):
         elif numofcount>1:
             print "more than 1 line of count"
             pdb.set_trace()
-        
+
         if self.spsfo==None:
             m=self.originalmodel
         else:
@@ -440,7 +440,7 @@ class k2cv(object):
             if rows[0][1:]!=tuple(optList):
                 print "duplicate but not matching optmethod"
                 pdb.set_trace()
-            optList.insert(0, rows[0][0])                
+            optList.insert(0, rows[0][0])
         elif len(rows)==0:
             conn.execute('update Counter set numoptm=numoptm+1')
             optind=conn.execute('Select numoptm from Counter').fetchall()[0][0]
@@ -540,7 +540,7 @@ class k2cvlocal(k2cv):
         [self.spsfo.scorer,self.testscorer]=self.spsfo.scorer.get_ds_part(sample)
         trainresult=self.spsfo.multi_optimizer_local()#nspo.optimize()[0:2]#
         return trainresult
-    
+
     def cross_validation_single_model(self,input):
         k=input['k']
         sample=input['sample']
@@ -558,14 +558,14 @@ class k2cvlocal(k2cv):
         #    srtask=task(runenv).parallel_local_withreturn(self.cross_validation_single_run,inputlist,len(inputlist))
         #else:
         srtask=task().serial_local(self.cross_validation_single_run,inputlist)#parallel_local_withreturn,10
-        return srtask   
-    
+        return srtask
+
     def cross_validation_single_run(self,input):
         if len(input[0])==0:
             return []
-        trainedresult=self.trainfunc(input[0])            
+        trainedresult=self.trainfunc(input[0])
         return self.single_run_after_processing(trainedresult)
-        
+
     def cross_validation_with_test(self,testsample=[],testperc=0):
         sample=self.sample
         #should call this function to do cross validation under every circustance
@@ -574,21 +574,21 @@ class k2cvlocal(k2cv):
         self.testsample=testsample
         srtask=self.cross_validation_single_model(input)
         return self.analyze_cv([srtask])
-        
+
 class k2cvcluster(k2cvlocal):
     """
     Cross validate a model on SGE cluster
-    """    
+    """
     def __init__(self,spsfo=None,model=[], initialize=False,logpath=''):
-        self.model=model        
+        self.model=model
         self.spsfo=spsfo
         self.runspernode=1
         self.runpath='./'
-        self.statsstr='' 
+        self.statsstr=''
         self.testperc=-1
-        self.testsample=[] 
+        self.testsample=[]
         self.rid=0
-        self.rsn=0 
+        self.rsn=0
         self.repeat=1
         if logpath:
             self.load_fromlogdir(logpath)
@@ -607,7 +607,7 @@ class k2cvcluster(k2cvlocal):
             except:
                 traceback.print_exc()
                 pdb.set_trace()
-            
+
     def initialize_scorer(self):
         so=scorer(model=self.originalmodel)
         spsfo=optimizer(scorer=so)
@@ -638,7 +638,7 @@ class k2cvcluster(k2cvlocal):
             self.prepare_cross_validation_sample()
         self.analyze_clustering_results()
         #self.rundir=os.path.split(lp)[-1].split('-')[0]
-        
+
     def initialize_model(self):
         if self.model!=[]:
             so=scorer(model=self.model)
@@ -653,10 +653,10 @@ class k2cvcluster(k2cvlocal):
             self.model=self.spsfo.scorer.model
         else:
             self.sample=[]
-            
+
     def cross_validation_single_run(self,input):
         pass
-    
+
     def cross_validation_single_model(self,input):
         k=input['k']
         sample=input['sample']
@@ -673,7 +673,7 @@ class k2cvcluster(k2cvlocal):
                 trainlist=[]
                 for m in range(parnum):
                     if m!=j:
-                        trainlist=trainlist+samplelist[m]                        
+                        trainlist=trainlist+samplelist[m]
                 inputlist.append([trainlist,samplelist[j]])
         if 'testsample' in input:
             inputlist.append([sample,input['testsample']])
@@ -684,10 +684,10 @@ class k2cvcluster(k2cvlocal):
         else:
             self.inputlist=inputlist
         self.get_scorer_list()
-        self.distribute_runs()        
+        self.distribute_runs()
         if "initialmodelpath" in self.model:
             self.get_initial_values_from_path(self.model['initialmodelpath'])
-            
+
     def get_initial_values_from_path(self,path):
         if isinstance(path,str):
             path=[path]
@@ -697,7 +697,7 @@ class k2cvcluster(k2cvlocal):
             om=cvm['model']
             #if om['cvk']!=self.model['cvk'] or ('fold' in self.model and om['fold']!=self.model['fold']) or ('testperc' in self.model and om['testperc']!=self.model['testperc']):
             #    raise Bugs('Models does not match, can not load the model as initial conditions')
-            #match models How to???        
+            #match models How to???
             if 'initialpars' in self.model and self.model['initialpars']=='best':
                 parname='bestrepna'
             else:
@@ -731,7 +731,7 @@ class k2cvcluster(k2cvlocal):
         self.spsfo.scorer.initialvalues=so.initialvalues
         self.spsfo.get_initial_value()
         print self.spsfo.scorer.assess(self.spsfo.bestpar)
-                
+
     def get_parvalue_from_rf(self,newpar,originalmodel,originalpar,oso,sp=0):
         #originalpar is the list containing all the search pars, we need to somehow convert the original pars to the pars for the new model
         #pdb.set_trace()
@@ -743,11 +743,11 @@ class k2cvcluster(k2cvlocal):
             #if spi==(len(self.spsfo.scorer.model['scorers'])-2):
             #    pdb.set_trace()
             if len(self.spsfo.scorer.scorersearchlist[spi])==0:
-                continue            
+                continue
             bins=[]
             if 'par' in self.model['scorers'][spi]:
                 for j in range(parshape[0]):
-                    bins.append(self.model['scorers'][spi]['par'])            
+                    bins.append(self.model['scorers'][spi]['par'])
             #skip original model to the first search position
             while ospi<len(originalmodel['scorers']):
                 if len(oso.scorersearchlist[ospi])>0:
@@ -769,25 +769,25 @@ class k2cvcluster(k2cvlocal):
                                 newpar[j,self.spsfo.scorer.searchlistspos[si]]=originalpar[j,oso.searchlistspos[si2]]
                             setvalues=True
                 elif currentsearch['key']=='par':
-                    setbins=False 
+                    setbins=False
                     for si2 in oso.scorersearchlist[ospi]:
                         if originalmodel['searches'][si2]['key']=='par' and ((self.spsfo.scorer.searchlistspos[si+1]-self.spsfo.scorer.searchlistspos[si])==(oso.searchlistspos[si2+1]-oso.searchlistspos[si2])):
                             setbins=True
                             bins=[]
                             if np.any(newpar[:,self.spsfo.scorer.searchlistspos[si]:self.spsfo.scorer.searchlistspos[si+1]]!=-9999):
                                 print "resetting the values twice"
-                                pdb.set_trace()                            
+                                pdb.set_trace()
                             for j in range(parshape[0]):
-                                newpar[j,self.spsfo.scorer.searchlistspos[si]:self.spsfo.scorer.searchlistspos[si+1]]=originalpar[j,oso.searchlistspos[si2]:oso.searchlistspos[si2+1]]                    
-                                bins.append(originalpar[j,oso.searchlistspos[si2]:oso.searchlistspos[si2+1]]) 
+                                newpar[j,self.spsfo.scorer.searchlistspos[si]:self.spsfo.scorer.searchlistspos[si+1]]=originalpar[j,oso.searchlistspos[si2]:oso.searchlistspos[si2+1]]
+                                bins.append(originalpar[j,oso.searchlistspos[si2]:oso.searchlistspos[si2+1]])
                             setvalues=True
                     if setbins==False and len(originalmodel['scorers'][ospi]['par'])==len(self.model['scorers'][spi]['par']):
                         bins=[]
                         if np.any(newpar[:,self.spsfo.scorer.searchlistspos[si]:self.spsfo.scorer.searchlistspos[si+1]]!=-9999):
                             print "resetting the values twice"
-                            pdb.set_trace()                        
+                            pdb.set_trace()
                         for j in range(parshape[0]):
-                            newpar[j,self.spsfo.scorer.searchlistspos[si]:self.spsfo.scorer.searchlistspos[si+1]]=originalmodel['scorers'][ospi]['par']                   
+                            newpar[j,self.spsfo.scorer.searchlistspos[si]:self.spsfo.scorer.searchlistspos[si+1]]=originalmodel['scorers'][ospi]['par']
                             bins.append(originalmodel['scorers'][ospi]['par'])
                         setvalues=True
             for si in self.spsfo.scorer.scorersearchlist[spi]:
@@ -797,7 +797,7 @@ class k2cvcluster(k2cvlocal):
                         if originalmodel['searches'][si2]['key']=='parvalue':
                             if np.any(newpar[:,self.spsfo.scorer.searchlistspos[si]:self.spsfo.scorer.searchlistspos[si+1]]!=-9999):
                                 print "resetting the values twice"
-                                pdb.set_trace()                            
+                                pdb.set_trace()
                             for j in range(parshape[0]):
                                 oso.parvalues=originalpar[j,:]
                                 oso.assign_values2model()
@@ -806,7 +806,7 @@ class k2cvcluster(k2cvlocal):
                                 if self.model['scorers'][spi]['sftype']=='bins':
                                     sfo.bins=sf(**self.model['scorers'][spi]).bins
                                     sfv=np.exp(sfo.get_sf(returnreft=True))
-                                    newpar[j,self.spsfo.scorer.searchlistspos[si]:self.spsfo.scorer.searchlistspos[si+1]]=sfv                                    
+                                    newpar[j,self.spsfo.scorer.searchlistspos[si]:self.spsfo.scorer.searchlistspos[si+1]]=sfv
                                 else:
                                     sfo.bins=[list(bins[j])+[sfo.bins[0][-1]]]
                                     sfv=np.exp(sfo.get_sf(returnreft=True))
@@ -815,17 +815,17 @@ class k2cvcluster(k2cvlocal):
             if setvalues:
                 ospi+=1
             if ospi==(len(originalmodel['scorers'])):
-                break            
+                break
             #pdb.set_trace()
         if np.any(newpar==-9999):
             print 'Some Initial values are undefined '
         print spi
         spi+=1
         return spi
-            
+
     def distribute_runs(self):
         #get runs per node
-        self.optn=len(self.inputlist) #total number of trials, number of different sets        
+        self.optn=len(self.inputlist) #total number of trials, number of different sets
         perruntime=len(self.spsfo.scorer.dsss.ds.sa)/250000.0 #approximate run time in minutes
         optin=self.spsfo.scorer.model['runsperscorer']
         self.runsperscorer=optin
@@ -863,14 +863,14 @@ class k2cvcluster(k2cvlocal):
         self.nors=k#number of runs
         self.runnumlist=rnl
         self.runnumdict=rnd
-        
+
     def get_task(self):
         if self.modelinlog(self.model):
             return 0
         else:
             self.task=task('','',afterprocessing=self,preparing=self)
             return self.task
-    
+
     def prepare_cross_validation_sample(self):
         sample=self.sample
         #should call this function to do cross validation under every circustance
@@ -895,7 +895,7 @@ class k2cvcluster(k2cvlocal):
     def cross_validation_with_test(self):
         to=self.get_task()
         tasklist(tasklist=[to]).monitor2end()
-    
+
     def runtask_cluster(self,inputcode):
         #the individual nodes on the cluster will run this function, if other funtions needs to be run here, chage the code here.
         self.rid=int(inputcode)
@@ -908,7 +908,7 @@ class k2cvcluster(k2cvlocal):
         self.testscorer=self.scorerlist[inputindex][1]
         self.spsfo.scorerid=inputindex
         self.spsfo.jobid=inputcode
-        self.spsfo.runsperscorer=len(self.runnumlist[inputindex])   
+        self.spsfo.runsperscorer=len(self.runnumlist[inputindex])
         res=[]
         #initialize the daemon thread array if specified...
         if 'thread' in self.spsfo.scorer.model and self.spsfo.scorer.model['thread']>0:
@@ -962,7 +962,7 @@ class k2cvcluster(k2cvlocal):
             time.sleep(30)
             rn=self.check_status_single_try(inputindex,type='jobfinished')
             print 'waiting for others to finish'
-            #print os.system('touch '+self.runpath+str(inputindex)+'-waitingjob-'+str(rn))        
+            #print os.system('touch '+self.runpath+str(inputindex)+'-waitingjob-'+str(rn))
         #print os.system('rm '+self.runpath+str(inputindex)+'-waiting*')
         return self.analyze_results_for_single_try(inputindex)
 
@@ -1000,7 +1000,7 @@ class k2cvcluster(k2cvlocal):
                         brl.append(np.array(nd['trainresultlist']).max())
                     success=True
                 except:
-                    traceback.print_exc() 
+                    traceback.print_exc()
                     success=False
                     time.sleep(1)
         if inputindex==len(self.runnumlist)-1 and self.withlastone:
@@ -1026,7 +1026,7 @@ class k2cvcluster(k2cvlocal):
                 k=k+1
             allparlist=allparlist+dl[i]['parlist']
             alltrainresult=alltrainresult+dl[i]['trainresultlist']
-            #alltestresult=alltestresult+dl[i]['testresultlist']            
+            #alltestresult=alltestresult+dl[i]['testresultlist']
         #get representative pars
         allna=np.hstack([np.array(allparlist),np.array(alltrainresult).reshape(len(alltrainresult),1)])
         #bestrepna=get_representative_pars_forbest(allna,maxcluster=400,cutoffdistance=0.0000001,clusteringperc=0.999, othermaxnumber=0)
@@ -1042,7 +1042,7 @@ class k2cvcluster(k2cvlocal):
             if len(plna.shape)==1:
                 plnad=(((plnas-plnam))**2)
             else:
-                plnad=(((plnas-plnam))**2).sum(axis=1)            
+                plnad=(((plnas-plnam))**2).sum(axis=1)
             mindex=np.argmin(plnad)
             bestpar=plnas[mindex]
             bestresult=ra.max()
@@ -1054,7 +1054,7 @@ class k2cvcluster(k2cvlocal):
         if 'finalcriteria' in self.model['bmtype']:
             self.spsfo.scorer=load_scorer(self.trainscorer,self.spsfo.indexlen)
             finalbestresult=self.spsfo.scorer.assess(bestpar,slevel=self.model['bmtype']['finalcriteria'])
-            del self.spsfo.scorer            
+            del self.spsfo.scorer
         testscorer=load_scorer(self.testscorer,self.spsfo.indexlen)
         finaltestresult=0
         if 'finalcriteria' in self.model['bmtype']:
@@ -1066,7 +1066,7 @@ class k2cvcluster(k2cvlocal):
         fh=open(self.inputcode+'.optimizer.pickle','w')
         pickle.dump(sd,fh)
         fh.close()
-    
+
     def prepare_task_input(self):
         self.initialize_model()
         self.prepare_cross_validation_sample()
@@ -1074,7 +1074,7 @@ class k2cvcluster(k2cvlocal):
         self.task.get_sn()
         self.rundir=str(self.task.rsn)
         self.runpath=runenv.serverUserPath+self.rundir+'/'
-        #self.task=task('','',afterprocessing=self,preparing=self)        
+        #self.task=task('','',afterprocessing=self,preparing=self)
         self.task.dir=self.dir+self.rundir+'/'
         self.task.rdirname=self.rundir
         #return self.task
@@ -1082,7 +1082,7 @@ class k2cvcluster(k2cvlocal):
         os.system('rm -r '+self.rundir)
         os.mkdir(self.rundir)
         os.chdir(self.dir+self.rundir)
-        self.save()          
+        self.save()
         freememory=0.5+self.spsfo.arraysize*self.get_runmemory_percentage()/1000000000.0
         self.freememory=freememory
         #if self.spsfo.arraysize>50000000:
@@ -1163,7 +1163,7 @@ class k2cvcluster(k2cvlocal):
         else:
             self.originalresult=[self.rdlist]
         for i in range(len(self.rdlist)):
-            rd=self.rdlist[i]    
+            rd=self.rdlist[i]
             allnalist=[]
             for arl in self.originalresult:
                 allnalist.append(arl[i]['allna'])
@@ -1231,7 +1231,7 @@ class k2cvcluster(k2cvlocal):
                 k+=1
         return ara
 
-    def generate_potential(self):        
+    def generate_potential(self):
         so=scorer(model=self.model)
         if not hasattr(self,'finaloptpar'):
             self.load_fromlogdir(self.logpath)
@@ -1242,5 +1242,3 @@ class k2cvcluster(k2cvlocal):
         libpath=rp[0]+'.opt.lib'
         print libpath
         print os.system('scp '+libpath+' '+runenv.jobserver+':'+os.path.join(runenv.serverUserPath+'lib',self.rundir+'.lib'))
-        
-                

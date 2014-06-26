@@ -1,6 +1,6 @@
 """
    SOAP RankScore module, calculating scores on decoys.
-   
+
    In SOAP, recovery function scores are treated as a separate scoring term, which enables a substaintial~1000000x increase in evaluation speed.
 
 """
@@ -10,7 +10,7 @@ from recoveryFunction import *
 from statsTable import *
 from decoys import decoysets
 
-                
+
 class dsscore(object):
     """
     Base class for decoy sets scores
@@ -22,7 +22,7 @@ class dsscore(object):
         self.dslist=[]
         self.score=[]
         self.method=[]
-        
+
     def __add__(self,other):
         ndss=self
         ndss.score=self.score+other.score
@@ -30,27 +30,27 @@ class dsscore(object):
         ndss.scorepath=self.dir+self.scorename
         ndss.method=self.method+other.method
         return ndss
-            
+
     def save(self):
         np.save(self.scorepath+'.numpy',self.score)
         #fh=open(self.scorepath+'.pickle','wb')
         #pickle.dump(self.dnlist,fh)
         #fh.close()
         #sio.savemat(self.scorepath+'.mat',{'score':self.score})
-        
+
     def load(self):
         fh=open(self.scorepath+'.pickle','rb')
         no=cPickle.load(fh)
         fh.close()
         return no
-    
+
     def get(self,nors=2000):
         if os.path.isfile(self.scorepath+'.pickle'):
             return self.load()
         else:
             self.calc_score_cluster(nors)
             return self
-        
+
     def get_score(self,nors=2000):
         if len(self.score)>0:
             return self.score
@@ -78,7 +78,7 @@ class sfdsscore(dsscore,sf): #the score comes from scaling function
             self.get_sfv()
         if len(self.dslist)>0:
             self.get_dsidist()
-        
+
     def get_dsidist(self,dslist=[],bm='', features=''):
         if dslist:
             self.dslist=dslist
@@ -86,7 +86,7 @@ class sfdsscore(dsscore,sf): #the score comes from scaling function
             self.bm=bm
         if features:
             self.features=features
-        idist=rawsp('_'.join(self.dslist),self.features,self.bm,decoy=True,routine='calc_sp_i').get_i()#.astype(np.float32)     
+        idist=rawsp('_'.join(self.dslist),self.features,self.bm,decoy=True,routine='calc_sp_i').get_i()#.astype(np.float32)
         sdl=1
         ms=idist.shape
         for msi in ms[1:]:
@@ -97,11 +97,11 @@ class sfdsscore(dsscore,sf): #the score comes from scaling function
         except:
             pdb.set_trace()
         self.score=np.zeros(ms[0],dtype=np.float32)
-    
+
     def filter(self,fa,newscore):
         self.idist=self.idist[fa,:]
         self.score=newscore
-    
+
     def get_dsidistpath(self):
         distfeatures=re.search('(d[0-9]+)',self.features).group(1)
         return rawsp('_'.join(self.dslist),distfeatures,self.bm,decoy=True).sppath+'.npy'
@@ -109,7 +109,7 @@ class sfdsscore(dsscore,sf): #the score comes from scaling function
     def get_dsidistname(self):
         distfeatures=re.search('(d[0-9]+)',self.features).group(1)
         return rawsp('_'.join(self.dslist),distfeatures,self.bm,decoy=True).spname+'.npy'
-        
+
     def get_score(self,indexlist=[],sfv=[]):
         if len(sfv)==0:
             self.get_sf()
@@ -130,11 +130,11 @@ class sfdsscore(dsscore,sf): #the score comes from scaling function
             print "nan in score"
             raise NanInScore()
         return self.score
-        
+
 class spdsscore(dsscore,scaledsp): #the score from distributions
     """
     Decoy sets scores calculated using stats tables
-    """    
+    """
     def __init__(self,dslist=[],bm='',ssp=scaledsp(),model=[]):
         dsscore.__init__(self)
         if model: #needfix???
@@ -160,7 +160,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
         self.justwait=False
         self.isatompairclustering()
         self.isdecomposition()
-        
+
     def isatompairclustering(self):
         genmethod=self.bm
         self.atompairclustering=False;
@@ -190,7 +190,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
             print os.system('cp '+self.ssppath+'svdu.npy ./')
             print os.system('cp '+self.ssppath+'svdv.npy ./')
         if self.tlib:
-            os.system('cp '+runenv.libdir+self.tlib+' ./')        
+            os.system('cp '+runenv.libdir+self.tlib+' ./')
         freememory=feature(self.features).get_runmem()
         if self.features=='epad':
             freememory=3.0
@@ -232,7 +232,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
     def calc_score_cluster(self):
         sj=self.get_task()
         tasklist(tasklist=[sj]).monitor2end()
-    
+
     def calc_score_local(self,nors):
         self.prepare_task_input(nors)
         sj=task(self.scorepath+'/',self.scorename)
@@ -240,7 +240,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
         os.system('cat *score > allbenchmark')
         self.sort_score()
         self.save()
-        
+
     def calc_score_nmrfile(self,fn):
         fh=open(fn)
         fc=fh.read()
@@ -263,7 +263,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
         """Methods to benchmark the statistical potential, run on current directory"""
         bm=self.bm
         features=self.features
-        mdtfile=self.ssppath+'.hdf5'    
+        mdtfile=self.ssppath+'.hdf5'
         env = environ()
         log.minimal()
         io=env.io
@@ -276,7 +276,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
         ms=m.shape
         a=alignment(env)
         ffile=open('score','w')
-        csmin, csmax,kcut, kcut1, bs,bsm, errsv,ssp=decode_genmethod(bm)  
+        csmin, csmax,kcut, kcut1, bs,bsm, errsv,ssp=decode_genmethod(bm)
         fp=0;
         tn=0;
         xp=0
@@ -316,18 +316,18 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
         pdbfile=fd+naln[0].atom_file
         if self.features=='dope':
             if not 'currentmodel' in self.__dict__.keys():
-                mdl=model(env)                
+                mdl=model(env)
                 mdl.read(pdbfile+'.pdb')
             else:
                 mdl=self.currentmodel
             return selection(mdl).assess_dope()
         elif self.features.startswith('soap'):
             if not 'currentmodel' in self.__dict__.keys():
-                mdl=model(env)                
+                mdl=model(env)
                 mdl.read(pdbfile+'.pdb')
             else:
                 mdl=self.currentmodel
-            return selection(mdl).energy()[0]        
+            return selection(mdl).energy()[0]
         else:
             raise Exception('Do not know how to calculate scores using potential '+self.features)
 
@@ -357,7 +357,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
             np.save(str(runnumber)+'.score.npy',idist)
             if reportstatus:
                 report_job_runstatus(self.runpath, True, runnumber, '.score.npy',inputname='runme.py')
-            return idist            
+            return idist
         if self.features=='soap_loop':
             from modeller import soap_loop
             pair = soap_loop.Scorer()
@@ -379,7 +379,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
             env.edat.sphere_stdv=-1
             env.edat.contact_shell=15
             env.edat.dynamic_sphere=False
-            env.edat.energy_terms.append(atom)            
+            env.edat.energy_terms.append(atom)
             env.edat.energy_terms.append(pair)
         elif self.features=='soap_protein_od':
             from modeller import soap_protein_od
@@ -387,9 +387,9 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
             env.edat.sphere_stdv=-1
             env.edat.contact_shell=7
             env.edat.dynamic_sphere=False
-            env.edat.energy_terms.append(pair)            
+            env.edat.energy_terms.append(pair)
         features=self.features
-        mdtfile=self.ssppath+'.hdf5'    
+        mdtfile=self.ssppath+'.hdf5'
         print 'Benchmarking: '+ ddbfile
         log.minimal()
         io=env.io
@@ -402,7 +402,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
             m.read_hdf5(mdtfile)
         a=alignment(env)
         f=modfile.File(self.runpath+ddbfile,'r')
-        csmin, csmax,kcut, kcut1, bs,bsm, errsv,ssp=decode_genmethod(bm) 
+        csmin, csmax,kcut, kcut1, bs,bsm, errsv,ssp=decode_genmethod(bm)
         fp=0;
         tn=0;
         xp=0
@@ -433,7 +433,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
                     errcount=1
                     while errcount<10:
                         try:
-                            fd,naln=self.get_pdbfile(spdbdir,codelist,alncode,env,aln,tmpdir)                    
+                            fd,naln=self.get_pdbfile(spdbdir,codelist,alncode,env,aln,tmpdir)
                             io.atom_files_directory=[fd]
                             if self.features=='dope' or self.features.startswith('soap'):
                                 score=self.calc_special_score(env,fd,naln)
@@ -451,7 +451,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
                             print os.system('rm -f '+os.path.join(tmpdir,'*'))
                             errcount+=1
                             if errcount>=10:
-                               raise e 
+                                raise e
             except Exception,e:
                 traceback.print_exc()
                 xp=1
@@ -459,7 +459,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
                     raise Exception('fork failure, quiting')
                 else:
                     if not self.test:
-                        raise e                 
+                        raise e
             aln=0
             aln=alignment(env)
         print tn
@@ -479,7 +479,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
             tn=fp
         elif self.features=='plop':
             scorestr=self.calc_plop_score(runnumber,tmml,fdl)
-            tn=fp              
+            tn=fp
         elif self.features=='epad':
             scorestr=self.calc_epad_score(runnumber,tmml,fdl)
             tn=fp
@@ -547,10 +547,10 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
                 #rer=re.findall(' DFIRE-score :\s*([0-9\.\-\s]+)',fc)
                 #for item in rer:
                 scorestr=scorestr+'>'+sml+' score: '+fc.split()[-1]+'\n'
-        print os.system('rm -r '+scratchdir)    
+        print os.system('rm -r '+scratchdir)
         return scorestr
 
-    def calc_rosetta_score(self,runnumber,tmml,fdl):     
+    def calc_rosetta_score(self,runnumber,tmml,fdl):
         wd=os.getcwd()
         scorestr=''
         for i in range(len(fdl)):
@@ -561,7 +561,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
                     print os.system('cp '+os.path.join(fd,sml+'.pdb.gz')+' '+scratchdir)
                     print os.system('gunzip '+os.path.join(scratchdir,sml+'.pdb.gz'))
                 if self.genmethod=='fpd':
-                    print os.system(runenv.serverUserPath+'rosetta_source/bin/FlexPepDocking.linuxgccrelease -database '+runenv.serverUserPath+'/rosetta_source/rosetta_database/ -flexpep_score_only -s '+os.path.join(scratchdir,sml+'.pdb')+' -out:file:scorefile '+os.path.join(scratchdir,sml+'.score'))                    
+                    print os.system(runenv.serverUserPath+'rosetta_source/bin/FlexPepDocking.linuxgccrelease -database '+runenv.serverUserPath+'/rosetta_source/rosetta_database/ -flexpep_score_only -s '+os.path.join(scratchdir,sml+'.pdb')+' -out:file:scorefile '+os.path.join(scratchdir,sml+'.score'))
                 else:
                     print os.system(runenv.serverUserPath+'/rosetta_source/bin/score.linuxgccrelease -database '+runenv.serverUserPath+'/rosetta_source/rosetta_database/ -s '+os.path.join(scratchdir,sml+'.pdb')+' -out:file:scorefile '+os.path.join(scratchdir,sml+'.score'))
                 #print os.system('rm '+os.path.join(scratchdir,sml+'.pdb*'))
@@ -575,7 +575,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
                 else:
                     scorestr=scorestr+'>'+sml+' score: '+fc.split('\n')[1].split()[1]+'\n'
         print os.chdir(wd)
-        print os.system('rm -r '+scratchdir)    
+        print os.system('rm -r '+scratchdir)
         return scorestr
 
     def calc_plop_score(self,runnumber,tmml,fdl):
@@ -601,7 +601,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
                 else:
                     scorestr=scorestr+'>'+sml+' score: 9999999.999998\n'
                 print scorestr
-        print os.system('rm -r '+scratchdir)    
+        print os.system('rm -r '+scratchdir)
         return scorestr
 
     def calc_plop_score_old(self,runnumber,tmml,fdl):
@@ -626,7 +626,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
                     k+=1
             cc=rer[1]
             if cc=='-':
-                cc='_' 
+                cc='_'
             loopdef=cc+':'+rer[2]+' '+cc+':'+str(int(rer[0])+int(rer[2])-1)
             for sml in tmml[i]:
                 #if not os.path.isfile(os.path.join(scratchdir,sml+'.pdb')):
@@ -677,7 +677,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
                     if 'penalty' in self.genmethod:
                         pn='yes'
                     else:
-                        pn='no'                        
+                        pn='no'
                     ploop='file datadir /netapp/home/ck/plop/data\n\nload pdb '+os.path.join(scratchdir,sml+'.pdb \nenergy para solvent '+gb+'np penalty '+pn+' rbuffer 2.0\nenergy lipocalc group heavy '+loopdef+'\n\nenergy calc')
                 open(os.path.join(scratchdir,'ploop'),'w').write(ploop)
                 print os.system('/netapp/home/ck/plop/plop '+os.path.join(scratchdir,'ploop')+' > '+os.path.join(scratchdir,sml+'.score'))
@@ -692,7 +692,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
                 else:
                     scorestr=scorestr+'>'+sml+' score: 9999999.999998\n'
                 print scorestr
-        print os.system('rm -r '+scratchdir)    
+        print os.system('rm -r '+scratchdir)
         return scorestr
 
     def calc_epad_score(self,runnumber,tmml,fdl):
@@ -704,7 +704,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
         print os.system('cp -r '+runenv.serverUserPath+'sps/epad/EPAD/config ./')
         print os.system('cp -r '+runenv.serverUserPath+'sps/epad/EPAD/SEQ ./')
         #os.mkdir(os.path.join(scratchdir,'SEQ'))
-        os.mkdir(os.path.join(scratchdir,'DECOYS'))        
+        os.mkdir(os.path.join(scratchdir,'DECOYS'))
         #print os.system('mv *.seq '+os.path.join(scratchdir,'SEQ'))
         #fl=os.listdir(os.path.join(scratchdir,'SEQ'))
         #fl=[f[:-4] for f in fl if f.endswith('.seq')]
@@ -748,13 +748,13 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
             fid=pickle.load(fh2)
             fh2.close()
             print os.system('cp '+os.path.join(fd,fid['rpdb'])+' ./')
-            print os.system('cp '+os.path.join(fd,fid['lpdb'])+' ./')            
+            print os.system('cp '+os.path.join(fd,fid['lpdb'])+' ./')
             if self.features=='firedock':
                 sml=[str(i)+' '+sml[i] for i in range(len(sml))]
                 inputfile='\n'.join(sml)
                 fh=open('transfile','w')
                 fh.write(inputfile)
-                fh.close()                        
+                fh.close()
                 print os.system('/netapp/sali/dina/FiberDock1.1/buildFiberDockParams.pl '+fid['rpdb']+' '+fid['lpdb']+' U U '+fid['complextype']+' transfile out 0 50 0.8 0 glpk outp > /dev/null')
                 print os.system('/netapp/sali/dina/FiberDock1.1/FiberDock outp')
                 fh3=open('out.ref')
@@ -765,7 +765,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
                     scorestr=scorestr+'>'+item[0].strip()+' score: '+item[1].strip()+'\n'
             elif self.features=='zrank':
                 print os.system('cp '+os.path.join(fd,fid['orpdbAB'])+' ./')
-                print os.system('cp '+os.path.join(fd,fid['olpdbAB'])+' ./')               
+                print os.system('cp '+os.path.join(fd,fid['olpdbAB'])+' ./')
                 fl=''
                 for tm, i in zip(sml, range(len(sml))):
                     print os.system(runenv.serverUserPath+'bin/pdb_trans64 '+tm+' <'+fid['lpdb']+' >ltemp.pdb')
@@ -782,7 +782,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
                         scorestr=scorestr+'>'+item[0].strip()+' score: '+item[1].strip()+'\n'
                 fh.close()
             elif self.features=='rdock':
-                fl=''           
+                fl=''
                 for tm, i in zip(sml, range(len(sml))):
                     print os.system(runenv.serverUserPath+'bin/pdb_trans64 '+tm+' <'+fid['lpdb']+' >ltemp.pdb')
                     if fid['lpdb'][0:4] in ['1ACB','2J7P','1HE8','1YVB','1I4D','1ZM4']:
@@ -793,7 +793,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
                 fh=open('pdblist','w')
                 fh.write(fl)
                 fh.close()
-                print os.system(runenv.serverUserPath+'rosetta_source/bin/score.linuxgccrelease -database '+runenv.serverUserPath+'rosetta_source/rosetta_database -s '+fid['lpdb']+' -score:weights docking') 
+                print os.system(runenv.serverUserPath+'rosetta_source/bin/score.linuxgccrelease -database '+runenv.serverUserPath+'rosetta_source/rosetta_database -s '+fid['lpdb']+' -score:weights docking')
                 print os.system(runenv.serverUserPath+'rosetta_source/bin/score.linuxgccrelease -database '+runenv.serverUserPath+'rosetta_source/rosetta_database -s '+fid['rpdb']+' -score:weights docking')
                 fh=open('default.sc')
                 fh.readline()
@@ -823,7 +823,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
         env.libs.parameters.read('${LIB}/par.lib')
         m = complete_pdb(env, pdbfile)
         m.write(file=pdbfile,no_ter=True)
-        
+
     def afterprocessing(self, benchmarkfile=''):
     #Sort benchmark scores according to the name. The order will be a standard for combining scores and other analysis...
         time.sleep(1)
@@ -841,7 +841,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
             self.score=allscore
             self.save()
             print os.system('rm -r '+self.dir+self.scorename)
-            return 1            
+            return 1
         elif self.atompairclustering:
             #process atom pair features
             allscore=self.cat_spi(name='score')
@@ -906,7 +906,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
             self.save()
             print os.system('rm -r '+self.dir+self.scorename)
             return 1
-    
+
     def read_singlescorefile(self,scorefile):
         sfile=open(scorefile,'r')
         #build a dictionary uisng the benchmark score
@@ -921,7 +921,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
                 #dnlist.append(scoreg.group(1))
                 i+=1
         return np.array(scorelist)
-    
+
     def get_task(self):
         if os.path.isfile(self.scorepath+'.numpy.npy'):
             return 0
@@ -930,16 +930,16 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
                 rer=re.search('(ap[0-9]+)(n[0-9]+)(svd)([0-9]+)$',self.bm)
                 nbm=self.bm[:-(len(rer.group(2))+len(rer.group(3))+len(rer.group(4)))]+'svd'
                 if any2str([nbm,self.dslist,self.scaledsp.ssppath]) in runenv.spdsscoreTasks:
-                    return runenv.spdsscoreTasks[any2str([nbm,self.dslist,self.scaledsp.ssppath])]                
+                    return runenv.spdsscoreTasks[any2str([nbm,self.dslist,self.scaledsp.ssppath])]
                 nsp=spdsscore(bm=nbm,dslist=self.dslist,ssp=self.scaledsp)
                 newtask=nsp.get_task()
                 runenv.spdsscoreTasks[any2str([nbm,self.dslist,self.scaledsp.ssppath])]=newtask
-                return newtask                
+                return newtask
             if re.search('(ap[0-9]+n[0-9]+)$',self.bm):
                 rer=re.search('(ap[0-9]+)(n[0-9]+)$',self.bm)
                 nbm=self.bm[:-len(rer.group(2))]
                 if any2str([nbm,self.dslist,self.scaledsp.ssppath]) in runenv.spdsscoreTasks:
-                    return runenv.spdsscoreTasks[any2str([nbm,self.dslist,self.scaledsp.ssppath])]                
+                    return runenv.spdsscoreTasks[any2str([nbm,self.dslist,self.scaledsp.ssppath])]
                 nsp=spdsscore(bm=nbm,dslist=self.dslist,ssp=self.scaledsp)
                 newtask=nsp.get_task()
                 runenv.spdsscoreTasks[any2str([nbm,self.dslist,self.scaledsp.ssppath])]=newtask
@@ -952,8 +952,8 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
                 nsp=spdsscore(bm=nbm,dslist=self.dslist,ssp=self.scaledsp)
                 newtask=nsp.get_task()
                 runenv.spdsscoreTasks[any2str([nbm,self.dslist,self.scaledsp.ssppath])]=newtask
-                return newtask   
-            if len(self.dslist)==1:  
+                return newtask
+            if len(self.dslist)==1:
                 sj=task(self.scorepath+'/',self.scorename,afterprocessing=self,preparing=self,targetfile=self.scorepath+'.numpy.npy')
                 return sj
             else:
@@ -962,7 +962,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
                     nspo=spdsscore([pset],self.bm,self.scaledsp)
                     tl.append(nspo.get_task())
                 return tasklist(tasklist=tl,afterprocessing=dummy)
-                
+
     def get_score(self,nors=2000):
         if len(self.score)>0:
             return self.score
@@ -982,4 +982,3 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
                     scorelist.append(nspo.score)
                 self.score=np.hstack(scorelist)
         return self.score
-    

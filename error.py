@@ -12,23 +12,23 @@ class NetworkError(Exception):
 class NanInScore(Exception):
     """
     Nan error
-    """    
+    """
     pass
 
 class Bugs(Exception):
     """
-    Bug in code 
-    """    
+    Bug in code
+    """
     pass
 
 class FatalError(Exception):
     """
     Fatal error
-    """    
+    """
     pass
 
 class OutOfRange(Exception):
     """
     Index out of range error
-    """    
+    """
     pass

@@ -1,6 +1,6 @@
 """
 SOAP env module, defining the computing environments.
-   
+
 Dependence (in both local host and sgeserver): numpy, scipy, bottleneck, modeller, mdt, h5py, pymc,filelock (https://github.com/dmfrey/FileLock), matplotlib.
 
 If the installation paths for these packages are not in the python search path (in both local host and sgeserver), please add the pathes to $PYTHONPATH or sys.path.
@@ -15,53 +15,15 @@ import os
 hostname=os.getenv('HOSTNAME')
 print hostname
 from modeller import *
-import Queue 
+import Queue
 import threading
 
 
 class SOAPenv(object):
     """This class defines the directory and other enviroment variables for all the other classes.
     These varialbes needs to be defined::
-    
-        self.localHost=''#local server for storing results and tables, and running SOAP 
-        self.sgeServer=''#for submitting jobs on sge cluster, ssh key authencation needed for passwordless access both way (local host<->server)
-        self.userName="" # username on local host and sge server, must use RSA Key for passwordless SSH Authentication
-        self.localStatPotPath=''# the root path of statistical potential files in local host (could take TB of spaces)            
-        self.localDecoysPath='' # the directory for storing decoys on local host
-        self.localProcessedPDBPaths=['',''] # paths to preprocessed pdb files on local host
-        self.serverProcessedPDBPaths=['',''] # paths to processed pdb files on sge server
-        self.localRawPDBPath='' # path to original pdb files on local host
-        self.serverRawPDBPath=''# paths to processed pdb files on sge server
-        self.serverLogPath='' # for storing logs when path name contains "\#"
-        self.serverUserPath='' # the working directory on sge server
-        self.serverHDF5Path='' # for storing hdf5 tables on sge server, temporary use only
-        self.localInstallPath='' # path to SOAP module on localHost
-        self.serverInstallPath='' # path to SOAP module on sge server
-        self.serverScrathPath=''# for storing temporary results on sge cluster
-        self.localRunCachePath='' # temporary run path on local host
-        self.localResultDB='x.sql3'  # database file location on local host
 
-    .. note::
-        the statpot directory must contains:
-        
-        1. file rsn with a 5-6 digit number in it (run serial number), eg. 10000
-        
-        2. folder results for storing optimization results
-        3. folder Decoys for storing decoys metadata used during training
-        4. folder pdbpir for storing the filtered pir sequence files for PDB structures
-
-    .. warning::
-        The paths in lib/universal_script.sh also need to be configured correctly for SOAP to run on SGE cluster.
-        
-    .. warning::
-        All paths defined in this file as well as the database file must exist before SOAP can be run.
-        
-    """
-    
-    
-    def __init__(self):
-        #define hostnames
-        self.localHost=''#local server for storing results and tables, and running SOAP 
+        self.localHost=''#local server for storing results and tables, and running SOAP
         self.sgeServer=''#for submitting jobs on sge cluster, ssh key authencation needed for passwordless access both way (local host<->server)
         self.userName="" # username on local host and sge server, must use RSA Key for passwordless SSH Authentication
         self.localStatPotPath=''# the root path of statistical potential files in local host (could take TB of spaces)
@@ -78,7 +40,45 @@ class SOAPenv(object):
         self.serverScrathPath=''# for storing temporary results on sge cluster
         self.localRunCachePath='' # temporary run path on local host
         self.localResultDB='x.sql3'  # database file location on local host
-        self.hostname=hostname      
+
+    .. note::
+        the statpot directory must contains:
+
+        1. file rsn with a 5-6 digit number in it (run serial number), eg. 10000
+
+        2. folder results for storing optimization results
+        3. folder Decoys for storing decoys metadata used during training
+        4. folder pdbpir for storing the filtered pir sequence files for PDB structures
+
+    .. warning::
+        The paths in lib/universal_script.sh also need to be configured correctly for SOAP to run on SGE cluster.
+
+    .. warning::
+        All paths defined in this file as well as the database file must exist before SOAP can be run.
+
+    """
+
+
+    def __init__(self):
+        #define hostnames
+        self.localHost=''#local server for storing results and tables, and running SOAP
+        self.sgeServer=''#for submitting jobs on sge cluster, ssh key authencation needed for passwordless access both way (local host<->server)
+        self.userName="" # username on local host and sge server, must use RSA Key for passwordless SSH Authentication
+        self.localStatPotPath=''# the root path of statistical potential files in local host (could take TB of spaces)
+        self.localDecoysPath='' # the directory for storing decoys on local host
+        self.localProcessedPDBPaths=['',''] # paths to preprocessed pdb files on local host
+        self.serverProcessedPDBPaths=['',''] # paths to processed pdb files on sge server
+        self.localRawPDBPath='' # path to original pdb files on local host
+        self.serverRawPDBPath=''# paths to processed pdb files on sge server
+        self.serverLogPath='' # for storing logs when path name contains "\#"
+        self.serverUserPath='' # the working directory on sge server
+        self.serverHDF5Path='' # for storing hdf5 tables on sge server, temporary use only
+        self.localInstallPath='' # path to SOAP module on localHost
+        self.serverInstallPath='' # path to SOAP module on sge server
+        self.serverScrathPath=''# for storing temporary results on sge cluster
+        self.localRunCachePath='' # temporary run path on local host
+        self.localResultDB='x.sql3'  # database file location on local host
+        self.hostname=hostname
         if self.hostname==self.localHost:
             self.hostn=0#local
             self.basedir=self.localStatPotPath
@@ -96,7 +96,7 @@ class SOAPenv(object):
             self.currentrundirlist=[]
             self.jobserverhdf5path=self.serverHDF5Path
             self.resultdbpath=self.localResultDB
-            self.libdir=self.localInstallPath+'lib/'            
+            self.libdir=self.localInstallPath+'lib/'
             self.debug=True
         else:
             self.hostn=1
@@ -119,7 +119,7 @@ class SOAPenv(object):
         self.numofthread=0
         self.queue=Queue.Queue() #queue item format [func, [paras]]
         self.spdsscoreTasks={}
-            
+
     def log(self,sdict):#obsolete
         logstrfile=open(self.basedir+'score.summary','a')
         logstrfile.write(sdict['string']+'\n')
@@ -129,7 +129,7 @@ class SOAPenv(object):
             loglist=cPickle.load(logcPicklefile)
             loglist.append(sdict)
             logcPicklefile.close()
-        else: 
+        else:
             loglist=[]+[sdict]
         logcPicklefile=open(self.basedir+'score.summary.pickle','wb')
         cPickle.dump(loglist,logcPicklefile)
@@ -146,7 +146,7 @@ class SOAPenv(object):
 runenv=SOAPenv()
 
 class ThreadClass(threading.Thread):
-    # will take any jobs from queue, while the queue 
+    # will take any jobs from queue, while the queue
     def __init__(self):
         threading.Thread.__init__(self)
         self.queue = runenv.queue
@@ -160,7 +160,7 @@ class ThreadClass(threading.Thread):
             self.queue.task_done()
         print "quit"
 
-sys.path.extend([]) 
+sys.path.extend([])
 scriptname='universal_script.sh'
 runtimetest=False
 localtest=False
@@ -174,7 +174,7 @@ mcverbose=1
 
 from error import *
 import re
-import time 
+import time
 from modeller import optimizers
 from modeller import automodel
 from modeller.optimizers import actions
@@ -216,7 +216,7 @@ if runenv.hostn==0:
     scratchdir='/scratch'
 else:
     if not os.getenv('JOB_ID'):
-        scratchdir='/scratch/'+runenv.userName+'/temp/' 
+        scratchdir='/scratch/'+runenv.userName+'/temp/'
         if not os.path.isdir(scratchdir):
             os.makedirs(scratchdir)
     else:

@@ -49,7 +49,7 @@ class MMetropolis(Metropolis): #discrete anchor points and lower limit on the sc
                 self._len = 1
         self.proposal_distribution='Normal'
         self.blockind=blockind
-        
+
     def propose(self):
         """
         This method is called by step() to generate proposed values
@@ -60,7 +60,7 @@ class MMetropolis(Metropolis): #discrete anchor points and lower limit on the sc
             self.stochastic.value = rnormal(self.stochastic.value, self.adaptive_scale_factor * self.proposal_sd, size=self.stochastic.value.shape)
         elif self.proposal_distribution == "Prior":
             self.stochastic.random()
-        
+
 class MyMetropolis(Metropolis):
     def __init__(self, stochastic, parindex, proposemethod, proposepars, blockind=-999, searchind=[],scale=1, proposal_sd=None, proposal_distribution=None, verbose=1, tally=True, check_before_accepting=True):
         # Metropolis class initialization
@@ -75,7 +75,7 @@ class MyMetropolis(Metropolis):
             proposepars=proposepars[searchind[0]:searchind[-1]+1]
         else:
             self.searchind=range(len(proposemethod))
-        
+
         # Initialize hidden attributes
         self.adaptive_scale_factor = 0.5
         self.accepted = 0.
@@ -95,7 +95,7 @@ class MyMetropolis(Metropolis):
         self.proposepars=proposepars
         self.proposevalue=np.zeros(self.stochastic.value.shape)
         for i in range(len(self.parindex)-1):
-             if self.proposemethod[i] == "splineparn":
+            if self.proposemethod[i] == "splineparn":
                 numofpars=self.proposepars[i][2]
                 parmean=self.proposepars[i][3]
                 parstd=parmean*scale
@@ -123,7 +123,7 @@ class MyMetropolis(Metropolis):
             else:
                 self._len = 1
         self.proposal_distribution='Normal'
-    
+
     def tune(self, divergence_threshold=1e10, verbose=0):
         """
         Tunes the scaling parameter for the proposal distribution
@@ -154,7 +154,7 @@ class MyMetropolis(Metropolis):
         if verbose > 0:
             print '\t%s tuning:' % self._id
             print '\t\tadaptive scale factor(old):', self.adaptive_scale_factor
-            
+
         # Flag for tuning state
         tuning = True
 
@@ -237,7 +237,7 @@ class MyMetropolis(Metropolis):
                 pvalue[self.parindex[i]+1:self.parindex[i+1]]=parvalue
                 pvalue[self.parindex[i]]=self.proposepars[i][0]
         self.stochastic.value=pvalue
-        
+
 class MxMetropolis(MyMetropolis): #discrete anchor points
     def __init__(self, stochastic, parindex, proposemethod, proposepars, blockind=-999, searchind=[],scale=1., proposal_sd=None, proposal_distribution=None, verbose=mcverbose, tally=True, check_before_accepting=True):
         # Metropolis class initialization
@@ -253,7 +253,7 @@ class MxMetropolis(MyMetropolis): #discrete anchor points
             proposepars=proposepars[searchind[0]:searchind[-1]+1]
         else:
             self.searchind=range(len(proposemethod))
-            
+
         # Initialize hidden attributes
         self.adaptive_scale_factor = 1.
         self.accepted = 0.
@@ -274,7 +274,7 @@ class MxMetropolis(MyMetropolis): #discrete anchor points
         print self.proposepars
         self.proposevalue=np.zeros(self.stochastic.value.shape)
         for i in range(len(self.parindex)-1):
-             if self.proposemethod[i] == "splineparn":
+            if self.proposemethod[i] == "splineparn":
                 numofpars=self.proposepars[i][2]
                 parmean=self.proposepars[i][3]-self.proposepars[i][4]
                 parstd=parmean*scale
@@ -301,7 +301,7 @@ class MxMetropolis(MyMetropolis): #discrete anchor points
             else:
                 self._len = 1
         self.proposal_distribution='Normal'
-    
+
     def propose(self):
         """
         This method is called by step() to generate proposed values
@@ -363,7 +363,7 @@ class MxMetropolis(MyMetropolis): #discrete anchor points
                 #print parvalue
                 #pvalue[self.parindex[i]]=self.proposepars[i][0]
         self.stochastic.value=pvalue
- 
+
 class MzMetropolis(MxMetropolis): #discrete anchor points and lower limit on the scale factor
     def __init__(self, stochastic, parindex, proposemethod, proposepars, blockind=-999,scale=1., proposal_sd=None, proposal_distribution=None, verbose=1, tally=True, check_before_accepting=True):
         # Metropolis class initialization
@@ -376,7 +376,7 @@ class MzMetropolis(MxMetropolis): #discrete anchor points and lower limit on the
                 self.scale_factor_min.append(0.5*(self.proposepars[i][4]/(scale*parmean)))
             else:
                 self.scale_factor_min.append(0.001)
-   
+
     def propose(self):
         """
         This method is called by step() to generate proposed values
@@ -417,5 +417,4 @@ class MzMetropolis(MxMetropolis): #discrete anchor points and lower limit on the
                 #print parvalue
                 pvalue[self.parindex[i]+1:self.parindex[i+1]]=parvalue
                 pvalue[self.parindex[i]]=self.proposepars[i][0]
-        self.stochastic.value=pvalue   
-   
+        self.stochastic.value=pvalue

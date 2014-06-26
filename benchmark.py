@@ -9,10 +9,10 @@ from rankScores import dsscore
 class dsscorestats(object):
     """
     Summarize the ranking results based on RMSDs and scores.
-    
+
     :param list dslist: the names of decoy sets used for benchmark, for retrieving the RMSD values
     :param dsscore dsscore: the score object :class:`rankScores.dsscore`, with the scores
-    
+
     """
     def __init__(self,dslist=[],dsscore=dsscore()):
         self.dsscore=dsscore
@@ -27,27 +27,27 @@ class dsscorestats(object):
         #self.sa_fields=[]
         #self.sa={}# reorder sa to save it in continuous array
         #self.sal=[]
-        
+
     def get_rmsdlist(self):
         self.ds=decoysets(self.dslist)
         #clean up the decoysets object to eliminate unnecessary objects
         self.ds=self.ds.load(mode='dss')
         if not self.ds.sa.flags['OWNDATA']:
             self.ds.sa=copy.deepcopy(self.ds.sa)
- 
-    def analyze_score(self,slevel='NativeSelection',dsscoreo=[],score=[], report='single'):
-	"""
-	Calculate the performance measure.
-	
-	:param str slevel: benchmark criteria/performance measure
-	:param dsscore dsscoreo: the score object :class:`rankScores.dsscore`, with the scores 
-	:param list score: the scores
-	:param str report: single|full, report single number summarizing the performance or detailed measures
 
-	"""	
+    def analyze_score(self,slevel='NativeSelection',dsscoreo=[],score=[], report='single'):
+        """
+        Calculate the performance measure.
+
+        :param str slevel: benchmark criteria/performance measure
+        :param dsscore dsscoreo: the score object :class:`rankScores.dsscore`, with the scores
+        :param list score: the scores
+        :param str report: single|full, report single number summarizing the performance or detailed measures
+
+        """
         #reported result are the large the better
         if len(score)>0:
-            self.score=score    
+            self.score=score
         elif dsscoreo:
             self.dsscore=dsscoreo
             self.score=dsscoreo.score
@@ -62,7 +62,7 @@ class dsscorestats(object):
             elif key=='top':
                 self.analyze_topmodels()
             elif key=='cc':
-                self.analyze_cc()                
+                self.analyze_cc()
             elif key=='bestrank':
                 self.analyze_bestrank()
             elif key=='lbslope':
@@ -70,11 +70,11 @@ class dsscorestats(object):
             elif key=='dcg':
                 self.analyze_dcg()
             elif key=='enrichment':
-                self.analyze_enrichment()		
+                self.analyze_enrichment()
             else:
                 raise Exception('Do not know how to analyze score with criteria: '+slevel)
         return self.report_stats(report)
-        
+
     def report_stats(self,report):
         csa=np.copy(self.statsarray)
         #print csa
@@ -91,7 +91,7 @@ class dsscorestats(object):
                 srv=srv/(len(self.ds.setpos)-1)
                 rv+=self.criterialist[i]['ratio']*srv
         if report=='single':
-            return rv 
+            return rv
         ra=[]
         #report details on each criteria
         for i in range(self.numofc):
@@ -146,14 +146,14 @@ class dsscorestats(object):
                 self.criterialist.append(criteriadict['NativeSelection'])
             elif sl.startswith('cc'):
                 criteriadict['cc']={'ctsn':ctsn,'ct':'cc','ratio':ratio}
-                self.criterialist.append(criteriadict['cc'])  
+                self.criterialist.append(criteriadict['cc'])
             elif sl.startswith('dcg'):
                 criteriadict['dcg']={'ctsn':ctsn,'ct':'dcg','ratio':ratio}
                 self.criterialist.append(criteriadict['dcg'])
             elif sl.startswith('enrichment'):
                 criteriadict['enrichment']={'ctsn':ctsn,'ct':'enrichment','ratio':ratio}
                 self.criterialist.append(criteriadict['enrichment'])
-		self.ds.sa['rmsd']=1-self.ds.sa['rmsd']#make 1 be postiive example, 0 negative example
+                self.ds.sa['rmsd']=1-self.ds.sa['rmsd']#make 1 be postiive example, 0 negative example
             elif sl.startswith('lbslope'):
                 criteriadict['lbslope']={'ctsn':ctsn,'ct':'lbslope','ratio':ratio}
                 self.criterialist.append(criteriadict['lbslope'])
@@ -202,15 +202,15 @@ class dsscorestats(object):
                 ramean=[0]
             else:
                 raindex=[0]
-                ramean=[]                
+                ramean=[]
             prmsdcutoff=rmsdmin
             ramean
             for rmsdcutoff in np.linspace(rmsdmin,rmsdmax,int(lbpl[1]))[1:]:
                 cind=np.searchsorted(rmsds,rmsdcutoff)
-                if cind>raindex[-1]+5:# each bin contain at leat 
-                	raindex.append(cind)
-                	ramean.append(0.5*(rmsdcutoff+prmsdcutoff))# the center
-                	prmsdcutoff=rmsdcutoff
+                if cind>raindex[-1]+5:# each bin contain at leat
+                    raindex.append(cind)
+                    ramean.append(0.5*(rmsdcutoff+prmsdcutoff))# the center
+                    prmsdcutoff=rmsdcutoff
             self.rmsdbinlist.append([raindex,np.array(ramean)])
 
     def initialize_topmodels(self,slevel):
@@ -255,7 +255,7 @@ class dsscorestats(object):
         ctd['cs']=sl[2]
         ctd['cf']=sl[3]
         ctd['cfd']={}
-        if sl[3]:            
+        if sl[3]:
             filters=sl[3]
             if filters.endswith('FIRST'):
                 ctd['cfd']['firstonly']=True
@@ -267,14 +267,14 @@ class dsscorestats(object):
             for item in fl:
                 if re.search('([a-z]+)([0-9\.]+)',item):#whether the structure complies to the criteria
                     rerl=re.search('([a-z]+)([0-9\.]+)',item)
-                    #self.sa_fields.append(rerl.group(1))                    
-                    ctd['cfd']['cl'].append([rerl.group(1),float(rerl.group(2))]) 
+                    #self.sa_fields.append(rerl.group(1))
+                    ctd['cfd']['cl'].append([rerl.group(1),float(rerl.group(2))])
                 else:# the rmsd ... value
                     raise Exception('Do not know how to handle this benchmark criteria '+slevel)
             #initialize total number for percentage calculation
             ctd['cfn']=[]
             poslist=self.ds.indexlist
-            for i in range(0,len(poslist)):            
+            for i in range(0,len(poslist)):
                 if self.withnative:
                     csa=self.ds.sa[poslist[i][0]+1:poslist[i][1]]
                 else:
@@ -285,21 +285,21 @@ class dsscorestats(object):
                 #bni=np.nonzero(bool)[0] # index for the sortind
                 ctd['cfn'].append(float(bool.sum())+0.00000000000001)
         return ctd
-                    
+
     def initialize_topmodels_stats(self):
         self.top_numarray=np.zeros([len(self.ds.indexlist),len(self.criteriadict['top'])+1],dtype=np.int)
         for i in range(0,len(self.ds.indexlist)):
-            for sd,j in zip(self.criteriadict['top'],range(0,len(self.criteriadict['top']))):                    
+            for sd,j in zip(self.criteriadict['top'],range(0,len(self.criteriadict['top']))):
                 if sd['cn']<1:
                     self.top_numarray[i,j]=int(sd['cn']*(self.ds.indexlist[i][1]-self.ds.indexlist[i][0]))
                 else:
                     self.top_numarray[i,j]=min(int(sd['cn']),self.ds.indexlist[i][1]-self.ds.indexlist[i][0])
-            self.top_numarray[i,-1]=np.max(self.top_numarray[i,:-1]) 
+            self.top_numarray[i,-1]=np.max(self.top_numarray[i,:-1])
         top_nummax=self.top_numarray.max()
         #self.top_valuearray=np.zeros(top_nummax,dtype=self.ds.sa.dtype) # the array for store changed sa value
         #self.top_propertyarray=np.zeros(top_nummax) #array for store intermidiate results.
         self.top_boolarray=np.zeros(top_nummax,dtype=np.bool) # the array for store bool values
-    
+
     def initialize_topmodels_sa(self):
         for key in self.sa_fields:
             self.sa[key]=np.copy(self.ds.sa[key])
@@ -312,7 +312,7 @@ class dsscorestats(object):
                     self.sal[-1][key]=self.sa[key][poslist[i][0]+1:poslist[i][1]]
                 else:
                     self.sal[-1][key]=self.sa[key][poslist[i][0]:poslist[i][1]]
-                
+
     def analyze_topmodels(self):
         #calc the success rate of top models to be in some rmsd range.slevel top10_rmsd2.0_irmsd2.0
         rmsdnpa=self.score
@@ -338,7 +338,7 @@ class dsscorestats(object):
                         rmsdcriteria=tpc['cp']
                 lowestctn=bottleneck.argpartsort(rmsds[rmsdcriteria],ctn)
                 lsind=np.argsort(rmsds[rmsdcriteria][lowestctn[:ctn]])
-                sortind=lowestctn[:ctn][lsind]                
+                sortind=lowestctn[:ctn][lsind]
             elif self.getworstvalue:
                 rmsdcriteria='rmsd'
                 for tpc,k in zip(topcd,range(len(topcd))):
@@ -346,7 +346,7 @@ class dsscorestats(object):
                         rmsdcriteria=tpc['cp']
                 lowestctn=bottleneck.argpartsort(-rmsds[rmsdcriteria],ctn)
                 lsind=np.argsort(-rmsds[rmsdcriteria][lowestctn[:ctn]])
-                sortind=lowestctn[:ctn][lsind] 
+                sortind=lowestctn[:ctn][lsind]
             else:#testing code
                 lowestctn=bottleneck.argpartsort(score,ctn)
                 lsind=np.argsort(score[lowestctn[:ctn]])
@@ -388,7 +388,7 @@ class dsscorestats(object):
                     if len(bni)==0:
                         pa=np.array([0])
                     else:
-                        pa=np.log10(tn[k]+2)-np.log10(bni+1)                        
+                        pa=np.log10(tn[k]+2)-np.log10(bni+1)
                 elif tpc['cp']=='rrankr': #with reverse rmsd
                     if len(bni)==0:
                         pa=np.array([0])
@@ -411,7 +411,7 @@ class dsscorestats(object):
                 elif tpc['cs']=='mean':
                     statsarray[tpc['ctsn']]=sum(pa)/len(pa)
                 elif tpc['cs']=='median':
-                    statsarray[tpc['ctsn']]=np.median(pa)                    
+                    statsarray[tpc['ctsn']]=np.median(pa)
                 elif tpc['cs']=='sum':
                     statsarray[tpc['ctsn']]=np.sum(pa)
                 elif tpc['cs']=='min':
@@ -425,7 +425,7 @@ class dsscorestats(object):
                 else:
                     raise Exception('can not handle benchmark criteria cs '+str(tpc['cs']))
         #print self.statsarray
-                
+
     def analyze_score_0(self):
     #calculate benchmark statistics based on scores
         rmsdnpa=self.score
@@ -437,7 +437,7 @@ class dsscorestats(object):
             if (np.argmin(score)==0 or self.getidealvalue) and (not self.getworstvalue):
                 sn=sn+1
                 self.statsarray[i,ai]=1
-                
+
     def analyze_cc(self):
     #calculate benchmark statistics based on scores
         rmsdnpa=self.score
@@ -451,10 +451,10 @@ class dsscorestats(object):
             elif self.getworstvalue:
                 self.statsarray[i,ai]=-1
             else:
-		self.statsarray[i,ai]=np.corrcoef(score,rmsds)[0,1]
-		if np.isnan(self.statsarray[i,ai]):
-		    self.statsarray[i,ai]=-1
-		
+                self.statsarray[i,ai]=np.corrcoef(score,rmsds)[0,1]
+                if np.isnan(self.statsarray[i,ai]):
+                    self.statsarray[i,ai]=-1
+
     def analyze_dcg(self):#discounted cumulative gain
         rmsdnpa=self.score
         poslist=self.ds.indexlist
@@ -472,9 +472,9 @@ class dsscorestats(object):
             self.statsarray[i,ai]=(ta[ta>0]).sum()
 
     def analyze_enrichment(self):
-	"""
-	    Calculate the enrichment score
-	"""
+        """
+            Calculate the enrichment score
+        """
         rmsdnpa=self.score
         poslist=self.ds.indexlist
         ai=self.criteriadict['enrichment']['ctsn']
@@ -487,12 +487,12 @@ class dsscorestats(object):
                 sind=np.arange(poslist[i][1]-poslist[i][0]-1,-1,-1)
             else:
                 sind=np.argsort(score)
-	    va=-np.log(np.nonzero(rmsds[sind])[0])
+            va=-np.log(np.nonzero(rmsds[sind])[0])
             self.statsarray[i,ai]=va.sum()/len(va)
-                
+
     def analyze_lbslope(self):
     #calculate the slope of the lower bound line in the score vs rmsd file.
-    	# the lower bound rmsd bins are precalculated as saved in self.rmsdbins
+        # the lower bound rmsd bins are precalculated as saved in self.rmsdbins
         rmsdnpa=self.score
         poslist=self.ds.indexlist
         ai=self.criteriadict['lbslope']['ctsn']
@@ -530,18 +530,18 @@ class dsscorestats(object):
                 self.statsarray[i,ai]=len(score)
             else:
                 self.statsarray[i,ai]=(score<score[si]).sum()+1
-                
+
     def save(self):
         fh=open(self.dsscore.scorepath+'.stats.pickle','wb')
         cPickle.dump(self,fh)
         fh.close()
-        
+
     def load(self):
         fh=open(self.score.scorepath+'.stats.pickle','rb')
         no=cPickle.load(fh)
         fh.close()
         return no
-    
+
     def log(self):
         sdict={}
         result={}
@@ -555,4 +555,3 @@ class dsscorestats(object):
         sdict['string']=self.dsscore.scorename+self.statsstring
         self.sdict=sdict
         runenv.log(sdict)
-    

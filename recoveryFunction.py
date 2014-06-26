@@ -10,13 +10,13 @@ import scipy.interpolate
 class sf(object):
     """
     Recovery function class
-    
+
     :param str sftype: the type of recovery function, see source codes for detail, get1d().
     :param list|numpyArray par: anchor points positions for splines.
     :param list|numpyArray parvalue: anchor values for splines, and parameters for other type of recovery functions.
     :param str features: features the recovery function corresponding to, see :mod:`feature`.
     :param dict model: a dict contains the same parameters described above
-    
+
     """
     def __init__(self,data=None,sftype='',par=[],parvalue=[],features='',type='',model=[],rawsp=None,*args,**args2):
         if model:
@@ -101,7 +101,7 @@ class sf(object):
             print 'The length of parvalue is not matched'
             pdb.set_trace()
             raise Exception('The length of parvalue is not the same as needed for building the reference distribution')
-                 
+
     def get_sf(self, returnreft=False):
         """
         Return the recovery function calculated using the self.par and self.parvalue.
@@ -132,7 +132,7 @@ class sf(object):
         self.sfv[self.sfv<-1000000]=-100000
         self.sfv[self.sfv>1000000]=100000
         return self.sfv
-            
+
     def getmd(self,par,parvalue):#should not be useful in any situation.
         ref=np.array(0,dtype=np.float32)
         for k in range(0,len(self.stypes)):
@@ -157,7 +157,7 @@ class sf(object):
             if ptype.endswith('s'):
                 res=res/res.sum()
             else:
-                res=res/res[-1]            
+                res=res/res[-1]
             return np.log(np.abs(res))
         elif ptype.startswith('rwr'):
             n=max(int(parvalue[0]*200),1)
@@ -170,7 +170,7 @@ class sf(object):
                 res=res/res.sum()
             else:
                 res=res/1.0
-            return np.log(np.abs(res))  
+            return np.log(np.abs(res))
         elif ptype.startswith('rw'): #random walk reference state from Yang zhang.
             n=int(parvalue[0])
             la=parvalue[1]
@@ -181,7 +181,7 @@ class sf(object):
                 res=res/res.sum()
             else:
                 res=res/res[-1]
-            return np.log(np.abs(res))          
+            return np.log(np.abs(res))
         elif ptype.startswith('normb'):
             n=len(parvalue)/3 # mean ,std, weight
             res=np.zeros(len(self.bins[pi]))
@@ -190,8 +190,8 @@ class sf(object):
             if ptype.endswith('s'):
                 res=res/res.sum()
             else:
-                res=res/1.0            
-            return np.log(np.abs(res))  
+                res=res/1.0
+            return np.log(np.abs(res))
         elif ptype.startswith('lognb'):
             n=len(parvalue)/3 # mean ,std, weight
             res=np.zeros(len(self.bins[pi]))
@@ -201,7 +201,7 @@ class sf(object):
                 res=res/res.sum()
             else:
                 res=res/1.0
-            return np.log(np.abs(res+0.0000001))  
+            return np.log(np.abs(res+0.0000001))
         elif ptype.startswith('sinb'):
             n=len(parvalue)/3 # mean ,std, weight
             res=np.zeros(len(self.bins[pi]))
@@ -210,8 +210,8 @@ class sf(object):
             if ptype.endswith('s'):
                 res=res/res.sum()
             else:
-                res=res/1.0           
-            return np.log(np.abs(res)) 
+                res=res/1.0
+            return np.log(np.abs(res))
         elif ptype.startswith('expb'):
             n=len(parvalue)/4 # mean ,std, weight,exponential
             res=np.zeros(len(self.bins[pi]))
@@ -220,8 +220,8 @@ class sf(object):
             if ptype.endswith('s'):
                 res=res/res.sum()
             else:
-                res=res/1.0            
-            return np.log(np.abs(res))         
+                res=res/1.0
+            return np.log(np.abs(res))
         elif ptype.startswith('rexpb'):
             n=len(parvalue)/5 # mean ,std, weight
             res=np.zeros(len(self.bins[pi]))
@@ -230,8 +230,8 @@ class sf(object):
             if ptype.endswith('s'):
                 res=res/res.sum()
             else:
-                res=res/1.0            
-            return np.log(np.abs(res))   
+                res=res/1.0
+            return np.log(np.abs(res))
         elif ptype.startswith('svdb'):
             k=0
             for pvs in parvalue:
@@ -239,11 +239,11 @@ class sf(object):
                     res=self.svdu[:,k]*pvs
                 else:
                     res+=self.svdu[:,k]*pvs
-                k+=1                
+                k+=1
             if ptype.endswith('s'):
                 res=res/res.sum()
             else:
-                res=res/1.0          
+                res=res/1.0
             return res
         elif ptype.startswith('spline'):
             us=scipy.interpolate.InterpolatedUnivariateSpline(par,parvalue)
@@ -276,19 +276,19 @@ class sf(object):
                 us=scipy.interpolate.pchip(par,np.log(parvalue))
                 svalue=us(self.bins[pi])
             elif ptype[4]=='o':
-                us=scipy.interpolate.pchip(par,parvalue)           
+                us=scipy.interpolate.pchip(par,parvalue)
                 svalue=np.log(np.abs(us(self.bins[pi]))+0.00000000000000000001)
             elif ptype[4]=='l':
-                us=scipy.interpolate.pchip(par,parvalue)           
+                us=scipy.interpolate.pchip(par,parvalue)
                 svalue=us(self.bins[pi])
             elif ptype[4]=='f':
                 us=scipy.interpolate.InterpolatedUnivariateSpline(par,np.log(np.abs(parvalue)))
-                svalue=us(self.bins[pi])               
+                svalue=us(self.bins[pi])
             elif ptype[4]=='p':
-                us=scipy.interpolate.InterpolatedUnivariateSpline(par,parvalue)           
+                us=scipy.interpolate.InterpolatedUnivariateSpline(par,parvalue)
                 svalue=np.log(np.abs(us(self.bins[pi]))+0.00000000000000000001)
             elif ptype[4]=='s':
-                us=scipy.interpolate.InterpolatedUnivariateSpline(par,parvalue)           
+                us=scipy.interpolate.InterpolatedUnivariateSpline(par,parvalue)
                 svalue=us(self.bins[pi])
             return svalue
         elif ptype.startswith('psn4'): #
@@ -296,10 +296,10 @@ class sf(object):
             pl=list(par)
             newparvalue=list(parvalue)
             pl.append(self.bins[pi][-1])
-            par=np.array(pl)    
+            par=np.array(pl)
             parvalue=np.cumsum(newparvalue)
             us=scipy.interpolate.pchip(par,np.abs(parvalue))
-            return np.log(np.abs(us(self.bins[pi]))+0.00000000000000000001) 
+            return np.log(np.abs(us(self.bins[pi]))+0.00000000000000000001)
         elif ptype.startswith('psn3'):
             #positive monotonic spline, normailized at last bin=1, search interval
             #print par
@@ -307,57 +307,57 @@ class sf(object):
             pl=list(par)
             newparvalue=list(parvalue)+[1]
             pl.append(self.bins[pi][-1])
-            par=np.array(pl)    
+            par=np.array(pl)
             parvalue=np.cumsum(newparvalue)
             parvalue=parvalue/parvalue[-1]
-            #print par 
+            #print par
             #print parvalue
             #valuelist=pypchip.pchip(par,np.abs(parvalue),self.bins[pi])
             #print self.bins[pi]
             #print valuelist
             #return np.log(np.abs(valuelist)+0.00000000000000000001)
             us=scipy.interpolate.pchip(par,np.abs(parvalue))
-            return np.log(np.abs(us(self.bins[pi]))+0.00000000000000000001)             
+            return np.log(np.abs(us(self.bins[pi]))+0.00000000000000000001)
             #us=scipy.interpolate.InterpolatedUnivariateSpline(par,np.log(np.abs(parvalue)))
             #return us(self.bins[pi])
         elif ptype.startswith('psn2'):
-            #positive  spline, not normalized, 
+            #positive  spline, not normalized,
             #print par
             #print parvalue
             pl=list(par)
             newparvalue=list(parvalue)
             pl.append(self.bins[pi][-1])
-            par=np.array(pl)    
+            par=np.array(pl)
             parvalue=np.array(newparvalue)
             #print par
             #print parvalue
             us=scipy.interpolate.InterpolatedUnivariateSpline(par,np.abs(parvalue))
-            return np.log(np.abs(us(self.bins[pi]))+0.00000000000000000001) 
+            return np.log(np.abs(us(self.bins[pi]))+0.00000000000000000001)
         elif ptype.startswith('psn'):
-            #positive spline, normailized at last bin=1, 
+            #positive spline, normailized at last bin=1,
             #print par
             #print parvalue
             pl=list(par)
             newparvalue=list(parvalue)
             pl.append(self.bins[pi][-1])
             newparvalue.append(1)
-            par=np.array(pl)    
+            par=np.array(pl)
             parvalue=np.array(newparvalue)
             #print par
             #print parvalue
             us=scipy.interpolate.InterpolatedUnivariateSpline(par,np.abs(parvalue))
-            return np.log(np.abs(us(self.bins[pi]))+0.00000000000000000001)       
+            return np.log(np.abs(us(self.bins[pi]))+0.00000000000000000001)
         elif ptype.startswith('ps'):
             #print par
             #print parvalue
             pl=list(par)
             newparvalue=list(parvalue)
-            par=np.array(pl)    
+            par=np.array(pl)
             parvalue=np.array(newparvalue)
             #print par
             #print parvalue
             us=scipy.interpolate.InterpolatedUnivariateSpline(par,np.abs(parvalue))
-            return np.log(np.abs(us(self.bins[pi]))+0.00000000000000000001) 
+            return np.log(np.abs(us(self.bins[pi]))+0.00000000000000000001)
         elif ptype=='ig':
             xi=np.arange(0.5,30,1)
             aprpr=[   144.434703,   1412.820011,   3834.829326,   7202.871092,
@@ -379,4 +379,3 @@ class sf(object):
             return sfv
         else:
             raise Bugs('Unknown reference function type: '+ptype)
-

@@ -35,11 +35,11 @@ class sps(object):
         self.tasktempdirs=[]
         self.logpathlist=[]
         self.evalPotFunc=evalPotFunc
-        
+
     def append(self,m):
         self.models.append(copy.deepcopy(m))
         self.modelso.append(copy.deepcopy(m))
-     
+
     def initialize(self):
         tl=[]
         for model in self.models:
@@ -50,15 +50,15 @@ class sps(object):
             tco=taskchain(chains=tcl)
             tl.append(tco)
         to=tasklist(tasklist=tl)
-        
+
         to.monitor2end()
-        
+
     def get_alltasks(self):
         tl=[]
         for model in self.models:
             tl.append(self.get_singlemodel_taskchain(model))
         return tasklist(tasklist=tl)
-    
+
     def get_singlemodel_taskchain(self,model):
         tcl=[]
         tcl.append(localtask(func=self.initialize_model_pir,inputlist=[model]))
@@ -91,7 +91,7 @@ class sps(object):
         for pird in pirlist:
             pir().get_pir(pird)
         return 1
-        
+
     def initialize_model_distributions(self,model,taskchain):
         rawsplist=[]
         scaledsplist=[]
@@ -122,7 +122,7 @@ class sps(object):
                 listoftasks.append(r)
         if len(listoftasks)>0:
             taskchain.append(tasklist(tasklist=listoftasks))
-            
+
     def initialize_model_scores(self,model,taskchain):
         listoftasks=[]
         scorelist=[]
@@ -134,7 +134,7 @@ class sps(object):
             if scorer['type']=='scaledsp':
                 if scorer in searches:
                     continue
-                if model['bmtype']['type']=='dsscore':    
+                if model['bmtype']['type']=='dsscore':
                     ns=copy.deepcopy(scorer)
                     ns['scoretype']='dsscore'
                     ns['dslist']=model['bmtype']['dslist']
@@ -151,20 +151,20 @@ class sps(object):
                 listoftasks.append(sj)
         if len(listoftasks)>0:
             taskchain.append(tasklist(tasklist=listoftasks))
-            
+
     def cv_start(self,testperc,testsample):
         #self.loadlog()
         self.cvlist=[]
         listoftasks=[]
         for model in self.models:
-            
+
             so=scorer(model=model)
             opt=optimizer(scorer=so)
             cv=k2cvcluster(spsfo=opt)
             self.cvlist.append(cv)
             listoftasks.append(cv.cross_validation_with_test(testperc,testsample))
         self.cvtask=tasklist(tasklist=listoftasks)
-        
+
     def cv(self):
         alltasks=self.get_alltasks()
         #finished getting tasks, now start running
@@ -172,8 +172,8 @@ class sps(object):
         runenv.spdsscoreTasks={}
         alltasks.monitor2end()
         self.show_summary()
-        
-    
+
+
     def cvlocal(self,testperc=0,testsample=[]):
         self.cvlist=[]
         for opt in self.optlist:
@@ -192,7 +192,7 @@ class sps(object):
             scorer=self.scorerlist[i]
             scorer.build_model(self.cvresult[i][-1][0][0][0])
             scorer.write_potential(type)
-            
+
     def show_summary(self):
         for cv in self.cvlist:
             print cv.statsstr
@@ -200,7 +200,7 @@ class sps(object):
             print cv.bestmodelresult
         for cv in self.cvlist:
             print cv.resultstr
-        
+
     def plot(self,cl=[]):
         clusterslist=[]
         for i in range(len(self.cvlist)):
@@ -223,136 +223,136 @@ class sps(object):
         for cv in self.cvlist:
             rdl.append(cv.rundir)
         return rdl
-  
+
 class spss(object):
     """
-    
+
     Select the best model.
-    
+
     :Parameters:
       - `model`: the model space to search the best model within
 
     Common usage::
         spl=spss(model=model1)
         spl.find_best_par()
-        spl.log()    
-    
+        spl.log()
+
     .. note::
         The model and model space are defined using python lists and dictionaries.
-        
+
         Define the recovery function features, distance only, from 0 to 20A with bin size 0.05, see the :mod:`features`. ::
-        
+
            rfeature=[['d',0,20,0.05]] # 'd' - distance, 0 - start position, 20 - end position, 0.05 - bin size
-           
+
         Features can be defined using either list or string, list defintion will be converted into string defintion on the fly.
-        
+
         Define the spliens used for generating recoery functions. see :mod:`recoveryFunction`::
-        
+
             par={'uniform':4,'featurebins':rfeature[0],'distribute':'lownumberpriority','firstpoint':2.25}
             slo={'key':'sacnfflex',
             'valueset':{
                             'sacnfflex':{'sftype':'sacnf','par':par,'parvalue':[1,1,1,1]},
                             'sacnf52':{'sftype':'sacnf','par':[2.75,3.75],'parvalue':[1,1,1,1]},
             }}
-        
+
         The most important parameter to vary is 'uniform', which defines the number of anchor points to use.
-            
+
         Define the recovery function, see :mod:`recoveryFunction`::
-        
+
             ref1={'type':'sf','features':rfeature,'sftype':slo,'par':slo,'parvalue':slo,'ratio':[1.0]}
-        
+
         Define the features for the statistics calculation from a set of structures, a158 represent residue dependent atom type::
-        
+
             sfeature=[rfeature[0],'a158','as158']
-            
+
         Define the processing method of the probabilistic table, 'npend' means normalized by the last bin value, see :class:`statsTable.scaledsp`::
-        
+
             pm=['','npend']
-            
+
         Processing method can be defined using either list or string, list defintion will be converted into string definition on the fly.
-        
-        
+
+
         Define the probabilistic table using for scoring::
-        
+
             scaledsp1={'type':'scaledsp','pdbset':'X_2.2A_0.25rfree','features':sfeature,'genmethod':'cs1','pm':pm,'refs':[ref1],'ratio':[1.0]}
-        
-        
+
+
         The benchmark criteria, defines how the statistical potentials are benchmarked, see :mod:`benchmark`::
-        
+
             bmtype={'type':'dsscore','dslist':['fpdb','fpdu'],'criteria':'3xtop1_rmsdallif_mean_+2xtop3_rmsdallif_mean_','combine':'scoresum','bm':'cs1'}
-        
+
         * 'type' can be 'dsscore' or 'refinescore' (use SOAP for refine).
         * 'combine' can only be 'scoresum' at the moment.
         * 'bm' has the same meaning as 'genmethod' :ref:`genmethod`.
-        
+
         Parameters to optimize::
-        
+
             search1={'object':ref1,'key':'parvalue','pos':[0,1,2,3],'InitialGenerator':{'type':'dfire','values':initvalues}}
             search2={'object':ref1,'key':'par','pos':[0,1,2,3],'InitialGenerator':{'type':'dfire','values':initvalues}}
-            
+
         * 'Object': the object to optimize, needs to be a dict
         * 'key': the key of the object to optimize, must be a list
         * 'pos': the positions of the values in the list to optimize.
         * 'InitialGenerator': ways to generate initial value
-        
+
         Discrete search dictionaries, defining the model space - the model variables/options to vary::
-        
+
             dsearch4={'object':par,'key':'uniform','valueset':[7,6,5,4,3]}
-            
+
             dsearch9={'object':[scaledsp1,scaledsp1],'key':['genmethod','pdbset'],'valueset':[['cs1','X2_2.2A_0.25rfree']]}#,['cs1','X2_2.2A_0.25rfree_30'],['cs1','X2_2.2A_0.25rfree_60'],['cs1','X2_2.2A_0.25rfree_95'],['bs20dsp','X_2.2A_0.25rfree'],['bs20dsp','X_2.2A_0.25rfree_30'],['bs20dsp','X_2.2A_0.25rfree_60'],['bs15dsp','X_2.2A_0.25rfree'],['bs10dsp','X_2.2A_0.25rfree']]}#,,'cs1'
-        
+
         * 'Object': the object to vary, needs to be a dict
         * 'key': the key of the object to vary, often a string
         * 'valueset': the set of values to search within.
-        
+
         Parameters controling sampling and optimization, please check the code in the sampling module for detailed meanings::
-        
+
             ni=40
-            
+
             initvalues=list(np.arange(0,ni)/10.0+1)
-            
+
             initvalues=np.array(initvalues)
-            
+
             inner={'improved':2,'maxloop':100,'minloop':2}
             outer={'improved':4,'maxloop':5023}
-            
+
             td=list(np.sqrt(np.linspace(1,float(10)**2,ni)))
             td=np.array(td)
             tune_interval=200
-            
+
             sampleschedule={'inner':inner,'outer':outer}
             ssm={'sm':'mcp','reset_betweenruns':2,'blockupdate':True, 'exchange_method':1,
                   'sample_schedule':sampleschedule,
                   'stepmethod':'mxmp2.0','tune_interval':200,'add_bias':False,'temperature_distribution':td}
-            
+
             ssm0={'sm':'mcs','reset_betweenruns':2,'blockupdate':False,'using_globalbest':True,
                   'sample_schedule':sampleschedule,
                   'stepmethod':'mxmp2.0','tune_interval':201,'add_bias':False,'temperature_distribution':td}
-            
-            
+
+
             ssm2={'sm':'mcp','reset_betweenruns':2,'blockupdate':False, 'exchange_method':1,
                   'sample_schedule':sampleschedule,
                   'stepmethod':'mxmp2.0','tune_interval':200,'add_bias':False,'temperature_distribution':td}
-            
+
             ssm20={'sm':'mcs','reset_betweenruns':2,'blockupdate':True,'using_globalbest':True,
                   'sample_schedule':sampleschedule,
                   'stepmethod':'mxmp2.0','tune_interval':201,'add_bias':False,'temperature_distribution':td}
-            
-            
+
+
             ssm1={'sm':'mca','reset_betweenruns':2,'blockupdate':True, 'using_globalbest':True,
                   'sample_schedule':sampleschedule,
                   'stepmethod':'mxmp2.0','tune_interval':201,'add_bias':False,'temperature_distribution':np.zeros(ni)+2}
-            
+
             ssm3={'sm':'powell','blockupdate':False}
-            
+
             sml=[ssm20,ssm2,ssm0,ssm,ssm0,ssm,ssm0,ssm, ssm1]
-        
-        
+
+
         Define the final model::
-        
+
             model1={'scorers':[scaledsp1,ref1],'bmtype':bmtype,'searches':[search1,search2], 'runsperscorer':ni,
                 'dsearches':[dsearch2,dsearch5,dsearch4,dsearch7,dsearch8,dsearch9],'sml':sml,'cvk':2,'repeat':1,'fold':3}
-    
+
         * 'scorers': scoring terms
         * 'bmtype' : benchmark criteria for juding a statistical potential
         * 'searches' : parameters to optimzie
@@ -363,8 +363,8 @@ class spss(object):
         * 'repeat' : how many replica exchanges to carry out for each optimization run
         * 'fold' : n fold cross validation
         * 'testperc': if included, this percentage of decoys will be left out for final validation.
-    
-    
+
+
     """
     def __init__(self, model=[],logfoldername='',evalPotFunc=None):
         self.dsearches=model['dsearches']
@@ -404,7 +404,7 @@ class spss(object):
             self.refineProtocal={}
         self.currentOptimal=-np.inf
         self.bestpar=[]
-    
+
     def modelinlog(self,nm):
         os.chdir(self.baselogdir)
         with FileLock("log.shelve", timeout=100, delay=2) as lock:
@@ -424,7 +424,7 @@ class spss(object):
                 resultdictlog.close()
             print("lock released")
         return nmr
-    
+
     def modelexist(self):
         os.chdir(self.baselogdir)
         path=''
@@ -468,13 +468,13 @@ class spss(object):
         os.mkdir(self.logdir)
         os.chdir(self.logdir)
         return ''
-        
+
     def complete_model(self):
         defaultmodel={'sm':['fmins','pbp.powell','powell'],'cvk':20,'cvm':'parallel','clustermethod':{'clusteringperc':0.999,'clustercutoff':2.5,'scoreratio':[1,1,0,3,1],'pickwhichone':'median'}}
         for key in defaultmodel:
             if not key in self.model:
                 self.model[key]=defaultmodel[key]
-            
+
     def complete_rrf(self,searches):
         return 0
         for so in searches:
@@ -482,7 +482,7 @@ class spss(object):
                 par=so['object']['par']
                 so['object']['parvalue']=list(np.ones(len(par)))
                 so['pos']=range(len(par))
-            
+
     def get_model_list(self,dsearch):
         nml=[]
         mkl=[]
@@ -502,8 +502,8 @@ class spss(object):
             #    continue
             nml.append(nm)
             mil.append(i)
-        return [nml,mkl,mil]        
-    
+        return [nml,mkl,mil]
+
     def set_model(self,dsearch,i):
         sobj=dsearch['object']
         skey=dsearch['key']
@@ -513,7 +513,7 @@ class spss(object):
                 sobj[j][skey[j]]=sval[i][j]
         else:
             sobj[skey]=sval[i]
-                
+
     def eval_single_parlist(self,dsearch):
         #get the list of models
         [nml,mkl,mil]=self.get_model_list(dsearch)
@@ -553,7 +553,7 @@ class spss(object):
                 print cv.resultstr+' '+str(mk)
             except:
                 pass
-    
+
     def get_current_keyvalues(self):
         vl=[]
         for dsearch in self.dsearches:
@@ -568,7 +568,7 @@ class spss(object):
             except:
                 pdb.set_trace()
         return vl
-        
+
     def get_resultarray(self,mkl):
         ra=[]
         for mk in mkl:
@@ -580,13 +580,13 @@ class spss(object):
         for mk in mkl:
             loglist.append(str(self.resultdict[str(mk)][0][-1])+' '+self.resultdict[str(mk)][1]+' '+str(mk)+' '+self.resultdict[str(mk)][2])
         return '\n'.join(loglist)
-            
+
     def pick_best_par(self,rarank,toprankbest,cti):
         if 'fix' in self.dsearches[self.dsearchpos] and self.dsearches[self.dsearchpos]['fix']:
             return rarank
         else:
             return rarank[0:cti]
-        
+
     def rank_model(self,ra):
         ras=ra[:,-1]
         if ras.min()==ras.max():
@@ -611,7 +611,7 @@ class spss(object):
         else:
             toprankbest=False
         return [rassort,toprankbest,cti]
-    
+
     def update_dsearches(self,pickedindex,dsearch):
         nvl=[]
         for i in pickedindex:
@@ -631,7 +631,7 @@ class spss(object):
             pdb.set_trace()
         dsearch['valueset']=nvl
         self.write2log(self.get_valuesets())
-        
+
     def oneloop_through_dsearches(self):
         self.numofevals=0
         for i,dsearch in enumerate(self.dsearches):
@@ -639,7 +639,7 @@ class spss(object):
                 continue
             self.dsearchpos=i
             self.eval_single_parlist(dsearch)
-            
+
     def count_searchspace(self):
         n=1
         for dsearch in self.dsearches:
@@ -662,7 +662,7 @@ class spss(object):
                 break
         mkl=self.resultdict.keys()
         self.analyze_results(mkl,'FinalAll\n')
-        
+
     def analyze_results(self,mkl,logprefix=''):
         ra=self.get_resultarray(mkl)
         rarank,toprankbest,cti=self.rank_model(ra)
@@ -682,19 +682,19 @@ class spss(object):
             print logstr
             logfile.close()
             #print os.system('cp '+self.logdir+'log '+self.logdir2)
-            print("lock released")        
-        
+            print("lock released")
+
     def get_valuesets(self):
         dsstr=''
         for dsearch in self.dsearches:
             dsstr=dsstr+str(dsearch['valueset'])
         return dsstr
-        
+
     def eval_allpars(self):
         ml3=[[],[],[]]#model, key,index
         self.get_all_models(ml3,0)
         self.eval_modellist(ml3[0],ml3[1],ml3[2],'EvalAll\n')
-        
+
     def log(self):
         #not used anymore
         try:
@@ -736,7 +736,7 @@ class spss(object):
             return bbd
         except:
             pass
-        
+
     def write_best_pot(self):
         print "only works for the case with single pot, single reference state"
         fh=open(self.logdir+'bestmodel.pickle')
@@ -750,13 +750,13 @@ class spss(object):
         ssppath=so.write_potential(type=type)
         print mre
         print ssppath+'.opt.'+type
-        
+
     def dump(self):
         os.chdir(self.logdir)
         fh=open('spss.pickle','w')
         pickle.dump(self,fh)
         fh.close()
-        
+
     def get_all_models(self,ml3, dsearchindex):
         dsearch=self.dsearches[dsearchindex]
         if dsearchindex==(len(self.dsearches)-1):
@@ -774,7 +774,7 @@ class spss(object):
         self.get_all_models(ml3,0)
         for key in self.resultdict:
             print self.resultdict[key][1]+', '+str(key)
-    
+
 def pickle2shelf(prefix):
     fh=open(prefix+'.pickle')
     a=pickle.load(fh)
@@ -784,7 +784,7 @@ def pickle2shelf(prefix):
     for key in a:
         nd[key]=a[key]
     nd.close()
-        
+
 def get_ppdock_plotdata(path2logdir,scoretype='model',bm=[],mindex=-1,bmset='',scorers=[],sname='',accuracy='rmsd10ORirmsd4FIRST'):
     if bm==[]:
         bm=get_best_model(path2logdir)
@@ -817,7 +817,7 @@ def get_ppdock_plotdata(path2logdir,scoretype='model',bm=[],mindex=-1,bmset='',s
         elif scoretype=='random':
             ra[p]=so.assess_randomized_score(slevel='top'+str(tcp)+'__nonempty_'+accuracy)
         elif scoretype=='scorer':
-            ra[p]=so.assess_basescore(slevel='top'+str(tcp)+'__nonempty_'+accuracy)            
+            ra[p]=so.assess_basescore(slevel='top'+str(tcp)+'__nonempty_'+accuracy)
     ra[...]=ra[...]/idealperc
     if sname:
         np.save(os.path.join(path2logdir,bmset+sname+'.npy'),ra)
@@ -828,7 +828,7 @@ def get_ppdock_plotdata(path2logdir,scoretype='model',bm=[],mindex=-1,bmset='',s
     elif scoretype=='random':
         np.save(os.path.join(path2logdir,bmset+'random.npy'),ra)
     elif scoretype=='scorer':
-        np.save(os.path.join(path2logdir,bmset+'scorer.npy'),ra)        
+        np.save(os.path.join(path2logdir,bmset+'scorer.npy'),ra)
     return ra
 
 def get_bestm_result(path2logdir,scoretype='model',bm=[],mindex=-1,dslist=''
@@ -878,9 +878,9 @@ def get_bestm_result(path2logdir,scoretype='model',bm=[],mindex=-1,dslist=''
             ra[pi]=so.assess_basescore(slevel=p)
         elif scoretype=='ideal':
             ra[pi]=so.assess_ideal(slevel=p)
-    
+
     if sname:
-        np.save(os.path.join(path2logdir,bmset+sname+'.npy'),ra)       
+        np.save(os.path.join(path2logdir,bmset+sname+'.npy'),ra)
     return ra
 
 def get_best_model(path2logdir):
@@ -907,7 +907,7 @@ def plot_ppdock_result(figpath,fl,lt):
     plt.ylabel('Success rate')
     plt.legend(lt,loc=0)
     plt.savefig(figpath)
-    
+
 def plot_reference_state(figpath,reflist,lt):
     xb=range(0,30)
     x=[int(10**(p/10.0)) for p in xb]
@@ -919,7 +919,7 @@ def plot_reference_state(figpath,reflist,lt):
     plt.ylabel('Success rate')
     plt.legend(lt,loc=0)
     plt.savefig(figpath)
-  
+
 def generate_uniformbins(pd):
     fbs=pd['featurebins']#0,6,0.5
     bs=fbs[1]
@@ -1042,11 +1042,11 @@ def convert2old(nm):
         npl=[]
         for item in nm['bmtype']['bm']:
             if isinstance(item,list):
-                npl.append(''.join(item))                      
+                npl.append(''.join(item))
             else:
                 npl.append(item)
         nnpl=[item for item in npl if len(item)>0]
-        nm['bmtype']['bm']=''.join(nnpl)    
+        nm['bmtype']['bm']=''.join(nnpl)
     for scorer in nm['scorers']:
         if ('features' in scorer) and isinstance(scorer['features'],list):
             nfl=[]
@@ -1057,7 +1057,7 @@ def convert2old(nm):
                         if item[1]==0:
                             nfl.append(item[0]+str(int(0.5+(item[2]-item[1])/item[3]))+'#'+str(item[2]))
                         else:
-                            nfl.append(item[0]+str(int(0.5+(item[2]-item[1])/item[3]))+'#'+str(item[2])+'#'+str(item[1]))                        
+                            nfl.append(item[0]+str(int(0.5+(item[2]-item[1])/item[3]))+'#'+str(item[2])+'#'+str(item[1]))
                     except:
                         traceback.print_exc()
                         pdb.set_trace()
@@ -1068,7 +1068,7 @@ def convert2old(nm):
             npl=[]
             for item in scorer['pm']:
                 if isinstance(item,list):
-                    npl.append(''.join(item))                      
+                    npl.append(''.join(item))
                 else:
                     npl.append(item)
             nnpl=[item for item in npl if len(item)>0]
@@ -1078,7 +1078,7 @@ def convert2old(nm):
                 npl=[]
                 for item in scorer[pn]:
                     if isinstance(item,list):
-                        npl.append(''.join(item))                      
+                        npl.append(''.join(item))
                     else:
                         npl.append(item)
                 nnpl=[item for item in npl if len(item)>0]
@@ -1096,7 +1096,7 @@ def convert2old(nm):
                 scorer['par']=copy.deepcopy(scorer['par']['par'])
                 scorer['parvalue']=copy.deepcopy(scorer['parvalue']['parvalue'])
             except:
-                pdb.set_trace()        
+                pdb.set_trace()
 
         if ('par' in scorer) and isinstance(scorer['par'],dict):
             if 'uniform' in scorer['par']:
@@ -1127,7 +1127,3 @@ def convert2old(nm):
                     search['pos'][ind]=range(0,len(scorer['parvalue']))
     print nm
     return nm
-
-
-        
-    

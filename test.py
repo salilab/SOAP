@@ -12,7 +12,7 @@ class TestMHC2(unittest.TestCase):
     def test_decoys_preparation(self):
         # make sure the shuffled sequence does not lose any elements
         pass
-    
+
     def test_model_selection(self):
         pass
 
@@ -20,4 +20,3 @@ class TestMHC2(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-

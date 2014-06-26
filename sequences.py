@@ -7,21 +7,21 @@ from env import *
 class pir(object):
     """
     Process pir files for use by MDT.
-    
+
     MDT calculate statistics from structures by looping throgh
     a pir file contains all pir sequences for the structures.
-    
+
     The last two fields in the pir header( X-ray resolution and the r factor)
     can be overwiritten to define the error bar parameters associated
     with each structure, used by MDT to calculate the error bar
     on the position of each atom.
-    
+
     :Parameters:
       - `path`: path to the pir file.
     """
     def __init__(self, path=''):
         self.pirpath=path
-        
+
     def get_pir(self,pdbset):#X-xray, U-biological unit, T-transmembrane protein, M-membrane protein,S-single chain, W-non-membrane protein,1-single chain pir or none, 2-multiple chain pir, H-helical protein, B-beta protein
         import pp
         pirfiledirectory=runenv.pdbpirdir
@@ -38,7 +38,7 @@ class pir(object):
         else:
             self.property_filter(pdbset)
         return pdbfile
-        
+
     def get_property_dict(self,pdbset):
         #pdb.set_trace()
         fc=pdbset.split('_')
@@ -68,7 +68,7 @@ class pir(object):
                 propertydict[fi]=fi
                 continue
         return propertydict
-        
+
     def property_filter(self,pdbset):
         pirfiledirectory=runenv.pdbpirdir
         pdbfile='pdb_'+pdbset+'.pir'
@@ -80,7 +80,7 @@ class pir(object):
         fh.write(pirstring)
         fh.close()
         pir(path=runenv.pdbpirdir+'pdb_'+pdbset+'.pir').duplicate_check()
-    
+
     def get_pir_from_pdbdict(self,pdbset):
         import pp
         if pdbset.startswith('THAC'):
@@ -96,7 +96,7 @@ class pir(object):
             ppdict=self.get_property_dict(pdbset)
             ep=pp.entirepdb()
         return ep.get_pir(ppdict)
-         
+
     def make_pir_single_forautomodel(self):
         code=self.pirpath
         e=environ()
@@ -152,7 +152,7 @@ class pir(object):
             if pirhead.match(line):
                 n=n+1
         return n
-    
+
     def build_dict(self):
         pirhead=re.compile(">P1;(.+)$")
         fh=open(self.pirpath,'r')
@@ -168,7 +168,7 @@ class pir(object):
         pirdict[code]=codepir
         self.pirdict=pirdict
         fh.close()
-                   
+
     def get_codelist(self):
         input=file(self.pirpath)
         n=0;
@@ -179,7 +179,7 @@ class pir(object):
                 rer=pirhead.match(line)
                 codelist.append(rer.group(1))
         return codelist
-    
+
     def count_residue2(self,residuepower=2):
         input=file(self.pirpath)
         n=0;
@@ -202,7 +202,7 @@ class pir(object):
                 numofr=0;
                 #print line
         return n
-    
+
     def sep_pir(self, tardir, numoff,permin=100,residuepower=2):
         pirfile=self.pirpath
         bdir=tardir # input
@@ -233,7 +233,7 @@ class pir(object):
                     county=0
             if sly==1:
                 sly=0
-                county=1      
+                county=1
             if pirhead.match(line):
                 if n > maxn:
                     n=0
@@ -247,8 +247,8 @@ class pir(object):
                 tc=tc+1
             out.write(line)
         out.flush()
-        out.close()   
-                     
+        out.close()
+
     def gen_pir(self, pirfiledirectory,pdbset):
         print 'Generating pdb file'
         env = environ()
@@ -273,7 +273,7 @@ class pir(object):
                     return pdbfile
         print 'The program do not know how to generate the pdbpir file. Please generate it manually.'
         return 0
-        
+
     def filter_pir(self,inputpirfile,outputpirfile,structuretype='structureX',structureresolution=99.0):
         if (os.access(outputpirfile,os.F_OK)):
             return 0
@@ -286,7 +286,7 @@ class pir(object):
                 aln.write(output, alignment_format='PIR')
         input.close()
         output.close()
-    
+
     def sif_pir(self,inputpirfile,outputpirfile,si=30):
         if (os.access(outputpirfile,os.F_OK)):
             return 0
@@ -310,8 +310,8 @@ class pir(object):
                 printline = m.group(1) in codes
             if printline:
                 out.write(line)
-    
-    def gen_pir_new(self,pirfiledirectory,pdbset):       
+
+    def gen_pir_new(self,pirfiledirectory,pdbset):
         print 'Generating pdb file ' + pdbset
         env = environ()
         aln = alignment(env)
@@ -340,7 +340,7 @@ class pir(object):
             sic=int(pdbset[-2:])
             sif_pir(pirfiledirectory+pdbfile[0:10]+'.pir', pdbfile,si=sic)
         return pdbfile
-    
+
     def get_pir_fromlist(self,list,targetpath):
         pirstring=''
         self.build_dict()
@@ -352,7 +352,7 @@ class pir(object):
         out=open(targetpath,'w')
         out.write(pirstring)
         out.close()
-        
+
     def get_first_n(self,n,targetpath):
         pirstring=''
         self.build_dict()
@@ -364,8 +364,8 @@ class pir(object):
                 break
         out=open(targetpath,'w')
         out.write(pirstring)
-        out.close()        
-        
+        out.close()
+
     def filter_pir(self,xray=2,rfactor=0.25,phrange=[6.5,7.5],sid=60):
         tp=self.pirpath[:-4]+'_'+str(xray)+'_'+str(rfactor)+'_'+str(phrange[0])+'-'+str(phrange[1])+'.pir'
         if os.path.isfile(tp[:-4]+'_'+str(sid)+'.pir'):
@@ -390,7 +390,7 @@ class pir(object):
         out=open(tp,'w')
         out.write(pirstring)
         out.close
-        import pp    
+        import pp
         pp.pir_sif(tp, tp[:-4]+'_'+str(sid)+'.pir',si=sid)
 
     def clean_pdb(self):
@@ -420,4 +420,3 @@ class pir(object):
             if not code[:4].lower() in codeset:
                 pirlist.append(self.pirdict[code])
         open(resultpir,'w').write('\n'.join(pirlist))
-                   

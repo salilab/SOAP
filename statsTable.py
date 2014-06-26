@@ -7,24 +7,24 @@ from feature import *
 from env import *
 from sequences import *
 from decoys import decoysets
-                    
+
 class rawsp(object):
     """Statistics from a set of structures
-    
+
     :param str pdbset: the name of the set of PDB or decoy structures
     :param str features: the name of the features, see :mod:`feature`
     :param str genmethod: the filters used for generating the table, see :func:`utility.decode_genmethod` for more detail.
     :param str decoy: True if the :attr:`rawsp.pdbset` represent decoys
     :param dict model: the parameters for this class can also be passed by a dict
-    
+
     .. _genmethod:
-    
+
     Example genmethod:
         * `bs2dsp`: bond separaion 2 with disulfide bond take into consideration
         * `cs1`: chain speration >=1
         * `ss1`: sequence separation >=1
     """
-    
+
     def __init__(self,pdbset='',features='',genmethod='',tlib=None,decoy=False,routine='calc_sp_all', model={}):
         if model:
             features=model['features']
@@ -91,7 +91,7 @@ class rawsp(object):
             self.ftype='.hdf5'
         self.mkdir() #make data dir: IT IS NOT THE RUNDIR-THE TEMP DIR
         self.isatompairclustering()
-          
+
     def mkdir(self):
         if runenv.hostn:
             return 0
@@ -147,7 +147,7 @@ class rawsp(object):
         na=np.zeros([20,1])
         if self.genmethodlist[4]==-1 and self.genmethodlist[5]==-1:
             na[...]=1
-        else:   
+        else:
             na[self.genmethodlist[4]:min(self.genmethodlist[5]+1,20)]=1
         mixweight=numpy.linalg.lstsq(existingsparray,na)[0]
         residue=sum((np.dot(existingsparray,mixweight)-na)**2)
@@ -162,7 +162,7 @@ class rawsp(object):
             return spl
         else:
             return []
-                    
+
     def get_allsp_range(self):
         fl=os.listdir(runenv.basedir+self.pdbset)
         fl=[f for f in fl if os.path.isdir(runenv.basedir+self.pdbset+'/'+f)]
@@ -174,7 +174,7 @@ class rawsp(object):
             if os.path.isfile(spdir+self.ftype) or os.path.isdir(runenv.basedir+self.pdbset+'/'+f+'/'+self.prd):
                 rangelist.append([spdir, fs[0],decode_genmethod(fs[1])])
         return rangelist
-        
+
     def calc_sp_all(self,runnumber):
         """Methods to generate the statistical potential from PDB files  in the currnt directory."""
         self.runpath=runenv.basedir
@@ -272,7 +272,7 @@ class rawsp(object):
             print m.sum()
             print 'mdt sum to 0, code problem'
         report_job_runstatus(self.runpath, runsuccess, runnumber, '.result',inputname='runme.py',temppath=temppath)
-            
+
     def calc_sp_cluster(self):
         sj=self.get_task()
         tasklist(tasklist=[sj]).monitor2end()
@@ -288,7 +288,7 @@ class rawsp(object):
             self.targetfile=self.sppath+'.hdf5'
             self.filetype='.hdf5'
             tc=os.path.isfile(self.sppath+'.hdf5')
-            self.nors=200        
+            self.nors=200
         elif self.routine=='calc_sp_i':
             pdbsets=self.pdbset.split('_')
             if len(pdbsets)==1:
@@ -309,7 +309,7 @@ class rawsp(object):
             return sj
         else:
             return 0
-        
+
     def afterprocessing(self):
         print "run finished -> processing result"
         if self.justwait and len(self.waittarget)==0:
@@ -325,10 +325,10 @@ class rawsp(object):
                 if 0:
                     self.sp_stderr2(nolog=True)
                     print os.system('mv ostderr2.hdf5 '+self.sppath+'.ostderr2.hdf5')
-                    print os.system('mv omean.hdf5 '+self.sppath+'.omean.hdf5')                   
+                    print os.system('mv omean.hdf5 '+self.sppath+'.omean.hdf5')
                     self.sp_stderr2(nolog=False)
                     print os.system('mv stderr2.hdf5 '+self.sppath+'.stderr2.hdf5')
-                    print os.system('mv mean.hdf5 '+self.sppath+'.mean.hdf5')     
+                    print os.system('mv mean.hdf5 '+self.sppath+'.mean.hdf5')
             elif self.routine=='calc_sp_i':
                 allarray=self.cat_spi()
                 if self.atompairclustering:
@@ -377,10 +377,10 @@ class rawsp(object):
             f=h5py.File(self.sppath+'.hdf5','r+')
             mdtb=f['mdt']
             mdtb[...]=sparray[...]
-            f.close()            
+            f.close()
         elif self.routine=='calc_sp_i':
             np.save(self.sppath+'.npy',sparray)
-            
+
     def get_sp_subset(self,f,subsetindex):
         if self.routine=='calc_sp_i':
             subsetindex[0]=[[0]]+subsetindex[0]
@@ -426,7 +426,7 @@ class rawsp(object):
         if subsetlist[1]!=range(len(subsetlist[1])):
             na=np.transpose(na,subsetlist[1])
         return na
-                    
+
     def load2npy(self,f):
         print "loading "+f
         if self.routine=='calc_sp_all':
@@ -440,7 +440,7 @@ class rawsp(object):
         elif self.routine=='calc_sp_i':
             mdta=np.load(f)
         return mdta
-            
+
     def calc_sp_local(self,nors,routine='calc_sp_all'):
         self.routine=routine
         self.nors=nors
@@ -458,7 +458,7 @@ class rawsp(object):
             sj.run_task_local(self.calc_sp_i)
             self.cat_spi()
             print os.system('mv all.npy ../'+self.spname+'.npy')
-        
+
     def sp_sum(self,wdir=None):
         if wdir:
             #wdir=self.sppath
@@ -478,7 +478,7 @@ class rawsp(object):
                 else:
                     continue
                 print 'Adding '+name
-                k=k+1          
+                k=k+1
                 if k==1:
                     m1.read_hdf5(fname)
                 else:
@@ -491,7 +491,7 @@ class rawsp(object):
                 return 1
         m1.write_hdf5('sum.hdf5',gzip=True)
         m1=[]
-        m2=[]    
+        m2=[]
         print "Combining finished"
         return 0
 
@@ -512,7 +512,7 @@ class rawsp(object):
             return wl
         else:
             return []
-    
+
     def prepare_task_input(self):
         wl=self.should_wait()
         if len(wl)>0:
@@ -557,7 +557,7 @@ class rawsp(object):
         makemdt.flush()
         generate_job_submit_script(freememory,self.spname,runtime,nors)
         return []
-    
+
     def calc_sp_i(self,runnumber,reportstatus=True):
         self.runpath=runenv.basedir
         pirfile='pdbs'+str(runnumber)
@@ -565,7 +565,7 @@ class rawsp(object):
         if self.atompairclustering:
             idist=self.calc_individual_sp(pirfile,dnlist,'apidist')
         else:
-            idist=self.calc_sp_individual1D_frompir(pirfile,dnlist)           
+            idist=self.calc_sp_individual1D_frompir(pirfile,dnlist)
         if reportstatus:
             try:
                 temppath=scratchdir
@@ -582,7 +582,7 @@ class rawsp(object):
             report_job_runstatus(self.runpath, True, runnumber, '.result',inputname='runme.py',temppath=temppath)
         else:
             return idist
-        
+
     def calc_sp_individual1D_frompir(self, pirfile,dnlist):
      #generate distributions for calculate benchmark score for reference state
         features=self.features
@@ -639,7 +639,7 @@ class rawsp(object):
             aln=alignment(env)
         #print os.system('rm -rf '+tmpdir)
         return refdista
-                
+
     def calc_sp_individual1D_fromlist(self, dnlist):
      #generate distributions for calculate benchmark score for reference state
         features=self.features
@@ -686,12 +686,12 @@ class rawsp(object):
             m=mdt.Table(mlib,features=featurelist,shape=[-1]*len(featurelist))
             fl=len(featurelist)
         return refdista
-    
+
     def calc_individual_sp(self, pirfile,dnlist,ptype):
         #get the mdt tables only for ddb
         features=self.features
         env = environ()
-        tmpdir=scratchdir     
+        tmpdir=scratchdir
         log.minimal()
         mlib=mdt.Library(env)
         mlib.bond_classes.read('${LIB}/bndgrp.lib')
@@ -752,7 +752,7 @@ class rawsp(object):
             msa=ms.get_array_view()
             self.svdu,self.svdv=self.get_svd()
             ra=np.zeros([len(dnlist),apcn,self.svdu.shape[0]])
-            csmin, csmax,kcut, kcut1, bs,bsm, errsv,ssp=decode_genmethod(self.bm)            
+            csmin, csmax,kcut, kcut1, bs,bsm, errsv,ssp=decode_genmethod(self.bm)
         elif ptype=='apscore':
             apc=self.apca
             apcl=[]
@@ -822,7 +822,7 @@ class rawsp(object):
             m.clear()
         #print os.system('rm -rf '+tmpdir)
         return ra
-                    
+
     def cat_spi(self,name='result'):
         filelist=[str(item)+'.'+name+'.npy' for item in range(1, self.nors+1)]
         al=[]
@@ -842,9 +842,9 @@ class rawsp(object):
             sp=sp+alp[i]
         np.save('all.npy',ddist)
         return ddist
-    
+
     def sp_stderr2(self,wdir=None,nolog=False):
-        ##!!!!!!!!!!!!!!!will calculate the stderr here 
+        ##!!!!!!!!!!!!!!!will calculate the stderr here
         if wdir:
             os.chdir(wdir)
         print "Calculating Standard deviation"
@@ -951,10 +951,10 @@ class rawsp(object):
                 #os.makedirs(os.path.split(self.sppath)[0])
                 np.save(self.sppath+'.npy',na)
                 return na
-    
+
     def combine_flag(self,pdbdir):
         pass
-    
+
     def get_pdbfile(self,pdbdir,codelist,alncode,env,aln,tmpdir='./'):
         code=alncode
         if isinstance(pdbdir, list) and len(pdbdir)==1:
@@ -1034,10 +1034,10 @@ class rawsp(object):
                     return [tmpdir,aln]
                 elif os.path.isfile(os.path.join(spdbdir,'pdb'+code+'.pdb.gz')):
                     print os.system('gzip -d -c  '+os.path.join(spdbdir,'pdb'+code+'.pdb.gz')+' > '+os.path.join(tmpdir,'pdb'+code+'.pdb'))
-                    return [tmpdir,aln]            
+                    return [tmpdir,aln]
                 elif os.path.isfile(os.path.join(spdbdir,'pdb'+code[:4]+'.pdb.gz')):
                     print os.system('gzip -d -c  '+os.path.join(spdbdir,'pdb'+code[:4]+'.pdb.gz')+' > '+os.path.join(tmpdir,'pdb'+code[:4]+'.pdb'))
-                    return [tmpdir,aln]   
+                    return [tmpdir,aln]
         #elif os.path.isfile(os.path.join(tmpdir,code+'.pdb')) or os.path.isfile(os.path.join(tmpdir,'pdb'+code+'.pdb')) or os.path.isfile(os.path.join(tmpdir,'pdb'+code[:4]+'.pdb')):
         #    return [tmpdir,aln]
         #elif os.path.isfile(os.path.join(pdbdir,code+'.pdb.gz')):
@@ -1045,10 +1045,10 @@ class rawsp(object):
         #    return [tmpdir,aln]
         #elif os.path.isfile(os.path.join(pdbdir,'pdb'+code+'.pdb.gz')):
         #    print os.system('gzip -d -c  '+os.path.join(pdbdir,'pdb'+code+'.pdb.gz')+' > '+os.path.join(tmpdir,'pdb'+code+'.pdb'))
-        #    return [tmpdir,aln]            
+        #    return [tmpdir,aln]
         #elif os.path.isfile(os.path.join(pdbdir,'pdb'+code[:4]+'.pdb.gz')):
         #    print os.system('gzip -d -c  '+os.path.join(pdbdir,'pdb'+code[:4]+'.pdb.gz')+' > '+os.path.join(tmpdir,'pdb'+code[:4]+'.pdb'))
-        #    return [tmpdir,aln]           
+        #    return [tmpdir,aln]
         else:
             return [pdbdir,aln]
 
@@ -1080,7 +1080,7 @@ class rawsp(object):
                     mdtb[i,j,...]=mdtb[i,j,...]+mdtb[j,i,...]
             for i in range(0,ms[0]):
                 for j in range(0,i):
-                    mdtb[i,j,...]=mdtb[j,i,...]          
+                    mdtb[i,j,...]=mdtb[j,i,...]
 
     def get_stretch_dictionary(self,pm=''):
         sd=[]
@@ -1093,12 +1093,12 @@ class rawsp(object):
         for i in range(len(self.fo.fclist)):
             if self.fo.fclist[i].startswith('d'):
                 if pm.endswith('u'):
-                    sd.append([{'type':'uniform','value':(self.fo.frlist[i]/self.fo.fdlist[i])/(l*1.414)}])                    
+                    sd.append([{'type':'uniform','value':(self.fo.frlist[i]/self.fo.fdlist[i])/(l*1.414)}])
                 else:
                     sd.append([{'type':'lowpass','turnpoint':4/(self.fo.frlist[i]/self.fo.fdlist[i]),'turnpower':2,'scale':10},
                     {'type':'lowcount','turnpoint':30,'turnpower':1,'xkernelwidth':[0.1/(self.fo.frlist[i]/self.fo.fdlist[i])],'lowvalue':0.01},
                     {'type':'uniform','value':(self.fo.frlist[i]/self.fo.fdlist[i])/(l*1.414)}]) #l is the actual kernel width
-                kwl.append(0.2/(self.fo.frlist[i]/self.fo.fdlist[i]))    
+                kwl.append(0.2/(self.fo.frlist[i]/self.fo.fdlist[i]))
             elif self.fo.fclist[i].startswith('h') or self.fo.fclist[i].startswith('g'):
                 if self.fo.fclist[i].startswith('h'):
                     pp=True
@@ -1110,7 +1110,7 @@ class rawsp(object):
                 sd.append([{'type':'lowpass','turnpoint':1/(self.fo.frlist[i]/self.fo.fdlist[i]),'turnpower':8,'scale':1000},
                 {'type':'lowcount','turnpoint':30,'turnpower':1,'xkernelwidth':[0.1/(self.fo.frlist[i]/self.fo.fdlist[i])],'lowvalue':0.1},
                 {'type':'uniform','value':(self.fo.frlist[i]/self.fo.fdlist[i])/(l*1.414)}]) #l is the actual kernel width
-                kwl.append(10/(self.fo.frlist[i]/self.fo.fdlist[i]))                  
+                kwl.append(10/(self.fo.frlist[i]/self.fo.fdlist[i]))
             elif self.fo.fclist[i][0] not in ['a','r','t']:
                 sd.append([{'type':'uniform','value':(self.fo.frlist[i]/self.fo.fdlist[i])/(l*1.414)}])
                 kwl.append(10/(self.fo.frlist[i]/self.fo.fdlist[i])) #this should not be used as we don't know much....
@@ -1120,7 +1120,7 @@ class rawsp(object):
         gps=gpsmoothing()
         sd,kwl=self.get_stretch_dictionary()
         ma=np.transpose(ma,self.rs1)
-        ms=ma.shape    
+        ms=ma.shape
         dvdim=1
         for i in range(0,self.ifl):
             dvdim=dvdim*ms[i]
@@ -1128,19 +1128,19 @@ class rawsp(object):
         for i in range(0,dvdim):
             print i
             ma[i]=gps.ksmoothing_single_withscale(ma[i],sd)
-        ma=np.reshape(ma,ms) 
+        ma=np.reshape(ma,ms)
         if self.permute:
             ma=np.transpose(ma,self.rs2)
         return ma
-    
-    def gpsmoothing(self,ma):        
+
+    def gpsmoothing(self,ma):
         gps=gpsmoothing()
         #define prior
         #prior_mean=self.get_prior(ma)
         sd,kwl=self.get_stretch_dictionary()
         if self.permute:
             ma=np.transpose(ma,self.rs1)
-        ms=ma.shape    
+        ms=ma.shape
         dvdim=1
         for i in range(0,self.ifl):
             dvdim=dvdim*ms[i]
@@ -1148,7 +1148,7 @@ class rawsp(object):
         for i in range(0,dvdim):
             print i
             ma[i]=gps.gpsmoothing_single(ma[i],sd,kwl)
-        ma=np.reshape(ma,ms) 
+        ma=np.reshape(ma,ms)
         if self.permute:
             ma=np.transpose(ma,self.rs2)
         return ma
@@ -1157,13 +1157,13 @@ class rawsp(object):
         ma=self.load2npy(self.sppath+'.hdf5')
         if self.permute:
             ma=np.transpose(ma,self.rs1)
-        ms=ma.shape    
-        self.make_symetry(ma)         
+        ms=ma.shape
+        self.make_symetry(ma)
         dvdim=1
         for i in range(0,self.ifl):
             ma=ma.sum(axis=0)
         return ma
-    
+
     def get_prior(self,mdta):
         pd=np.array(1,dtype=np.float32)
         ind1=[]
@@ -1269,11 +1269,11 @@ class rawsp(object):
                 if (l1==i).sum()<minmember:
                     l1[l1==i]=9999
                 else:
-                    nl.append(i)   
+                    nl.append(i)
             for i in range(len(nl)):
                 l1[l1==nl[i]]=i
             l1[l1==9999]=len(nl)
-            apa[...]=l1[apa]    
+            apa[...]=l1[apa]
             hc=np.histogram(l1,noc)
             plt.plot(hc[0])
             plt.savefig('histogram.eps')
@@ -1310,7 +1310,7 @@ class rawsp(object):
     def write_hdf5(self,path, mdtarray, permute=False):
         env = environ()
         env.libs.topology.read('${LIB}/top_heav.lib')
-        env.libs.parameters.read('${LIB}/par.lib')        
+        env.libs.parameters.read('${LIB}/par.lib')
         mlib=mdt.Library(env)
         mlib.atom_classes.read('$(LIB)/atmcls-mf.lib')
         mlib.bond_classes.read('${LIB}/bndgrp.lib')
@@ -1320,7 +1320,7 @@ class rawsp(object):
         mdl.build_sequence('CCG/CCG')
         aln = alignment(env)
         aln.append_model(mdl, align_codes='tmp')
-        csmin, csmax,kcut, kcut1, bs,bsm, errsv,ssp=decode_genmethod(self.genmethod)        
+        csmin, csmax,kcut, kcut1, bs,bsm, errsv,ssp=decode_genmethod(self.genmethod)
         m.add_alignment(aln,chain_span_range=(-csmax,-csmin,csmin,csmax),residue_span_range=(-kcut1,-kcut,kcut,kcut1),bond_span_range=(bs,bsm))#,startpos=0,endpos=0,scale=0,refyes=False,refmdt='',io=io)
         ma=m.get_array_view()
         ma[...]=mdtarray
@@ -1328,10 +1328,10 @@ class rawsp(object):
             d,a2,a1=featurelist
             m = m.reshape(features=(a1,a2,d), offset=[0,0,0], shape=m.shape[::-1])
         m.write_hdf5(path,gzip=True)
-        
+
 class scaledsp(rawsp):
     """Processed statistics table from a set of structures
-    
+
     :param rawsp rspo: class :class:`rawsp` object
     :param str pm: the method for processing the raw talbe :attr:`scaledsp.rspo`
     :param dict model: the parameters for this class can also be passed by a dict
@@ -1342,9 +1342,9 @@ class scaledsp(rawsp):
         pp[0-9]+ : add number to raw table
         (gps|ks)\\number : gaussian process or kernal smoothing with strength \\number.
         npend|npsum : normalize the count by the last bin or by the sum of the distribution (results in a proper discrete probalistic distribution).
-    
-        
-    """    
+
+
+    """
     def __init__(self, pm='',rspo=[],model=[],previouspm=''):
         if model:
             ns=copy.deepcopy(model)
@@ -1384,10 +1384,10 @@ class scaledsp(rawsp):
                 if not os.path.isfile(nssp.ssppath+'.hdf5'):
                     taskchains.append(nssp.get_scale_task())
         if len(taskchains)>0:
-            return taskchain(chains=taskchains) 
+            return taskchain(chains=taskchains)
         else:
             return 0
-        
+
     def get_scale_task(self):
         if self.pm.startswith('gps') or self.pm.startswith('ks') or self.pm.startswith('sks'):
             self.task=task('','',afterprocessing=self,preparing=self,targetfile=self.dir+self.sspname+'.hdf5')
@@ -1402,7 +1402,7 @@ class scaledsp(rawsp):
     def prepare_task_input(self):
         #prepare the run directories
         os.chdir(self.dir)
-        #os.system('rm -r '+self.rundir)      
+        #os.system('rm -r '+self.rundir)
         os.mkdir(self.sspname)
         os.chdir(self.dir+self.sspname)
         #save the input array
@@ -1422,7 +1422,7 @@ class scaledsp(rawsp):
         gps=gpsmoothing()
         gps.nofrpn=nofrpn
         gps.lib=self.tlib
-        gps.stretchdict,gps.priorkw=self.get_stretch_dictionary(self.pm) 
+        gps.stretchdict,gps.priorkw=self.get_stretch_dictionary(self.pm)
         gps.sm=self.pm
         fh=open('input.pickle','w')
         pickle.dump(gps,fh)
@@ -1444,8 +1444,8 @@ class scaledsp(rawsp):
                       +'so.runtask_cluster(sys.argv[1])')
         makemdt.flush()
         generate_job_submit_script(freememory,self.rundir,runtime,nors)
-        return [] 
-    
+        return []
+
     def afterprocessing(self):
         os.chdir(self.dir+self.rundir)
         nal=[]
@@ -1495,7 +1495,7 @@ class scaledsp(rawsp):
             mdtc[...]=pa[...]
             f2.flush()
             f2.close()
-            return 1                        
+            return 1
         f=h5py.File(self.sppath+'.hdf5','r')
         mdtb=f['mdt']
         ms=mdtb.shape
@@ -1504,16 +1504,16 @@ class scaledsp(rawsp):
         f.close()
         if self.permute:
             ma=np.transpose(ma,self.rs1)
-        ms=ma.shape   
+        ms=ma.shape
         if pm!='savema':
             if not self.pm.endswith('unsym'):
-                self.make_symetry(ma)         
+                self.make_symetry(ma)
             dvdim=1
             for i in range(0,ifpos):
                 dvdim=dvdim*ms[i]
             ma=np.reshape(ma,(dvdim,-1))
             #do the actual scaling or other...
-            if pm=='getma': #return ma 
+            if pm=='getma': #return ma
                 return ma
             else:
                 if pm.startswith('ks') or pm.startswith('gps'):
@@ -1521,9 +1521,9 @@ class scaledsp(rawsp):
                     gps.sm=self.pm
                     gps.lib=self.tlib
                     gps.bincenters=self.bins
-                    gps.stretchdict,gps.priorkw=self.get_stretch_dictionary(self.pm) 
+                    gps.stretchdict,gps.priorkw=self.get_stretch_dictionary(self.pm)
                 else:
-                    nolog, sums,sume,ref=self.decode_pm(pm,ma)            
+                    nolog, sums,sume,ref=self.decode_pm(pm,ma)
                 for i in range(0,dvdim):
                     if pm.startswith('ks'):
                         ma[i]=gps.ksmoothing_single_withscale(ma[i])
@@ -1534,7 +1534,7 @@ class scaledsp(rawsp):
                         self.applysf_single(nolog, ma[i],ref,sums, sume)
         else:
             ma=sma
-        ma=np.reshape(ma,ms) 
+        ma=np.reshape(ma,ms)
         if self.permute:
             ma=np.transpose(ma,self.rs2)
         print os.system('cp '+self.sppath+'.hdf5 '+ssppath+'.hdf5')
@@ -1544,7 +1544,7 @@ class scaledsp(rawsp):
         f2.flush()
         f2.close()
         return 1
-    
+
     def get_sf(self,sfm,ma):
         ref=sf(sftype=sfm, data=ma).get_sf()
         ref=np.exp(ref)
@@ -1553,8 +1553,8 @@ class scaledsp(rawsp):
     def get_SVD_subset(self,ms,ratio):
         s,v=self.get_svd()
         pa=np.dot(np.dot(s,np.eye(ratio)),v)
-        return pa[...].reshape(ms)        
-   
+        return pa[...].reshape(ms)
+
     def decode_pm(self,pm,ma):
         if pm.endswith('unsym'):
             pm=pm[:-5]
@@ -1570,17 +1570,17 @@ class scaledsp(rawsp):
             ref=self.get_sf(pms[0],ma)
             nmm=pms[1]
             sums,sume=self.decode_nmm(nmm,ma)
-            self.normalize_sinlge_dist(ref,sums,sume) # the reference is always normalized using the same mehtod            
+            self.normalize_sinlge_dist(ref,sums,sume) # the reference is always normalized using the same mehtod
         else:
             ref=[]
             nmm=pm
             sums,sume=self.decode_nmm(nmm,ma)
         return nolog, sums,sume,ref
-   
+
     def decode_nmm(self,nmm,ma):
         mas=ma.shape
         if re.search('nb([0-9]*)to([0-9]*)',nmm):
-            rer=re.search('nb([0-9]*)to([0-9]*)',nmm) 
+            rer=re.search('nb([0-9]*)to([0-9]*)',nmm)
             sume=int(rer.group(2))+1
             sums=int(rer.group(1))
         elif nmm=='nbsum':
@@ -1593,25 +1593,25 @@ class scaledsp(rawsp):
             sums=int(nmm[2:])
             sume=sums+1
         return sums,sume
-        
+
     def applysf_single(self,nolog, mai,ref,sums, sume):
         self.normalize_sinlge_dist(mai,sums,sume,nolog)
         if len(ref)>0:
             mai[...]=mai/ref
         if not nolog:
             self.log_nozero(mai)
-            
+
     def log_nozero(self,sd):
         sd[...]=sd+(sd==0)*np.exp(-20.123456789)
         sd[...]=-np.log(sd)
-    
+
     def normalize_sinlge_dist(self,sd,sums,sume,nolog):
         sdsum=sd[sums:sume].mean()
         if sdsum==0:
             print "Can not normalize array by sum because of zero:"+self.pm
             return 0
         sd[...]=sd/(sdsum)
-        
+
     def load(self):
         if os.path.isfile(self.ssppath+'.npy'):
             self.loadnpz()
@@ -1627,15 +1627,15 @@ class scaledsp(rawsp):
         f.close()
         self.array=mdta
         return 0
-        
+
     def savenpz(self):
         if len(self.array)==0:
             self.load()
         np.save( self.ssppath,self.array)
-        
+
     def loadnpz(self):
         self.array=np.load(self.ssppath+'.npy')
-        
+
     def add_ref(self,ref,refname='',savetype='',apca=[],ratio=[],svdilist=[],permute=False):
         #normalize raw distribution by making the value at pos to be 1. This version is only suitable for distance distribution.
         if len(self.array)==0:
@@ -1653,7 +1653,7 @@ class scaledsp(rawsp):
         elif len(apca)==0:
             rl=ref.shape
             refshape=[1 for i in range(0,len(ms)-len(rl))]+list(rl)
-            ref.resize(refshape)            
+            ref.resize(refshape)
             mdtb=(mdtb+ref)*ratio[0]
         else:
             rl=ref[0].shape
@@ -1667,7 +1667,7 @@ class scaledsp(rawsp):
                 for j in range(apca.shape[1]):
                     mdtb[i,j,...]=(mdtb[i,j]+ref[apca[i,j]])*ratio[apca[i,j]]
         if len(svdilist)==0 and self.permute:
-            mdtb=np.transpose(mdtb,self.rs2) 
+            mdtb=np.transpose(mdtb,self.rs2)
         if savetype=='hdf5':
             self.write_hdf5(self.ssppath+'.'+refname+'.hdf5',mdtb,permute=permute)
         elif savetype=='lib':
@@ -1675,8 +1675,8 @@ class scaledsp(rawsp):
         elif savetype=='npy':
             np.save(self.ssppath+'.'+refname+'.npy',mdtb)
         return mdtb
-    
-        
+
+
     def write_lib(self,path=[],mdtarray=[]):
         env = environ()
         log.minimal()
@@ -1733,7 +1733,7 @@ class scaledsp(rawsp):
             self.scalesp()
         else:
             return 0
-    
+
     def poscutoff(self,cutoff):
         refname='pc'+str(cutoff)
         print os.system('cp '+self.ssppath+'.hdf5 '+self.ssppath+'.'+refname+'.hdf5')
@@ -1800,10 +1800,10 @@ class gpsmoothing(object):
         #ndata[ndata>1000]=0
         #ndata[ndata<-1000]=0
         return ndata
-    
+
     def calc_prior_mean(self):
         self.prior_mean=self.prepare_mean(self.prior_mean)
-    
+
     def get_kernel_mask(self,ksize,width=[1]):
         ka=np.array(1)
         ind1=[]
@@ -1836,7 +1836,7 @@ class gpsmoothing(object):
                             e3=2*ksize[3]-l-1
                             sumarray[i,j,k,l]=ka[s0:e0,s1:e1,s2:e2,s3:e3].sum()
         return [ka,sumarray]
-    
+
     def ksmoothing_single_usingmask(self,data,ka,sumarray):
         nd=np.zeros(data.shape)
         if len(data.shape)==1:
@@ -1860,7 +1860,7 @@ class gpsmoothing(object):
                             e3=2*ksize[3]-l-1
                             nd[i,j,k,l]=(ka[s0:e0,s1:e1,s2:e2,s3:e3]*data).sum()/sumarray[i,j,k,l]
         return nd
-    
+
     def ksmoothing_single_uniform(self,data,width):
         ksize=data.shape
         axisscale=[]
@@ -1897,7 +1897,7 @@ class gpsmoothing(object):
                     sas=sas*d['value']
             sal.append(sas.cumsum())
         return sal
-    
+
     def get_kernel_mask_withscale_singlepos(self,ksize,scale=[],pos=[]):
         #get the weight array around a single point, so we can do smoothing by weighted sum over the values
         ka=np.array(1)
@@ -1914,7 +1914,7 @@ class gpsmoothing(object):
             ind1.append(len(nd))
             ind2.append(1)
         return ka
-        
+
     def ksmoothing_single_usingscale(self,data,axisscale):
         na=np.zeros(data.shape)
         for i in range(data.size):
@@ -1922,9 +1922,9 @@ class gpsmoothing(object):
             ka=self.get_kernel_mask_withscale_singlepos(data.shape,axisscale,ci)
             na[ci]=(data*ka).sum()/ka.sum()
         return na
-    
+
     def ksmoothing_single_withscale(self,data):
-        axisscale=self.get_stretched_axis(data,self.stretchdict)        
+        axisscale=self.get_stretched_axis(data,self.stretchdict)
         na=self.ksmoothing_single_usingscale(data, axisscale)
         return na
 
@@ -1956,7 +1956,7 @@ class gpsmoothing(object):
             ind2.append(1)
         return ka
 
-      
+
     def gpsmoothing_single(self,data):
         #pdb.set_trace()
         self.raw_data=data
@@ -1967,13 +1967,13 @@ class gpsmoothing(object):
         if 'mm' in self.sm:
             if self.apo==None:
                 self.apo=atmsprop(self.lib)
-            self.prior_mean=self.apo.get_repulsion(self.ind,self.bincenters[0])#self.ksmoothing_single_uniform(self.data_mean,self.priorkw)            
+            self.prior_mean=self.apo.get_repulsion(self.ind,self.bincenters[0])#self.ksmoothing_single_uniform(self.data_mean,self.priorkw)
         else:
             self.prior_mean=np.zeros(self.data_mean.shape)#self.ksmoothing_single_uniform(self.data_mean,self.priorkw)
         #pdb.set_trace()
         self.calc_prior_covariance(saxis)
         #self.prior_covariance=self.prior_covariance
-        self.data_mean.resize(self.data_mean.size)        
+        self.data_mean.resize(self.data_mean.size)
         self.prior_mean.resize(self.prior_mean.size)
         smootheddatamean=self.ksmoothing_single_uniform(self.data_mean,self.priorkw)
         #smootheddatamean=np.ones(len(smootheddatamean))*1
@@ -2002,7 +2002,7 @@ class gpsmoothing(object):
         uas=ua.shape
         adist=np.vstack([ua.reshape([1,ua.size]),ar.reshape([1,ar.size]),al.reshape([1,al.size])])
         return adist.min(axis=0).reshape(uas)
-        
+
     def calc_prior_covariance(self,saxis):
         pp=self.prior_mean.shape
         tn=self.prior_mean.size
@@ -2024,22 +2024,22 @@ class gpsmoothing(object):
         covarray.resize([tn,tn])
         self.prior_covariance=covarray*self.prior_baseline_variance
         #self.prior_covariance_inv=numpy.linalg.inv(self.prior_covariance)
-            
+
     def calc_data_mean(self):
         self.data_mean=self.prepare_mean(self.raw_data)
-        
+
     def calc_data_covariance(self):
         dcv=self.data_baseline_variance*self.raw_data.astype(np.float32)**self.data_variance_power
         dcv.resize([dcv.size,1])
         #dcv[dcv>1]=1000
         self.data_covariance=np.diag(np.squeeze(dcv))
         self.data_covariance_inv=np.diag(np.squeeze(dcv**-1))
-        
+
     def calc_posterior_mean(self):
 #self.posterior_mean=np.dot(self.posterior_covariance,np.dot(self.prior_covariance_inv,self.prior_mean)+np.dot(self.data_covariance_inv,self.data_mean))
         mi=np.eye(len(self.data_mean))
         m2=np.dot(self.prior_covariance,self.data_covariance_inv)
-        t1=mi+m2        
+        t1=mi+m2
         t2=np.dot(m2,self.data_mean)
         self.posterior_mean=numpy.linalg.solve(t1,t2)
         #pdb.set_trace()
@@ -2052,7 +2052,7 @@ class gpsmoothing(object):
 
     def calc_smoothness(self):
         pass
-    
+
     def runtask_cluster(self,runnum):
         print runnum
         self.runpath=runenv.basedir
@@ -2061,7 +2061,7 @@ class gpsmoothing(object):
         fh.close()
         nso.smoothing_2d_npa(runnum)
         report_job_runstatus(self.runpath, True, runnum, '.smoothed',inputname='runme.py')
-    
+
     def smoothing_2d_npa(self,npaname):
         orn=npaname
         if not npaname.endswith('npy'):
@@ -2072,7 +2072,7 @@ class gpsmoothing(object):
         print 'finish smoothing'
         #save the resulting array
         np.save(orn+'.smoothed',ma)
-        
+
     def smoothing_2d(self,ma,orn):
         ds=ma.shape
         for i in range(ds[0]):
@@ -2089,7 +2089,7 @@ class atmsprop(object):
         self.atomNameList=self.read_libfile()
         self.atomTypeList=[self.get_atomtype(an) for an in self.atomNameList]
         self.atomrl=[self.vdrd[at] for at in self.atomTypeList]
-        
+
     def get_atomtype(self,atomname):
         if 'Cl' in atomname:
             return 'Cl'
@@ -2097,7 +2097,7 @@ class atmsprop(object):
             if key in atomname:
                 return key
         raise exception('atom type not known')
-    
+
     def read_libfile(self):
         fh=open(runenv.basedir+'lib/'+self.libfile)
         fhc=fh.read()
@@ -2107,7 +2107,7 @@ class atmsprop(object):
         elif 'ATMGRP' in fhc:
             agl=[l[8:-1] for l in fhc.split('\n') if l.startswith('ATMGRP')]
         return [a for a in agl if len(a)>0]
-    
+
     def get_repulsion(self,ind,bins):
         atm1ind=ind/len(self.atomTypeList)
         atm2ind=ind%len(self.atomTypeList)
@@ -2118,5 +2118,3 @@ class atmsprop(object):
                 break
             pv[i]=np.exp(-0.5*((bins[i]-radius)/0.05)**2)/(0.05*2.51)
         return pv
-
-

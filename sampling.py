@@ -1,5 +1,5 @@
 """
-   SOAP Optimizer for optimizing parameters 
+   SOAP Optimizer for optimizing parameters
 
 """
 
@@ -13,7 +13,7 @@ class optimizer(object):
     """
     Sampling and optimizing parameters for a scorer.
     """
-    
+
     def __init__(self,scorer=[],seed=0):
         print 'Optimizer'
         self.inputcode=''
@@ -52,7 +52,7 @@ class optimizer(object):
         self.oldglobalbestresult=-9999999
         self.globalbestpar=[]
         self.optm=None
-         
+
     def optimize(self):
         """
         Optimize...
@@ -114,7 +114,7 @@ class optimizer(object):
             parvalues[self.scorer.searchlistspos[i]:self.scorer.searchlistspos[i+1]]=res[0]
             self.scorer.parvalues[...]=parvalues
         return [parvalues,res[1]]
-    
+
     def optimize_value(self,initialvalue,method='powell',pos=[]):
         if len(pos)>0:
             self.searchpos=pos
@@ -190,12 +190,12 @@ class optimizer(object):
             if len(method)>3:
                 self.std=float(method[3:])
             self.setup_mcpars()
-            res=self.mcmc_tillconverge_sametime()            
+            res=self.mcmc_tillconverge_sametime()
         elif method.startswith('mcp'):
             if len(method)>3:
                 self.std=float(method[3:])
             self.setup_mcpars()
-            res=self.mcmc_tillconverge_pt()           
+            res=self.mcmc_tillconverge_pt()
         return res
 
     def fmins(self,initialvalue, allpowell=False):
@@ -216,7 +216,7 @@ class optimizer(object):
             res=list(res)
             res[0]=[res[0]]
         return res
-        
+
     def get_initial_value(self):
         seed=self.seed
         self.initialvalue=[]
@@ -236,7 +236,7 @@ class optimizer(object):
                 self.initialvalue=self.initialvalue+list(par)
                 self.parproposemethod[-1]='splineparn'
                 self.parproposepars[-1]=([sfo.bins[0][0],sfo.bins[0][-1], len(par),(sfo.bins[0][-1]-sfo.bins[0][0])/(len(par)+1),sfo.bins[0][1]-sfo.bins[0][0]])
-                continue              
+                continue
             if isinstance(id,list):
                 if isinstance(id[0],list):
                     self.initialvalue=self.initialvalue+id[seed]
@@ -263,7 +263,7 @@ class optimizer(object):
                         self.initialvalue=self.initialvalue+list(dfirevalue)
                     else:
                         self.initialvalue=self.initialvalue+list(dfirevalue[:-1])
-                  
+
                 elif search['object']['sftype'] in 'psn4' and search['key']=='parvalue':
                     sfo=sf(**search['object'])
                     par=search['object']['par']
@@ -271,7 +271,7 @@ class optimizer(object):
                     dfirevalue=((np.array(par)/float(par[-1]))**(id['values'][seed]))
                     dfirevaluediff=[dfirevalue[0]]+list(dfirevalue[1:]-dfirevalue[0:-1])
                     parvalue=dfirevaluediff
-                    self.initialvalue=self.initialvalue+parvalue 
+                    self.initialvalue=self.initialvalue+parvalue
                 elif search['object']['sftype'] in 'psn3' and search['key']=='parvalue':
                     sfo=sf(model=search['object'])
                     par=search['object']['par']
@@ -279,13 +279,13 @@ class optimizer(object):
                     dfirevalue=((np.array(par)/float(par[-1]))**(id['values'][seed]))
                     dfirevaluediff=np.array([dfirevalue[0]]+list(dfirevalue[1:]-dfirevalue[0:-1]))
                     parvalue=list((dfirevaluediff/dfirevaluediff[-1])[:-1])
-                    self.initialvalue=self.initialvalue+parvalue 
+                    self.initialvalue=self.initialvalue+parvalue
                 elif search['object']['sftype'] in 'psn2' and search['key']=='parvalue':
                     sfo=sf(model=search['object'])
                     par=search['object']['par']
                     par=list(np.linspace(sfo.bins[0][0], sfo.bins[0][-1],len(par)+1))
                     parvalue=list(((np.array(par)/float(par[-1]))**(id['values'][seed])))
-                    self.initialvalue=self.initialvalue+parvalue                  
+                    self.initialvalue=self.initialvalue+parvalue
                 elif search['object']['sftype']=='psn' and search['key']=='parvalue':
                     sfo=sf(model=search['object'])
                     par=search['object']['par']
@@ -306,7 +306,7 @@ class optimizer(object):
             elif id['type']=='sin':
                 par=np.array(search['object']['par'])
                 print str(seed)+'sin'+str(id['values'][seed])
-                self.initialvalue=self.initialvalue+list(((np.abs(np.sin(par*3.1415926/180)+0.000000001))**(id['values'][seed]))[pos])            
+                self.initialvalue=self.initialvalue+list(((np.abs(np.sin(par*3.1415926/180)+0.000000001))**(id['values'][seed]))[pos])
             elif id['type']=='values':
                 if not isinstance(id['values'][0],list):
                     id['values']=[[item] for item in id['values']]
@@ -317,7 +317,7 @@ class optimizer(object):
                     par=search['object']['par']
                     self.initialvalue=self.initialvalue+list(par)
                     self.parproposemethod[-1]=('splineparn')
-                    self.parproposepars[-1]=([sfo.bins[0][0],sfo.bins[0][-1], len(par),(sfo.bins[0][-1]-sfo.bins[0][0])/(len(par)+1),sfo.bins[0][1]-sfo.bins[0][0]])                    
+                    self.parproposepars[-1]=([sfo.bins[0][0],sfo.bins[0][-1], len(par),(sfo.bins[0][-1]-sfo.bins[0][0])/(len(par)+1),sfo.bins[0][1]-sfo.bins[0][0]])
                 else:
                     parlen=len(search['object'][search['key']])
                     print parlen
@@ -328,7 +328,7 @@ class optimizer(object):
                             try:
                                 rvl.append(srv[0])
                             except:
-                                rvl.append(srv)                        
+                                rvl.append(srv)
                         self.initialvalue=self.initialvalue+rvl
                     #self.initialvalue=self.initialvalue+scipy.stats.uniform.rvs(0,2,parlen).tolist()
             elif id['type'].startswith('sf') and search['object']['type']=='sf':
@@ -358,8 +358,8 @@ class optimizer(object):
             self.initialvalue+=0.0000000001 #pymc has problems with values at zero, which I think mess up the step method...
         self.bestpar=np.copy(self.initialvalue)
         self.currentpar=np.copy(self.bestpar)
-        print "initialvalue performance "+str(self.calc_score_point(self.bestpar)) 
-                
+        print "initialvalue performance "+str(self.calc_score_point(self.bestpar))
+
     def calc_score_point(self,parvalues):
         #print parvalues
         if self.singlepar and not (isinstance(parvalues,np.ndarray) and len(parvalues.shape)==1):
@@ -380,8 +380,8 @@ class optimizer(object):
     def get_bias(self,score):
         index=np.floor((score-self.worstresult)/self.biasbin)
         index=max(0,min(self.biasnbin-1,index))
-        return self.biasna[index]        
-                
+        return self.biasna[index]
+
     def update_bias(self, score):
         if(score < self.worstresult or score >self.idealresult):
             return 0
@@ -412,7 +412,7 @@ class optimizer(object):
         pickle.dump(res,fh)
         fh.close()
         return 0
-    
+
     def runtask_local(self,inputcode=5,testscorer=[]):
         self.testscorer=testscorer
         #pdb.set_trace()
@@ -427,7 +427,7 @@ class optimizer(object):
         self.get_initial_value()
         print self.initialvalue
         res=self.optimize()
-        return res  
+        return res
 
     def get_MCMC_single_stochastic_block(self,initialvalue,i):
         @stochastic(observed=False,name='a'+str(i))
@@ -445,7 +445,7 @@ class optimizer(object):
             block=self.scorer.searchblocklist[i][-1]
             a=self.get_MCMC_single_stochastic_block(initialvalue[block[0]:block[1]],i)
             parlist.append(a)
-        
+
         print parlist
         print runenv.stepblockind
         print parlist[runenv.stepblockind]
@@ -453,7 +453,7 @@ class optimizer(object):
         @deterministic()
         def p(v=parlist):
             return -self.calc_score_point_block(v[runenv.stepblockind],runenv.stepblockind)
-            
+
         @stochastic(observed=True)
         def D(value=[],par=p):
             perc=par
@@ -461,7 +461,7 @@ class optimizer(object):
                 bias=self.update_bias(perc)
                 print bias
                 perc=perc-bias
-            rvalue=-(perc-self.idealresult)**2/(2*self.likehoodstd**2)            
+            rvalue=-(perc-self.idealresult)**2/(2*self.likehoodstd**2)
             return rvalue
         m=MyMCMC(parlist+[p,D])
         return m
@@ -474,21 +474,21 @@ class optimizer(object):
             else:
                 #print "Not accepatable value"
                 return -np.Inf
-        
+
         self.stochasticlist.append(a)
         @deterministic()
-        def p(v=a):            
+        def p(v=a):
             return -self.calc_score_point_block(v,blockind)
-            
+
         @stochastic(observed=True)
         def D(value=[],par=p):
             perc=par
-            rvalue=-(perc-self.idealresult)**2/(2*self.likehoodstd**2)            
+            rvalue=-(perc-self.idealresult)**2/(2*self.likehoodstd**2)
             return rvalue
-        
+
         m=MyMCMC(parlist+[p,D])
         return m
-                
+
     def get_MCMC_model(self,initialvalue=[]):
         @stochastic(observed=False)
         def a(value=initialvalue):
@@ -497,12 +497,12 @@ class optimizer(object):
             else:
                 #print "Not accepatable value"
                 return -np.Inf
-        
+
         self.stochasticlist=[a]
         @deterministic()
-        def p(v=a):            
+        def p(v=a):
             return -self.calc_score_point(v)
-    
+
         @stochastic(observed=True)
         def D(value=[],par=p):
             perc=par
@@ -510,12 +510,12 @@ class optimizer(object):
                 bias=self.update_bias(perc)
                 print bias
                 perc=perc-bias
-            rvalue=-(perc-self.idealresult)**2/(2*self.likehoodstd**2)            
+            rvalue=-(perc-self.idealresult)**2/(2*self.likehoodstd**2)
             return rvalue
-        
+
         m=MyMCMC([a,p,D])
         return m
-    
+
     def save_currentbest(self):
         os.system('rm -f ./'+str(self.scorerid)+'/'+'B'+str(self.optmind)+'est'+str(self.scorerid)+'#'+str(self.jobid)+'#*')
         fh=open('./'+str(self.scorerid)+'/B'+str(self.optmind)+'est'+str(self.scorerid)+'#'+str(self.jobid)+'#'+str(self.bestresult)+'#'+str(self.likehoodstd)+'#.pickle','w')
@@ -565,7 +565,7 @@ class optimizer(object):
                 bestf=[f for f in self.allfilelist if f.startswith(bestf.split('#')[0]+'#')][0]
                 fh=open('./'+str(self.scorerid)+'/'+bestf)
                 bp=pickle.load(fh)
-                fh.close()                
+                fh.close()
             self.globalbestresult=bp[-1]
             self.globalbestpar=bp[-2]
             print 'Global Bestresult '+bestf+'   '+str(self.globalbestresult)
@@ -579,7 +579,7 @@ class optimizer(object):
             self.bestpar=self.globalbestpar
             self.bestresult=self.globalbestresult
         print "////////////check_globalresult END/////////"
-            
+
     def set_globalbest2current(self):
         if 'using_globalbest' in self.optm and not self.optm['using_globalbest']:
             return 0
@@ -587,7 +587,7 @@ class optimizer(object):
         self.check_globalresult()
         self.currentpar=self.bestpar
         self.currentresult=self.bestresult
-                  
+
     def run_takewaytoolong(self):
         bestresult=self.globalbestresult
         if self.bestresult>bestresult+abs(bestresult)*0.001:
@@ -610,7 +610,7 @@ class optimizer(object):
         else:
             print "will continue because it is not too long yet "+str(crt)+' mean '+str(tamean)+' std '+str(tastd)
             return False
-        
+
     def mcmc(self,steps=2000): #repeated mcmc
         std=self.std
         if 'steps' in self.scorer.model:
@@ -660,7 +660,7 @@ class optimizer(object):
             self.initialize_bias_array()
         else:
             self.optm['add_bias']=False
-        
+
     def setup_mcmcm(self):
         if self.currentmcmcm==None:
             if self.optm['blockupdate']:
@@ -722,7 +722,7 @@ class optimizer(object):
                 sm.accepted=0.0
                 sm.rejected=0.0
         return self.currentmcmcm
-            
+
     def mcmc_tillconverge(self):
         print "------> mcmc_tillconverge"
         #start sampling
@@ -744,7 +744,7 @@ class optimizer(object):
         return pl
 
     def mcmc_converge_single(self):
-        m=self.setup_mcmcm()     
+        m=self.setup_mcmcm()
         pl=self.mcmc_sample(m, self.steps,update_status=False)
         cbr=pl[1].max()
         improved=self.mc_inner_converge['improved']
@@ -763,7 +763,7 @@ class optimizer(object):
             if 'r'+str(self.optmind)+'quit' in fl:
                 self.quit=True
                 print "instructed to quit"
-                break             
+                break
         self.update_runstatus(pl[0],pl[1])
         print '###################Single MCMC now converged'
         return pl
@@ -786,7 +786,7 @@ class optimizer(object):
         return pl
 
     def mcmc_converge_single_sametime(self):
-        m=self.setup_mcmcm()     
+        m=self.setup_mcmcm()
         #pl=self.mcmc_sample(m, self.steps,update_status=False, quittype=2)
         cbr=-999999
         improved=self.mc_inner_converge['improved']
@@ -804,7 +804,7 @@ class optimizer(object):
             if k>=self.mc_inner_converge['minloop'] and ('Finished'+str(self.optmind)+'-'+str(self.scorerid) in self.allfilelist):
                 print "breaking because other has finished"
                 self.quit=True
-                break            
+                break
         self.update_runstatus(pl[0],pl[1])
         print '###################Single MCMC now converged'
         return pl
@@ -827,9 +827,9 @@ class optimizer(object):
         print self.optm['temperature_distribution']
         print self.exchange_times/self.exchange_totaltimes
         return pl
-    
+
     def mcmc_converge_single_pt(self,save=True):
-        m=self.setup_mcmcm()             
+        m=self.setup_mcmcm()
         #pl=self.mcmc_sample(m, self.steps,update_status=False,quittype=1)
         cbr=-99999
         improved=self.mc_inner_converge['improved']
@@ -872,7 +872,7 @@ class optimizer(object):
                 #enabling quit with mark
                 if 's'+str(self.scorerid)+'#'+str(self.optmind)+'quitwithfinalround' in fl:
                     self.quit=True
-                    return 
+                    return
             time.sleep(1)
             self.get_filelist()
             print self.globalresultlist
@@ -913,7 +913,7 @@ class optimizer(object):
             print os.system('rm -f ./'+str(self.scorerid)+'/B'+str(self.optmind)+'est'+str(self.scorerid)+'#'+'*')
             print os.listdir('./'+str(self.scorerid)+'/')
         print "*********ptEND*******"
-    
+
     def pt_exhange(self):
         self.exchange_totaltimes+=1.0
         grl=self.globalresultlist
@@ -951,7 +951,7 @@ class optimizer(object):
             fh.flush()
             fh.close()
         #replica exhange finished...
-    
+
     def mcmc_tillconverge_withblocks_singlebysingle(self):
         if 'tune_interval' in self.scorer.model:
             steps=self.scorer.model['tune_interval']+1
@@ -978,12 +978,12 @@ class optimizer(object):
             rl.append(pl)
         #check whether initial value is in the trace . Need to combine the traces
         self.update_runstatus(pl[0],pl[1])
-        
+
     def mcmc_converge_single_singleblock(self,steps,blockind):
         print "####################Updating single block"
         self.optm['blockupdate']=False
         m=self.get_MCMC_model(self.currentpar,blockind)
-        self.setup_stepmethod(m)        
+        self.setup_stepmethod(m)
         pl=self.mcmc_sample(m, steps,update_status=False,verbose=2)
         cbr=pl[1].max()
         improved=4
@@ -1066,7 +1066,7 @@ class optimizer(object):
             if self.quit:
                 break
         self.global_exchange()
-        self.save_currentbest()        
+        self.save_currentbest()
         while self.improved>0 and (not self.quit):
             pl=self.mcsa_singleT(self.bestpar, self.likehoodstd, steps,nonadaptive=True)
             self.global_exchange()
@@ -1130,7 +1130,7 @@ class optimizer(object):
             parl.append(list(m.trace('a')[i][0]))
             rl.append(pl[i])
         return [parl,rl]
-            
+
     def analyze_optimization_results(self, results):
         opl=results[0]
         orl=results[1]
@@ -1147,11 +1147,11 @@ class optimizer(object):
             testscorer=self.testscorer
             testscorer=load_scorer(testscorer,self.indexlen)
             testideal=testscorer.assess_ideal()
-            testworst=testscorer.assess_worst()        
+            testworst=testscorer.assess_worst()
             if len(testscorer.dsss.ds.indexlist)>0:
                 teststd=self.std*(testideal)/(2*len(testscorer.dsss.ds.indexlist))
             else:
-                teststd=0        
+                teststd=0
             for i in range(len(opl)):
                 ni=opl[i]
                 cr=orl[i]
@@ -1203,7 +1203,7 @@ class optimizer(object):
                     m.use_step_method(AdaptiveMetropolis,self.stochasticlist[i],interval=200,delay=200,verbose=1)
         else:
             raise Exception('please specify step methos in you model')
-            
+
     def setup_stepmethod(self,m,cov=[]):
         #if len(cov)>0:
         #    print 'using adaptive metropolis method'
@@ -1259,7 +1259,7 @@ class optimizer(object):
         if update_status:
             self.update_runstatus(resultlist[0],resultlist[1])
         print time.asctime()
-        return resultlist        
+        return resultlist
 
     def mcsa_singleT(self,initialvalue,T,step,cov=[],nonadaptive=False):
         #build a new model and do ssampling
@@ -1267,7 +1267,7 @@ class optimizer(object):
         m=self.get_MCMC_model(initialvalue)
         self.setup_stepmethod(m)
         return self.mcmc_sample(m,step)
-    
+
     def get_perc_trace(self,m):
         if self.optm['blockupdate']:
             al=[]
@@ -1279,7 +1279,7 @@ class optimizer(object):
             naa=m.trace(self.stochasticlist[0]).gettrace()
             nap=m.trace('p').gettrace()
         return [naa,nap]
-        
+
     def update_runstatus(self,naa,nap):
         print "*********update_runstatus*********"
         mi=np.argmax(nap)
@@ -1294,7 +1294,7 @@ class optimizer(object):
             #elif br>self.bestresult:
             #    self.stepimproved=1
             #    self.improved-=self.mc_outer_converge['improved_less'][1]
-            #    print "Improved but not more than 0.1% "+str(self.improved)                
+            #    print "Improved but not more than 0.1% "+str(self.improved)
             else:
                 self.stepimproved=0
                 self.improved-=1
@@ -1314,4 +1314,3 @@ class optimizer(object):
         print self.bestresult
         print self.bestpar
         print "*********update_runstatus END*********"
-            

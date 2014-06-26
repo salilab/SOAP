@@ -83,8 +83,8 @@ class MyLoop(loopmodel):
                                  spline_dx=0.3, spline_min_points=5)
         # Generate restraints on all non-standard residues:
         self.nonstd_restraints(aln)
-        self.special_restraints(aln)        
-        
+        self.special_restraints(aln)
+
     def select_loop_atoms(self):
         s=selection()
         if not isinstance(self.loops[0],list):
@@ -93,7 +93,7 @@ class MyLoop(loopmodel):
             for loop in self.loops:
                 self.add_loop2selection(loop,s)
         return s
-   
+
     def add_loop2selection(self,loop,s):
         if loop[0]=='':
             loop[0]=self.chains[0].name
@@ -102,7 +102,7 @@ class MyLoop(loopmodel):
         except:
             lind=self.residues[str(loop[2])+':'+loop[0]].index
             s.add(selection(self.residues[lind:(lind+loop[1])]))
-    
+
     def loop_model_analysis(self, atmsel, ini_model, filename, out, id1, num):
         """Energy evaluation and assessment, and write out the loop model"""
         self.user_after_single_loop_model(out,last=True)
@@ -118,12 +118,12 @@ class MyLoop(loopmodel):
 
         # Do model assessment if requested
         self.assess(atmsel, self.loop.assess_methods, out)
-        
+
     def user_after_single_loop_model(self,out,last=False):
         if not self.calc_rmsds:
             return 0
         if not self.rmsd_calc_initialized:
-            self.initialize_rmsd_calculation()        
+            self.initialize_rmsd_calculation()
         # We can now use the calculated RMS, DRMS, etc. from the returned 'r' object:
         rt=str(self.calc_rmsds)
         if rt[-1]=='1':
@@ -143,19 +143,19 @@ class MyLoop(loopmodel):
             soapscore=self.loop.assess_methods[1](self.s2)[1] if last else 9999999
             dopescore=999999999 if np.isnan(dopescore) else dopescore
             soapscore=999999999 if np.isnan(soapscore) else soapscore
-            out['trace'].append((mcrmsd,dopescore,soapscore))                
+            out['trace'].append((mcrmsd,dopescore,soapscore))
         print r.rms
         return r.rms
-    
+
     def load_native_model(self):
         ormdl=Mymodel(self.env)
         ormdl.read(file=self.inimodel)
         ormdl.write(self.sequence+'.native.pdb')
         self.ormdl=ormdl
         self.ors=ormdl.select_loop_atoms(self.loops)
-       
-    #def read_potential(self):    
-    #    return group_restraints(self.env, classes=self.refinepotential[0],parameters=self.refinepotential[1])   
+
+    #def read_potential(self):
+    #    return group_restraints(self.env, classes=self.refinepotential[0],parameters=self.refinepotential[1])
 
     def single_loop_model(self, atmsel, ini_model, num, id1, sched,
                           parallel=False):
@@ -205,7 +205,7 @@ class MyLoop(loopmodel):
             self.loop_model_analysis(atmsel, ini_model, filename, out, id1, num)
         del self.tracefile
         return out
-    
+
     def get_loop_actions(self):
         """Get actions to carry out during loop optimization"""
         act = []
@@ -217,7 +217,7 @@ class MyLoop(loopmodel):
         """Build all loop models for a given initial model"""
         for id1 in range(self.loop.starting_model, self.loop.ending_model + 1):
             r = self.single_loop_model(atmsel, ini_model, num, id1, sched)
-            
+
 class ORLoop(loopmodel):
     """
     Original loop modeling class
@@ -252,7 +252,7 @@ class ORLoop(loopmodel):
         aln.append_model(self, align_codes='c2')
         self.aln=aln
         self.rmsd_calc_initialized=True
-       
+
     def select_loop_atoms(self):
         s=selection()
         if not isinstance(self.loops[0],list):
@@ -261,7 +261,7 @@ class ORLoop(loopmodel):
             for loop in self.loops:
                 self.add_loop2selection(loop,s)
         return s
-   
+
     def add_loop2selection(self,loop,s):
         if loop[0]=='':
             loop[0]=self.chains[0].name
@@ -286,12 +286,12 @@ class ORLoop(loopmodel):
 
         # Do model assessment if requested
         self.assess(atmsel, self.loop.assess_methods, out)
-        
+
     def user_after_single_loop_model(self,out,last=False):
         if not self.calc_rmsds:
             return 0
         if not self.rmsd_calc_initialized:
-            self.initialize_rmsd_calculation()        
+            self.initialize_rmsd_calculation()
         # We can now use the calculated RMS, DRMS, etc. from the returned 'r' object:
         rt=str(self.calc_rmsds)
         if rt[-1]=='1':
@@ -311,7 +311,7 @@ class ORLoop(loopmodel):
             soapscore=self.loop.assess_methods[1](self.s2)[1] if last else 9999999
             dopescore=999999999 if np.isnan(dopescore) else dopescore
             soapscore=999999999 if np.isnan(soapscore) else soapscore
-            out['trace'].append((mcrmsd,dopescore,soapscore))                
+            out['trace'].append((mcrmsd,dopescore,soapscore))
         print r.rms
         return r.rms
 
@@ -363,14 +363,14 @@ class ORLoop(loopmodel):
             self.loop_model_analysis(atmsel, ini_model, filename, out, id1, num)
         del self.tracefile
         return out
-    
+
     def get_loop_actions(self):
         """Get actions to carry out during loop optimization"""
         act = []
         if self.assess_trace:
             act.append(checkRMSD(20,self))
         return act
-               
+
 class sprefine(object):
     """
     SOAP loop refinement benchmark class
@@ -405,7 +405,7 @@ class sprefine(object):
         self.assess_method=assess
         self.criteria=criteria
         self.saveStructure=saveStructure
-        #self.codelist=decoysets(self.dslist).get_nativelist()  not applicalbel for loops    
+        #self.codelist=decoysets(self.dslist).get_nativelist()  not applicalbel for loops
         self.refpot=['$(LIB)/atmcls-mf.lib','$(LIB)/dist-mf.lib']
         bml=bm.split('.')
         self.refinetype=bml[0]
@@ -424,7 +424,7 @@ class sprefine(object):
         self.nonbond_spline=nonbond_spline
         self.contact_shell=contact_shell
         self.deviations=deviations
-        
+
     def get_refine_dict(self):
         if self.refinetype=='loop':
             if isinstance(self.dslist,str):
@@ -462,7 +462,7 @@ class sprefine(object):
                         tsp=tep-nofdecoy
                 self.codedict[code]['sa']=np.copy(ssa[tsp:tep])
                 self.codedict[code]['toberefined']=copy.deepcopy(ds.dnlist[tsp:tep])
-        
+
     def initialize_dslist(self):
         if runenv.hostn:
             fh=open(self.dslist+'.pickle')
@@ -474,13 +474,13 @@ class sprefine(object):
             for ds in self.dslist:
                 fh=open(runenv.basedir+'loop/'+ds+'.pickle')
                 self.codedict.update(pickle.load(fh))
-        
+
         if 'runenv' in self.codedict:
             self.startNum=self.codedict['runenv'][0]
             self.endNum=self.codedict['runenv'][1]
             del self.codedict['runenv']
         fh.close()
-    
+
     def get_ds_part(self,sample):
         newcodedict={}
         for key in self.codedict:
@@ -500,16 +500,16 @@ class sprefine(object):
             self.envinitialized=True
             self.j  = sge_qsub_job(maxslave=self.slavenumber, options="-l arch=lx24-amd64")
             #self.j.append(local_slave())
-    
+
     def refine(self,codes):
         if self.refinetype=='loop':
             self.model_loops_list(self.codedict)
         else:
             pass
-    
+
     def refine_single_code(self):
         pass
-      
+
     def model_loops(self, input):
         log.none()
         if input[-7:]!='.pickle':
@@ -525,7 +525,7 @@ class sprefine(object):
         fl=[item for item in fl if item[-3:]=='pdb']
         for item in fl:
             print os.system('mv '+item+' loop'+str(self.input)+'.'+item)
-                        
+
     def model_loops_list_old(self,loopdict):
         resultdict={}
         for key in loopdict:
@@ -536,7 +536,7 @@ class sprefine(object):
                 loopname=key+str(loop[1])+loop[0]+str(loop[2])
                 print os.system('rm -r '+'loop.'+loopname)
                 #print os.mkdir('loop.'+loopname)
-                #print os.chdir('loop.'+loopname)                  
+                #print os.chdir('loop.'+loopname)
                 res=self.loop_model_single_protein(modelfile='pdb'+key+'.ent',loops=[loop], modelname=loopname)
                 resultdict[loopname]=res
                     #print os.system('mv '+loopname+'.output.pickle loop'+str(self.input)+'.'+loopname+'.output.pickle')
@@ -544,7 +544,7 @@ class sprefine(object):
                 print os.system('rm '+loopname+'.DL*')
                 #print os.chdir('..')
         return resultdict
-            
+
     def loop_model_single_protein(self,modelfile,loops,modelname):
         numofmodels=self.nofloops
         print "number of loops to be calculated: "+str(numofmodels)
@@ -559,7 +559,7 @@ class sprefine(object):
         # select_loop_atoms (necessary)
         if self.assess_method=='SOAP':
             from modeller import soap_loop
-            loop_assess_methods=(assess.DOPE, soap_loop.Scorer())            
+            loop_assess_methods=(assess.DOPE, soap_loop.Scorer())
             energytrace=True
         else:
             loop_assess_methods=(assess.DOPE)
@@ -594,7 +594,7 @@ class sprefine(object):
             m.loop.md_lvel=sgmd
         m.loop.write_selection_only=True
         if len(self.j)>0:
-            m.use_parallel_job(self.j)   
+            m.use_parallel_job(self.j)
         m.make()
         resultlist=[]
         #nativescore=m.ors.assess_dope()
@@ -605,7 +605,7 @@ class sprefine(object):
                 lastone='trace' if self.assess_method=='SOAP' else 'DOPE score'
                 resultlist.append((loopoutput[i]['rmsd'],loopoutput[i]['mcrmsd'],loopoutput[i][lastone]))
             except Exception,e:
-                print >> sys.stderr, e 
+                print >> sys.stderr, e
                 continue
         #rmsddict[modelname+'.native.pdb']=0.0
         #dopedict[modelname+'.native.pdb']=nativescore
@@ -629,7 +629,7 @@ class sprefine(object):
         self.task.get_tasksn()
         self.rundir=str(self.task.rsn)
         self.runpath=runenv.serverUserPath+self.rundir+'/'
-        #self.task=task('','',afterprocessing=self,preparing=self)        
+        #self.task=task('','',afterprocessing=self,preparing=self)
         self.task.dir=self.dir+self.rundir+'/'
         self.task.rdirname=self.rundir
         #return self.task
@@ -667,7 +667,7 @@ class sprefine(object):
             cl=0
             k=k+1
         if len(ndict)>0:
-            dictlist.append(ndict)    
+            dictlist.append(ndict)
         print k
         tnt=k*self.nofloops
         numofruns=min(self.nors,tnt/20)
@@ -690,18 +690,18 @@ class sprefine(object):
         makemdt=open('runme.py','w')#nonbond_spline=0.1,contact_shell=12.0,deviations=50
         makemdt.write('from SOAP.loop import *\nimport sys \n \nspopt=sprefine(sys.argv[1],"'+self.bm+'","'+self.criteria+'",'+str(self.nonbond_spline)+','+str(self.contact_shell)+','+str(self.deviations)+')\nspopt.runpath=\''+self.runpath+'\'\nspopt.refpot[1]="'+self.refpot[1]+'"\n\nspopt.assess_method="'+self.assess_method+'"\n\nspopt.saveStructure='+str(self.saveStructure)+'\n\nspopt.trace='+str(self.trace)+'\n\nspopt.initialize_dslist()'+'\n'+'\nspopt.assess_cluster_node()\n')
         makemdt.flush()
-        generate_job_submit_script(freememory,self.rundir,runtime,nors,parallel=self.slavenumber)        
+        generate_job_submit_script(freememory,self.rundir,runtime,nors,parallel=self.slavenumber)
         return 0
 
     def runtask_cluster(self,nors):
         self.nors=nors
         self.task=task('','',afterprocessing=self,preparing=self)
         self.prepare_task_input()
-        return self.task.run_task_cluster()    
+        return self.task.run_task_cluster()
 
     def get_task(self,cv=None):
         if cv!=None:
-            self.cv=cv            
+            self.cv=cv
             om=copy.deepcopy(cv.model)
             om['refineProtocal']=self.refineProtocal
             self.model=om
@@ -709,7 +709,7 @@ class sprefine(object):
                 return 0
         self.task=task('','',afterprocessing=self,preparing=self)
         return self.task
-    
+
     def model_loops_list(self,loopdict):
         resultdict={}
         for key in loopdict:
@@ -718,9 +718,9 @@ class sprefine(object):
             for i,loop in enumerate(loops):
                 print loop
                 loopname=key+str(i)
-                print os.system('rm -r '+'loop.'+loopname)                 
+                print os.system('rm -r '+'loop.'+loopname)
                 #try:
-                if 1: 
+                if 1:
                     res=self.loop_model_single_protein(modelfile='pdb'+key+'.ent',loops=loop, modelname=loopname)
                     resultdict[loopname]=res
                 #except Exception,e:
@@ -734,7 +734,7 @@ class sprefine(object):
                     for f in fl:
                         print os.system('mv '+f+' '+self.dslist+'/'+f)
                     print os.system('cd '+self.dslist+';gzip *;cd ..')
-        return resultdict          
+        return resultdict
 
     def assess_cluster_node(self):
         os.chdir(scratchdir)
@@ -743,7 +743,7 @@ class sprefine(object):
         #    result=self.assess_bestrmsd(result)
         pickle.dump(result,open(self.dslist+'.pickle','w'))
         report_job_runstatus(self.runpath, True, self.dslist, '',inputname='runme.py',temppath=scratchdir)
-        
+
     def afterprocessing(self,returnDetails=False):
         os.chdir(self.dir+self.rundir)
         rd={}
@@ -770,7 +770,7 @@ class sprefine(object):
         except:
             traceback.print_exc()
         return self.analyze_loop_modeling(returnDetails)
-    
+
     def assess(self,refpot=[]):
         if refpot:
             self.refpot=refpot
@@ -782,16 +782,16 @@ class sprefine(object):
         if self.criteria=='bestrmsd':
             return self.analyze_loop_modeling_results(result)
             #return self.assess_bestrmsd(result)
-            
+
     def assess_local(self,refpot=[]):
         if refpot:
             self.refpot=refpot
         result=self.model_loops_list(self.codedict)
         if self.criteria=='bestrmsd':
-            return self.analyze_loop_modeling_results(result)        
+            return self.analyze_loop_modeling_results(result)
 
     def analyze_loop_modeling(self,returnDetails=False):
-        if self.assess_method=='SOAP':            
+        if self.assess_method=='SOAP':
             result=self.result
             mcrmsds=[]
             mcrmsds2=[]
@@ -822,19 +822,19 @@ class sprefine(object):
                     for item in ress:
                         sa=np.array(item[-1][rastart:])
                         srrl.append(min(item[1],srrl[-1]))
-                        srl.append(min(sa[:,0].min(),srl[-1]))                        
+                        srl.append(min(sa[:,0].min(),srl[-1]))
                         dmi=np.argmin(sa[:,1])
                         smi=np.argmin(sa[:,2])
                         if sa[dmi,1]<md:
                             md=sa[dmi,1]
                             sdl.append(sa[dmi,0])
                         else:
-                            sdl.append(sdl[-1])    
+                            sdl.append(sdl[-1])
                         if sa[smi,2]<ms:
                             ms=sa[smi,2]
                             ssl.append(sa[smi,0])
                         else:
-                            ssl.append(ssl[-1])                            
+                            ssl.append(ssl[-1])
                     rl.append(srl)
                     rrl.append(srrl)
                     dl.append(sdl)
@@ -872,11 +872,11 @@ class sprefine(object):
             k=0
             for key in result:
                 ra[k,:,:]=np.array(result[key])[:mn,:]
-                k+=1            
+                k+=1
             self.averageRMSD=ra[:,:,1].min(axis=1).mean()
             if not self.mcrmsdonly:
                 self.averageRMSD+=ra[:,:,0].min(axis=1).mean()
-            print 'mcrmsd',np.mean(mcrmsds) 
+            print 'mcrmsd',np.mean(mcrmsds)
         print self.averageRMSD
         if self.cv!=None:
             self.cv.resultsummary=-self.averageRMSD
@@ -914,10 +914,10 @@ class sprefine(object):
         #phs3=plt.plot(x,minscored)
         plt.xlabel('Number of models')
         plt.ylabel('Average RMSD')
-        plt.legend((phs[0],phs2[0]),('All atom','Main chain'),loc=0)        
+        plt.legend((phs[0],phs2[0]),('All atom','Main chain'),loc=0)
         plt.savefig(self.rundir+self.refinemethod+'.eps')
         #return minrmsd[-1]
-        
+
     def assess_bestrmsd(self,result):
         brmsdlist=[]
         for code in result:
@@ -966,7 +966,7 @@ class sprefine(object):
                 basem.gen_base_file(cc,l[2:],os.path.join(sdspath,dsname+'.base'),'backup')
                 basem.load_model_file(os.path.join(runenv.opdbdir,code[1:3],'pdb'+code+'.ent.gz'))
                 fl=os.listdir(str(i+1))
-                for f,r in zip(fl,res.values()[0]):  
+                for f,r in zip(fl,res.values()[0]):
                     dpn='.'.join(f.split('.')[1:])
                     dn=dpn.split('.')[0]
                     m2=Mymodel(env)
@@ -983,7 +983,7 @@ class sprefine(object):
         from decoys import decoyset
         do=decoyset(dsname=dsname, sourcedir=dspath)
         do.build()
-        
+
 
 def sgmd(atmsel, actions):
     """Very slow MD annealing"""

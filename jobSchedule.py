@@ -1,5 +1,5 @@
 """
-   SOAP job control(local parallel or SGE parallel). 
+   SOAP job control(local parallel or SGE parallel).
 
 """
 
@@ -9,13 +9,13 @@ from env import *
 class task(object):
     """
     A single SGE task
-    
+
     :param str dir: name of the parent directory of the run directory
     :param str rdirname: name of the run directory
     :param object afterprocessing: An ojbect with afterprocessing method for processing the run output, called when the sge run finsihes.
     :param object preparing: An ojbect with prepare_task_input method for prepare the run output, called when the task is started by monitor().
-    
-    
+
+
     """
     def __init__(self,dir='',rdirname='',afterprocessing=None, preparing=None, targetfile=''):
         self.dir=dir
@@ -43,7 +43,7 @@ class task(object):
         self.runduration=-9999 # the time it takes for the run to finish after it is submitted
         self.finished=False
         self.waitinglist=[]
-       
+
     def get_runf(self):
         rfh=open(self.dir+self.runname)
         rfs=rfh.read()
@@ -51,12 +51,12 @@ class task(object):
         rer=re.search('1-([0-9]+)',rfs)
         self.rfs=rfs
         self.numofruns=int(rer.group(1))
- 
+
     def get_inputlist(self):
         ilfh=open(self.dir+'inputlist')
         il=ilfh.read()
         self.inputlist=il.split(',')
-    
+
     def get_sn(self):
         if self.rsn==-9999:
             while os.path.isfile(runenv.basedir+'rsnlock'):
@@ -71,7 +71,7 @@ class task(object):
             rsnf.close()
             print os.system('rm -f '+runenv.basedir+'rsnlock')
             self.rsn=rsn
-        
+
     def get_tasksn(self):
         #get a unique number for this task to be used as the unique identifier...
         if self.rsn<0:
@@ -80,7 +80,7 @@ class task(object):
         runname='r'+str(rsn)+'.sh'
         self.runname=runname
         os.system('mv '+self.dir+'runme.sh '+self.dir+self.runname)
-        
+
     def run_task_cluster(self):
         self.get_tasksn()
         self.get_runf()
@@ -103,7 +103,7 @@ class task(object):
         print os.system('gzip '+self.runname)
         self.recheck_runstatus()
         self.afterprocessing.nors=self.numofruns
-     
+
     def start_task_cluster(self):
         self.started=True
         if os.path.isfile(self.targetfile):
@@ -134,7 +134,7 @@ class task(object):
         if '#' in self.rdirname:# '#' is not recoginized by sge as valid filename
             self.logpath=os.path.join(runenv.serverLogPath, self.rdirname.replace('#',''))
         else:
-            self.logpath=os.path.join(runenv.serverUserPath,self.rdirname,'output')         
+            self.logpath=os.path.join(runenv.serverUserPath,self.rdirname,'output')
         return 0
 
     def run_task_local(self,command,inputlist=None):
@@ -144,10 +144,10 @@ class task(object):
             self.inputlist=inputlist
         for item in self.inputlist:
             command(item)
-   
+
     def submit_task(self):
         try:
-            print os.system('ssh '+runenv.jobserver+' \' rm -rf '+self.rdirname+' ;mkdir '+self.rdirname+'; mkdir '+self.rdirname+'/output''\'') 
+            print os.system('ssh '+runenv.jobserver+' \' rm -rf '+self.rdirname+' ;mkdir '+self.rdirname+'; mkdir '+self.rdirname+'/output''\'')
             os.chdir(self.dir)
             print os.system('gzip -r -1 *')
             rc1=1
@@ -161,14 +161,14 @@ class task(object):
                        stdout=subprocess.PIPE)
                     result = ssh.communicate()#ssh.stdout.readlines()
                     if not hf in result[0]:
-                        print os.system('scp '+hf+' '+runenv.jobserver+':\''+runenv.jobserverhdf5path+'\'') 
+                        print os.system('scp '+hf+' '+runenv.jobserver+':\''+runenv.jobserverhdf5path+'\'')
                     print os.system('mv '+hf+' ../temp')
                     rc1=os.system('scp -r * '+runenv.jobserver+':\'~/'+self.rdirname+'/\'')
                     print os.system('mv ../temp'+' ./'+hf)
                     print os.system('ssh '+runenv.jobserver+' \' ln -s '+runenv.jobserverhdf5path+hf+' ~/'+self.rdirname+'/'+hf+'\'')
                 else:
                     rc1=os.system('scp -r * '+runenv.jobserver+':\'~/'+self.rdirname+'/\'')
-                 
+
                 time.sleep(0.1)
             rc2=os.system('ssh '+runenv.jobserver+' \'cd '+self.rdirname+';gunzip *gz;qsub '+self.queues+' ./'+self.runname+'\'')#
             self.runstatus=np.ones(self.numofruns,dtype=np.int8) # 0 finished, 1 running,  2  failed, 3 marked as finished
@@ -181,7 +181,7 @@ class task(object):
         except Exception,e:
             traceback.print_exc()
             time.sleep(60)
-        
+
     def start_sr(self,jnl):
         for jn in jnl:
             #pdb.set_trace()
@@ -201,7 +201,7 @@ class task(object):
                 raise NetworkError('Can not restart runs, possibly due to network problems')
             self.runstatusdict[int(jn)-1]['starttime']=0
             self.rtrys=self.rtrys+1
-    
+
     def check_start_failed_runs(self,jnl):
         self.finishedrn=(self.runstatus==0).sum()
         self.activern=(self.runstatus==1).sum()
@@ -221,7 +221,7 @@ class task(object):
             print "starting runs"
             self.start_sr(jnl)
             #repeated error for a single run should be noticed...
-            
+
     def check_failed_runs(self,jnl):
         fcl=[]
         fkl=[]
@@ -243,7 +243,7 @@ class task(object):
             raise Bugs('First 20 or 10% has all failed, probably bugs in code')
         if len(squeeze_list(fcl))==1 and len(fcl[0])>1 and (len(fcl[0])**2*len(fcl)>50):
             raise Bugs('Bugs for some of the runs '+str(jnl))
-            
+
     def check_runlog(self,jn):
         jn=str(jn+1)
         print 'checking run number '+jn
@@ -297,7 +297,7 @@ class task(object):
             ecode='Unknown'
         return ecode
         #_mdt.MDTError: unable to open file - no hdf5 file or file corrupt
-            
+
     def copy_result(self,djl):
         #the limit of command length is 131072, so big lists need to be separated into small ones
         dl=len(djl)
@@ -361,7 +361,7 @@ class task(object):
                 logfilelist.append('*.'+fjn)
         print os.system('ssh '+runenv.jobserver+' '+'\'cd '+os.path.join(self.logpath)+'; rm -f '+' '.join(logfilelist)+'\'')
         print os.system('ssh '+runenv.jobserver+' '+'\'cd '+self.rdirname+'; rm -f '+filelist+'\'')
-                    
+
     def get_runtimestats(self):
         #if not (runtimetest and os.path.isfile(self.dir+'pdbs1')):
         #    return 0
@@ -380,7 +380,7 @@ class task(object):
             self.runtime[int(fjn)-1]['cn']=pir(path=self.dir+'pdbs'+fjn).count_pir()
             self.runtime[int(fjn)-1]['r2n']=pir(path=self.dir+'pdbs'+fjn).count_residue2()
             self.runtime[int(fjn)-1]['host']=rl[2]
-     
+
     def get_wait_time(self):
         #not implemented yet
         self.wait_time=40
@@ -418,7 +418,7 @@ class task(object):
             rv=1
         self.finished=True
         return rv
-    
+
     def monitor_task(self):
         time.sleep(60)
         k=0
@@ -426,22 +426,22 @@ class task(object):
             if self.monitor():
                 break
             time.sleep(60)
-        
+
     def monitor(self):
         """
         The of task is started on remote SGE cluster, monitored until all tasks finish, after whcih the `afterprocessing` will be called.
-        
+
         Some error will be handled automately, but others will casue the program to pause, see :ref:`taskmonitor`
 
         .. note::
-            It is better to wrap the task in a tasklist object and call :method:`tasklist.monitor2end`. 
-        
+            It is better to wrap the task in a tasklist object and call :method:`tasklist.monitor2end`.
+
         """
         try:
             if self.finished:
                 return 1
             if not self.started:
-                print "##########monitoring:########## "+self.rdirname                
+                print "##########monitoring:########## "+self.rdirname
                 return self.start_task_cluster()
             print "##########monitoring:########## "+self.rdirname
             if self.justwait:
@@ -456,7 +456,7 @@ class task(object):
                     return self.process_result()
                 else:
                     print 'waiting for others'
-                    return 0            
+                    return 0
             if self.unnoticederror:
                 self.process_keyboard_interrupt(self.error)
                 print 'continue looping'
@@ -509,20 +509,20 @@ class task(object):
         os.chdir(self.dir)
         fl=os.listdir('./')
         fnl=[int(f.split('.')[0])-1 for f in fl if f.endswith('optimizer.pickle')]
-        self.runstatus=np.ones(self.numofruns)        
+        self.runstatus=np.ones(self.numofruns)
         self.runstatus[fnl]=0
-        
+
     def recheck_runstatus(self):
         os.chdir(self.dir)
         fl=os.listdir('./')
         fl=[f for f in fl if not (f.endswith('gz') or f.endswith('sh'))]
         #every input are gzipped ...
         fnl=[int(f.split('.')[0])-1 for f in fl ]
-        self.runstatus=np.ones(self.numofruns)        
+        self.runstatus=np.ones(self.numofruns)
         self.runstatus[fnl]=0
         for jn in range(0,self.numofruns):
-            self.runstatusdict[jn]={'errorcodelist':[],'starttime':0}   
-        
+            self.runstatusdict[jn]={'errorcodelist':[],'starttime':0}
+
     def reload_k2cvruns(self,rsn,numofruns=200):
         self.rsn=rsn
         self.dir=runenv.runs+str(rsn)+'/'
@@ -555,7 +555,7 @@ class task(object):
                 if currenttime-self.runstatusdict[int(item[-1])-1]['starttime']>rumtimelimit:
                     nodechecklist.append(item[-3])
         self.delete_runs_on_crashed_nodes(nodechecklist)
-        
+
     def delete_runs_on_crashed_nodes(self):
         try:
             proc1=subprocess.Popen('ssh '+runenv.jobserver+' '+'\' qstat -qs u \'',shell=True,stdout=subprocess.PIPE)
@@ -577,12 +577,12 @@ class task(object):
             if len(autl)>0:
                 print os.system('ssh '+runenv.jobserver+' '+'\' qdel -f '+', '.join(autl)+' \'')
         except:
-            return 
-        
+            return
+
     def get_single_node_status(self,node):
         proc1=subprocess.Popen('ssh '+runenv.jobserver+' '+'\' qstat -F -q '+node+'\'',shell=True,stdout=subprocess.PIPE)
         nodestatus=proc1.communicate()[0]
-        
+
     def decode_runstatus(self,runstatus):
         runstatuslist=runstatus.split('\n')[:-1]
         rsl=[]
@@ -672,13 +672,13 @@ class task(object):
         elif s=='6':
             self.submit_task()
         elif s=='7':
-            self.start_task_cluster()            
+            self.start_task_cluster()
         elif s=='8':
             self.error=None
             self.start_sr(self.errorjnl)
         else:
             self.unnoticederror=True
-        
+
     def parallel_local(self,command,inputlist=[],nors=8):
         listoflist=[]
         for i in range(0,nors):
@@ -784,14 +784,14 @@ class localtask(task):
         self.func=func
         self.inputlist=inputlist
         self.finished=False
-        
+
     def monitor(self):
         if self.finished:
             return 1
         tr=self.func(*self.inputlist)
-        self.finished=True 
+        self.finished=True
         return tr
-        
+
     def qdel_jobs(self,delete=False):
         pass
 
@@ -800,14 +800,14 @@ class taskchain(task):
     the inididual function should either excute some code, return some result as the input to the next function
     or the function should result a task object, which can be monitored, and the monitor() return 0 when not success"""
     def __init__(self, chains=[]):#, sharedinput=[], initialinput=[]
-        
+
         self.taskchains=chains
         #self.currenttask=[]
         self.currentpos=0
         #self.currentresult=initialinput
         #self.sharedinput=sharedinput
         self.started=False
-    
+
     def monitor(self):
         self.currentresult=self.taskchains[self.currentpos].monitor()
         while self.currentresult!=0 and self.currentpos<(len(self.taskchains)-1):
@@ -823,8 +823,8 @@ class taskchain(task):
 class tasklist(task):
     """
     List of tasks, task itself can be a :class:`jobSchedule.tasklist`, :class:`jobSchedule.task`,:class:`jobSchedule.localtask`, and :class:`jobSchedule.taskchain`.
-    
-    
+
+
     """
     def __init__(self,tasklist=[],afterprocessing=None,other=None,reload_rundir='',reload_dirlist=[]):
         if reload_rundir:
@@ -844,7 +844,7 @@ class tasklist(task):
         self.buginfo=''
         self.unnoticederror=False
         self.crashjobdict={}
-        
+
     def reload_tasks(self,dl):
         #only works for tasks with pickle saved...
         import gzip
@@ -854,7 +854,7 @@ class tasklist(task):
             ro.task.reload_existingruns()
             tl.append(ro.task)
         return tl
-        
+
     def monitor(self):
         tli=range(0,len(self.tasklist))
         tli.reverse()
@@ -891,17 +891,17 @@ class tasklist(task):
                 return self.afterprocessing(self.resultlist, self.tasklist,self.other)
             else:
                 return self.resultlist
-        
+
     def monitor2end(self):
         """
         The list of tasks are started(at the same time), local or on remote SGE cluster, monitored until all tasks finish, after whcih the `afterprocessing` will be called.
-            
+
         .. note::
             A task, tasklist, or taskchain and be interrupted by CTRL+c at runtime, to perform a list job controlling actions::
-            
+
                 @@@@@@@@ task-monitor
-        
-                You have 120s to interrupt the code to handle the error, otherwise code will continue looping 
+
+                You have 120s to interrupt the code to handle the error, otherwise code will continue looping
                  0-quit and delete;
                  1-quit this job;
                  2-re-raise;
@@ -909,14 +909,14 @@ class tasklist(task):
                  4-enter debug mode;
                  5-continue
                  6-restart runs with updated SOAP code
-                 7-re-parepare and restart job 
+                 7-re-parepare and restart job
                  8-ignore erros
-             
+
             The task will continue if no input is entered.
-            
+
             *The "task-monitor" is also triggered by some fetal errors.*
         """
-                
+
         try:
             while 0 in self.resultlist:
                 try:
@@ -950,7 +950,7 @@ class tasklist(task):
                 return self.afterprocessing(self.resultlist,self.tasklist,self.other)
             else:
                 return self.resultlist
-        except FatalError,e: 
+        except FatalError,e:
             self.qdel_jobs(delete=True)
             sys.exit(str(e))
         except KeyboardInterrupt,e:
@@ -961,8 +961,8 @@ class tasklist(task):
             if self.resultlist[k]:
                 continue
             self.tasklist[k].qdel_jobs(delete)
-               
-            
+
+
 def report_job_runstatus(runpath, runsuccess, runnumber, outputname,inputname='runme.py',temppath=''):
     """
     Utility function for  report the job run status when the runs finished.
@@ -1011,7 +1011,7 @@ def report_job_runstatus(runpath, runsuccess, runnumber, outputname,inputname='r
     else:
         if not runsuccess:
             raise Exception('Run failed '+str(runnumber))
-            
+
 def generate_job_submit_script(freememory,spname,runtime,nors,parallel=0,mem_total=0,additional_resources=''):
     """
     Utility function for generate SGE job submission script.
