@@ -104,7 +104,7 @@ class sf(object):
                  
     def get_sf(self, returnreft=False):
         """
-        Return the recovery function calcualted using the self.par and self.parvalue.
+        Return the recovery function calculated using the self.par and self.parvalue.
         """
         if self.type.startswith('sippl'):
             return np.log(self.data.sum(0)+0.000000000000000001)

@@ -62,7 +62,7 @@ class dsscore(object):
 
 class sfdsscore(dsscore,sf): #the score comes from scaling function
     """
-    Decoy sets scores calcualted using recovery function
+    Decoy sets scores calculated using recovery function
     """
     def __init__(self, dslist=[],bm='ss1', sfm='', features='', sftype='',par='',parvalue=[],type='',**argvs):
         dsscore.__init__(self,scorename='')
@@ -133,7 +133,7 @@ class sfdsscore(dsscore,sf): #the score comes from scaling function
         
 class spdsscore(dsscore,scaledsp): #the score from distributions
     """
-    Decoy sets scores calcualted using stats tables
+    Decoy sets scores calculated using stats tables
     """    
     def __init__(self,dslist=[],bm='',ssp=scaledsp(),model=[]):
         dsscore.__init__(self)

@@ -202,10 +202,10 @@ class decoys4single(object):
         print os.system('scp *base* '+runenv.jobserver+':'+tdir)
     
     def calc_rmsd(self,nativepattern='*native*pdb$'):
-        """Calcualte the RMSDs for the decoys
-        It takse either the rosetta sc file, rmsd.pickle, or raw decoys files with a native structure (named *native*pdb).
+        """Calculate the RMSDs for the decoys
+        It takes either the rosetta sc file, rmsd.pickle, or raw decoys files with a native structure (named *native*pdb).
         rmsd.pickle
-        {decoyname:rmsdvalue} or {decoyname:[rmsdvalue,extra propertitis defined by extrapar]}
+        {decoyname:rmsdvalue} or {decoyname:[rmsdvalue,extra properties defined by extrapar]}
         """
         #change the native name to be native.pdb
         fl=os.listdir('./')

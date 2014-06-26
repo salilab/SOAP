@@ -45,7 +45,7 @@ class MyLoop(loopmodel):
         self.loop.library_schedule=loopschedule()
         self.rmsd_calc_initialized=False
 
-    def initilialize_rmsd_calcualtion(self):
+    def initialize_rmsd_calculation(self):
         ormdl=Mymodel(self.env)
         ormdl.read(file=self.inimodel)
         self.ormdl=ormdl
@@ -123,7 +123,7 @@ class MyLoop(loopmodel):
         if not self.calc_rmsds:
             return 0
         if not self.rmsd_calc_initialized:
-            self.initilialize_rmsd_calcualtion()        
+            self.initialize_rmsd_calculation()        
         # We can now use the calculated RMS, DRMS, etc. from the returned 'r' object:
         rt=str(self.calc_rmsds)
         if rt[-1]=='1':
@@ -239,7 +239,7 @@ class ORLoop(loopmodel):
         self.assess_trace=assess_trace
         self.rmsd_calc_initialized=False
 
-    def initilialize_rmsd_calcualtion(self):
+    def initialize_rmsd_calculation(self):
         ormdl=Mymodel(self.env)
         ormdl.read(file=self.inimodel)
         self.ormdl=ormdl
@@ -291,7 +291,7 @@ class ORLoop(loopmodel):
         if not self.calc_rmsds:
             return 0
         if not self.rmsd_calc_initialized:
-            self.initilialize_rmsd_calcualtion()        
+            self.initialize_rmsd_calculation()        
         # We can now use the calculated RMS, DRMS, etc. from the returned 'r' object:
         rt=str(self.calc_rmsds)
         if rt[-1]=='1':
@@ -1019,7 +1019,7 @@ def loopschedule():
              step(CG, None, physical.values(default=4.00)) ])
 
 class checkRMSD(actions.action):
-    """calcualte the RMSDs of intermediate loops"""
+    """Calculate the RMSDs of intermediate loops"""
     def __init__(self, skip, loopObj,first=False,
                  last=False, start=0):
         actions.action.__init__(self, skip, first, last)

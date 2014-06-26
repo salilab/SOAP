@@ -11,7 +11,7 @@ class dsscorestats(object):
     Summarize the ranking results based on RMSDs and scores.
     
     :param list dslist: the names of decoy sets used for benchmark, for retrieving the RMSD values
-    :param dsscore dsscore: the score object :class:`rankScores.dsscore`, with the socres
+    :param dsscore dsscore: the score object :class:`rankScores.dsscore`, with the scores
     
     """
     def __init__(self,dslist=[],dsscore=dsscore()):
@@ -37,11 +37,11 @@ class dsscorestats(object):
  
     def analyze_score(self,slevel='NativeSelection',dsscoreo=[],score=[], report='single'):
 	"""
-	Calcualte the performance measure.
+	Calculate the performance measure.
 	
-	:param str slevel: benchmark criteria\/performace measure
-	:param dsscore dsscoreo: the score object :class:`rankScores.dsscore`, with the socres 
-	:param list score: the socres
+	:param str slevel: benchmark criteria/performance measure
+	:param dsscore dsscoreo: the score object :class:`rankScores.dsscore`, with the scores 
+	:param list score: the scores
 	:param str report: single|full, report single number summarizing the performance or detailed measures
 
 	"""	
@@ -402,7 +402,7 @@ class dsscorestats(object):
                 else:
                     pdb.set_trace()
                     raise Exception('can not handle benchmark criteria cp '+str(tpc['cp']))
-                #calcualte return value by combining the property
+                #calculate return value by combining the property
                 if tpc['cs']=='':
                     try:
                         statsarray[tpc['ctsn']]=pa
@@ -491,8 +491,8 @@ class dsscorestats(object):
             self.statsarray[i,ai]=va.sum()/len(va)
                 
     def analyze_lbslope(self):
-    #calculate the slope of the lower bond line in the score vs rmsd file.
-    	# the lower bond rmsd bins are precalcualted as saved in self.rmsdbins
+    #calculate the slope of the lower bound line in the score vs rmsd file.
+    	# the lower bound rmsd bins are precalculated as saved in self.rmsdbins
         rmsdnpa=self.score
         poslist=self.ds.indexlist
         ai=self.criteriadict['lbslope']['ctsn']

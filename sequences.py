@@ -8,12 +8,12 @@ class pir(object):
     """
     Process pir files for use by MDT.
     
-    MDT calcualte statistics from structures by looping throgh
+    MDT calculate statistics from structures by looping throgh
     a pir file contains all pir sequences for the structures.
     
-    The last two field in the pir header( X-ray resolution and the r factor)
+    The last two fields in the pir header( X-ray resolution and the r factor)
     can be overwiritten to define the error bar parameters associated
-    with each structure, used by MDT to cacluate the error bar
+    with each structure, used by MDT to calculate the error bar
     on the position of each atom.
     
     :Parameters:
