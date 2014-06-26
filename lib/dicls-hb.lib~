@@ -1,5 +1,0 @@
-DBLGRP "HB-ACC"
-  DOUBLET "ALA" "O" "C"
-DBLGRP "HB-DON"
-  DOUBLET "ALA" "N" "CA"
-
