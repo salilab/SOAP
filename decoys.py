@@ -898,9 +898,10 @@ class decoyset(object):
         for code in self.codelist:
             print "***********building "+code
             self.build_single(code)
-            sd=decoys4single(code,self.dsname,self.sourcedir+code+'/')
+            sd=decoys4single(code,self.dsname,
+                             os.path.join(self.sourcedir, code))
             sd.get()
-            fh=open(self.sourcedir+code+'/'+code+'.pickle','rb')
+            fh=open(os.path.join(self.sourcedir, code, code+'.pickle'),'rb')
             sd=cPickle.load(fh)
             fh.close()
             dnlist=dnlist+sd.dnlist
@@ -915,7 +916,7 @@ class decoyset(object):
         return sal
 
     def build_single(self,code):
-        sd=decoys4single(code,self.dsname,self.sourcedir+code+'/')
+        sd=decoys4single(code,self.dsname, os.path.join(self.sourcedir, code))
         print 'generating decoy for '+code
         sd=sd.get()
         print 'generating finished '+code
