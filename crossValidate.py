@@ -5,6 +5,7 @@
 
 from scorer import *
 from sampling import *
+import filelock
 
 
 class k2cv(object):
@@ -313,7 +314,7 @@ class k2cv(object):
         if model==None:
             model=self.spsfo.scorer.originalmodel
         os.chdir(self.logdir)
-        with FileLock("log.shelve", timeout=100, delay=2) as lock:
+        with filelock.FileLock("log.shelve", timeout=100, delay=2) as lock:
             print("Lock acquired.")
             resultdictlog=shelve.open(self.logdir+'log.shelve')
             del model['str']
@@ -330,7 +331,7 @@ class k2cv(object):
         if 'str' in model:
             del model['str']
         model['str']=any2str(model)
-        with FileLock("log.shelve", timeout=100, delay=2) as lock:
+        with filelock.FileLock("log.shelve", timeout=100, delay=2) as lock:
             print("Lock acquired.")
             if not os.path.isfile(self.logdir+'log.shelve'):
                 nmr=[]

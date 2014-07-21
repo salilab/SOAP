@@ -4,6 +4,7 @@
 """
 from env import *
 from crossValidate import *
+import filelock
 
 debug=True
 
@@ -407,7 +408,7 @@ class spss(object):
 
     def modelinlog(self,nm):
         os.chdir(self.baselogdir)
-        with FileLock("log.shelve", timeout=100, delay=2) as lock:
+        with filelock.FileLock("log.shelve", timeout=100, delay=2) as lock:
             print("Lock acquired.")
             if not os.path.isfile(self.baselogdir+'log.shelve'):
                 nmr=[]
@@ -428,7 +429,7 @@ class spss(object):
     def modelexist(self):
         os.chdir(self.baselogdir)
         path=''
-        with FileLock("spsslog.shelve", timeout=100, delay=2) as lock:
+        with filelock.FileLock("spsslog.shelve", timeout=100, delay=2) as lock:
             print("Lock acquired.")
             if os.path.isfile(self.baselogdir+'spsslog.shelve'):
                 resultdictlog=shelve.open(self.baselogdir+'spsslog.shelve')
@@ -674,7 +675,7 @@ class spss(object):
 
     def write2log(self,logstr):
         os.chdir(self.logdir)
-        with FileLock("log.shelve", timeout=100, delay=2) as lock:
+        with filelock.FileLock("log.shelve", timeout=100, delay=2) as lock:
             print("Lock acquired.")
             logfile=open(self.logdir+'log','a+')
             logstr=logstr.encode('utf-8')
@@ -727,7 +728,8 @@ class spss(object):
             #print os.system('mv '+self.logdir2+' '+self.logdir2[:-1]+'-'+bd[5:])
             self.logdir=self.logdir[:-1]+'-'+bd[5:]+'/'
             #self.logdir2=self.logdir2[:-1]+'-'+bd[5:]+'/'
-            with FileLock("spsslog.shelve", timeout=100, delay=2) as lock:
+            with filelock.FileLock("spsslog.shelve", timeout=100,
+                                   delay=2) as lock:
                 print("Lock acquired.")
                 resultdictlog=shelve.open(self.baselogdir+'spsslog.shelve')
                 resultdictlog[self.modelstr]=self.logdir[:-1]+'-'+bd[5:]

@@ -1,9 +1,9 @@
 """
 SOAP env module, defining the computing environments.
 
-Dependence (in both local host and sgeserver): numpy, scipy, bottleneck, modeller, mdt, h5py, pymc,filelock (https://github.com/dmfrey/FileLock), matplotlib.
+Dependence (in both local host and sgeserver): numpy, scipy, bottleneck, modeller, mdt, h5py, pymc, matplotlib.
 
-If the installation paths for these packages are not in the python search path (in both local host and sgeserver), please add the pathes to $PYTHONPATH or sys.path.
+If the installation paths for these packages are not in the python search path (in both local host and sgeserver), please add the paths to $PYTHONPATH or sys.path.
 
 You might need to run "module load modeller" to load modeller and MDT.
 
@@ -211,7 +211,6 @@ if runenv.hostn==0:
     import matplotlib.pylab as plt
     import signal
     import shelve
-    from filelock import *
     #import pypchip
     scratchdir='/scratch'
 else:
