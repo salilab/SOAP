@@ -2,6 +2,7 @@ import SOAP.decoys
 import shutil
 import os
 import sys
+import glob
 import pickle
 
 # define the paths for the decoys; assume they are found under the directory
@@ -28,9 +29,12 @@ for f in fl:
     shutil.rmtree(os.path.join(preparedDecoyPath,f), ignore_errors=True)
     os.makedirs(os.path.join(preparedDecoyPath,f))
     os.chdir(os.path.join(preparedDecoyPath,f))
-    print os.system('cp '+os.path.join(originalDecoyPath,f,'selected_peptides','*')+' ./')
-    print os.system('mv pMHC_'+f+'.pdb base.pdb')
-    print os.system('touch needattachtobase')
+    for d in glob.glob(os.path.join(originalDecoyPath,
+                                    f, 'selected_peptides','*')):
+        shutil.copy(d, '.')
+    shutil.move('pMHC_'+f+'.pdb', 'base.pdb')
+    # Touch
+    open('needattachtobase', 'w')
     rl=open(os.path.join(originalDecoyPath,f,'all_scores.txt')).read().split('\n')
     rmsddict={}
     scoredict={}
