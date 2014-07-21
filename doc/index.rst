@@ -8,14 +8,14 @@ Welcome to SOAP's documentation!
 
 Installation
 ------------
-1. Install required packages defined in env-config.py, detailed instructions: :mod:`envConfig`   
-2. Config env-config.py and rename it to env.py
+1. Install required packages defined in `envConfig.py` (:mod:`detailed instructions <envConfig>`).
+2. Copy `envConfig.py` to `env.py` and modify it to work with your setup.
 
 Basic workflow to generate a statistical potential
 --------------------------------------------------
 
 1. Preprocess PDB if necessary and generate sequence files. 
-2. Prepare Decoys. 
+2. Prepare decoys. 
 3. Run SOAP script to select models. 
 4. Run SOAP script to calculate the optimal statistical potential using the best model.
 5. Write out the optimal potential in hdf5 or lib format for use in Modeller, IMP or other packages. 
