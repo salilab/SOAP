@@ -20,8 +20,8 @@ import threading
 
 
 class SOAPenv(object):
-    """This class defines the directory and other enviroment variables for all the other classes.
-    These variables needs to be defined::
+    """This class defines the directory and other environment variables for all the other classes.
+    These variables need to be defined::
 
         self.localHost=''#local server for storing results and tables, and running SOAP
         self.sgeServer=''#for submitting jobs on sge cluster, ssh key authencation needed for passwordless access both way (local host<->server)
@@ -42,7 +42,7 @@ class SOAPenv(object):
         self.localResultDB='x.sql3'  # database file location on local host
 
     .. note::
-        the statpot directory must contains:
+        the statpot directory must contain:
 
         1. file rsn with a 5-6 digit number in it (run serial number), eg. 10000
 
@@ -82,31 +82,31 @@ class SOAPenv(object):
         if self.hostname==self.localHost:
             self.hostn=0#local
             self.basedir=self.localStatPotPath
-            self.loopStructurePath=self.basedir+'loop/'
+            self.loopStructurePath=os.path.join(self.basedir, 'loop')
             self.ddbdir=self.localDecoysPath
             self.pdbdir=self.localProcessedPDBPaths
             self.opdbdir=self.localRawPDBPath
-            self.decoysbasedir=self.basedir+'Decoys/'
-            self.pdbpirdir=self.basedir+'pdbpir/'
+            self.decoysbasedir=os.path.join(self.basedir, 'Decoys')
+            self.pdbpirdir=os.path.join(self.basedir, 'pdbpir')
             self.jobserver=self.userName+'@'+self.sgeServer
             self.scriptdir=self.localInstallPath
-            self.logpath=self.basedir+'scorelog'
+            self.logpath=os.path.join(self.basedir, 'scorelog')
             self.runs=self.localRunCachePath
             self.otherrun=True #True, there are other instances doing the same run or there aren't
             self.currentrundirlist=[]
             self.jobserverhdf5path=self.serverHDF5Path
             self.resultdbpath=self.localResultDB
-            self.libdir=self.localInstallPath+'lib/'
+            self.libdir=os.path.join(self.localInstallPath, 'lib')
             self.debug=True
         else:
             self.hostn=1
-            self.loopStructurePath=self.serverUserPath+'loop/'
+            self.loopStructurePath=os.path.join(self.serverUserPath, 'loop')
             self.basedir=os.getenv("RUNPATH")
-            self.ddbdir=self.serverUserPath+'decoys/'
+            self.ddbdir=os.path.join(self.serverUserPath, 'decoys')
             self.pdbdir=self.serverProcessedPDBPaths #'/netapp/database/pdb/remediated/pdb/'#
             self.opdbdir=self.serverRawPDBPath
             self.decoysbasedir=None
-            self.libdir=self.serverInstallPath+'lib/'
+            self.libdir=os.path.join(self.serverInstallPath, 'lib')
         self.hostn=0
         self.runpriority=0
         self.env=environ()

@@ -747,7 +747,7 @@ class decoyset(object):
     """
     def __init__(self,dsname='',sourcedir=''):
         self.dsname=dsname
-        self.dir=runenv.decoysbasedir+dsname+'/'
+        self.dir=os.path.join(runenv.decoysbasedir, dsname)
         self.path=self.dir+dsname
         self.pirpath=self.dir+dsname+'.pir'
         self.sourcedir=sourcedir
