@@ -20,7 +20,7 @@ Directory: SOAP/examples/mhc2/
 
 .. literalinclude:: ../examples/mhc2/select_dist_pot.py 
 
-* Select the best models with distance and accessbility feature, multiple recovery functions, only considering interface atom pairs.
+* Select the best models with distance and accessibility features, multiple recovery functions, only considering interface atom pairs.
 
 .. literalinclude:: ../examples/mhc2/select_dpp_pot.py
 
@@ -32,6 +32,6 @@ Directory: SOAP/examples/mhc2/
 
 .. literalinclude:: ../examples/mhc2/optimize_od_pot.py
 
-5. Write out the optimial potential in hdf5 or lib formart for use in Modeller, IMP or other packages.
+5. Write out the optimal potential in HDF5 or lib format for use in Modeller, IMP or other packages.
 
 .. literalinclude:: ../examples/mhc2/write_soap_mhc2.py

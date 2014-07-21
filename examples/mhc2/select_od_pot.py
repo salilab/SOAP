@@ -206,13 +206,13 @@ if 0:#load old result, can be used to detect sampling or other problems
                     allsearches[i]['object'][allsearches[i]['key']][j]=bestmodel['searches'][k]['object'][allsearches[i]['key']][j]
 
 
-spl=spss(model=model1) # set of statistical potentials/dicrete searches
+spl=spss(model=model1) # set of statistical potentials/discrete searches
 
-spl.currentcutoffpercinitial=0.0# no randomness on dicrete searches
+spl.currentcutoffpercinitial=0.0# no randomness on discrete searches
 spl.currentcutoffpercratio=0.0
 spl.maximumround=10
 #spl.eval_allpars()
-spl.find_best_par()#find the best paramters on discrete and continuous vairables.
+spl.find_best_par()#find the best parameters on discrete and continuous variables.
 spl.log()
 pdb.set_trace()
 

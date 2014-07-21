@@ -5,7 +5,7 @@ import sys
 import pdb
 import numpy as np
 
-#recoery function
+#recovery function
 
 ml=[]
 rfeature=[['d',0,6,0.2]]
@@ -68,7 +68,7 @@ for apn in [36]:#57
     ssl['full']=[scorers,searches]
     #define the final mode
 
-#sampling and seaching parameters
+#sampling and searching parameters
 
 inner={'improved':2,'maxloop':10,'minloop':1}
 outer={'improved':4,'maxloop':200}
@@ -222,12 +222,12 @@ elif 0:
     spl.eval_allpars()
     pdb.set_trace()
 
-spl=spss(model=model1) # set of statistical potentials/dicrete searches
+spl=spss(model=model1) # set of statistical potentials/discrete searches
 
-spl.currentcutoffpercinitial=0.0# no randomness on dicrete searches
+spl.currentcutoffpercinitial=0.0# no randomness on discrete searches
 spl.currentcutoffpercratio=0.0
 spl.maximumround=10
 #spl.eval_allpars()
-spl.find_best_par()#find the best paramters on discrete and continuous vairables.
+spl.find_best_par()#find the best parameters on discrete and continuous variables.
 spl.log()
 pdb.set_trace()                

@@ -16,11 +16,11 @@ bm=pickle.load(open(logpath+'cvmodel.pickle'))
 
 so=scorer(model=bm['model'])
 
-#assess the model using the best parameter (necessary for writting the optimal potential)
+#assess the model using the best parameter (necessary for writing the optimal potential)
 print so.assess(bm['allresult'][0]['bestpar'],slevel='dcg')
 print so.assess_model()
 
-#write out the potential in hdf5 format, the path to the hdf5 are printed out in log 
+#write out the potential in HDF5 format; the path to the HDF5 files are printed out in log 
 so.write_potential(filetype='hdf5')
 
 #write out detailed score for comparison with other implementation of SOAP_mhc2

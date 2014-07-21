@@ -26,7 +26,7 @@ slo={'key':'sacnfflex',
                     'sacnf158':{'sftype':'sacnf','par':[2.75,4.25,5.75,7.25,8.75,10.25,11.75,13.25],'parvalue':[1,1,1,1,1,1,1,1,1,1]}  
                         }} 
 
-#use more recovery function models, not recommended unless you are sure what this mean and think this will help
+#use more recovery function models, not recommended unless you are sure what this means and think this will help
 if 0:
                     for valuetype in ['aon','aoo','acn','aco','1oo','1cn','0oo']:
                             if valuetype.startswith('a'):
@@ -55,12 +55,12 @@ scaledsp1={'type':'scaledsp','pdbset':'X2_2.2A_0.25rfree','features':sfeature,'g
 #define the benchmark scheme
 bmtype={'type':'dsscore','dslist':['mhc2'],'criteria':'dcg','combine':'scoresum','bm':'cs1'}
 
-#define the continous parameter (model parameter) to be optimzied
+#define the continuous parameter (model parameter) to be optimzied
 search1={'object':ref1,'key':'parvalue','pos':[0,1,2,3],'InitialGenerator':{'type':'dfire','values':initvalues}}
 search2={'object':ref1,'key':'par','pos':[0,1,2,3],'InitialGenerator':{'type':'dfire','values':initvalues}}
 
 
-#define the models to be serached
+#define the models to be searched
 dsearch2={'object':rfeature[0],'key':2,'valueset':[20,5.6,5.8,6,7]}#[6,5.4,5,4.8,4.6,4.4,4.2]#15, 7,6,5,4.5,4,3.5,3#,10,8,7,6,5#15,12,10, 8,7,15,12,10, 8,7,6,
 dsearch4={'object':par,'key':'uniform','valueset':[7,6,5,4,3]}
 dsearch5={'object':rfeature[0],'key':3,'valueset':[0.05]}#0.1,0.025,0.05 #,0.25,0.1,0.05 #0.05,0.1,0.25,

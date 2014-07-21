@@ -185,6 +185,6 @@ spl.currentcutoffpercinitial=0.0# no randomness on dicrete searches
 spl.currentcutoffpercratio=0.0
 spl.maximumround=10
 spl.eval_allpars()
-#spl.find_best_par()#find the best paramters on discrete and continuous vairables.
+#spl.find_best_par()#find the best parameters on discrete and continuous variables.
 spl.log()
 pdb.set_trace()
