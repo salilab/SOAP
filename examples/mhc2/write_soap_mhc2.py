@@ -1,7 +1,7 @@
 """
     Write out the SOAP tables for use in Modeller and IMP.
     
-    Also write our raw scores for comparasion with scores from IMP or Modeller.
+    Also write our raw scores for comparison with scores from IMP or Modeller.
 """
 
 from SOAP.scorer import *
