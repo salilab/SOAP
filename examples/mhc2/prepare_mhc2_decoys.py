@@ -1,5 +1,5 @@
-from SOAP.decoys import *
-
+import SOAP.decoys
+import shutil
 
 #define the paths for the decoys
 workingPath='/bell2/gqdong/rawdecoyfiles/pep/'
@@ -7,8 +7,8 @@ originalDecoyPath=os.path.join(workingPath,'mhc2_original')
 preparedDecoyPath=os.path.join(workingPath,'mhc2/')
 decoySetName='mhc2'
 
-#copy the files from originalDecoyPath to target Path
-"""The pre-prepared decoys directory should looks like the following:
+#copy the files from originalDecoyPath to target path
+"""The pre-prepared decoys directory should look like the following:
     root:
         decoySet1: could use the PDB code of the receptor here
             Decoy files
@@ -21,7 +21,7 @@ fl=os.listdir(originalDecoyPath)
 for f in fl:
     if not os.path.isdir(os.path.join(originalDecoyPath,f)):
         continue
-    print os.system('rm -rf '+os.path.join(preparedDecoyPath,f))
+    shutil.rmtree(os.path.join(preparedDecoyPath,f), ignore_errors=True)
     os.makedirs(os.path.join(preparedDecoyPath,f))
     os.chdir(os.path.join(preparedDecoyPath,f))
     print os.system('cp '+os.path.join(originalDecoyPath,f,'selected_peptides','*')+' ./')
@@ -41,8 +41,7 @@ for f in fl:
         
 print os.system('rm -rf '+os.path.join('/bell3/gqdong/statpot/Decoys/mhc2'))
 
-#the decoys are now in the format that SOAP can process, use SOAP.decoys to build the decoyset
-do=decoyset(dsname=decoySetName, sourcedir=preparedDecoyPath)
+# the decoys are now in the format that SOAP can process;
+# use SOAP.decoys to build the decoyset
+do=SOAP.decoys.decoyset(dsname=decoySetName, sourcedir=preparedDecoyPath)
 do.build()
-pdb.set_trace()
-    
