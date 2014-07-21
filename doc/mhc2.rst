@@ -3,12 +3,12 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Calculate SOAP poential for ranking MHC2 peptides.
-==================================================
+Calculate SOAP potential for ranking MHC2 peptides.
+===================================================
 
 Directory: SOAP/examples/mhc2/
 
-1. Preprocess PDB if necessary and generate sequence files, example file: SOAP/examples/mhc2/pdb_X_2.2A_0.25rfree.pir. Please see the module :mod:`sequences` on how to generate different subset of PDBs. 
+1. Preprocess PDB if necessary and generate sequence files, example file: SOAP/examples/mhc2/pdb_X_2.2A_0.25rfree.pir. Please see the module :mod:`sequences` on how to generate different subsets of PDBs. 
 
 2. Prepare Decoys. The original decoy files generated using modeller, mhc2_original.tar.gz and the prepared decoys, mhc2.tar.gz can be found in the example directory. 
 

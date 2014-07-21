@@ -1,23 +1,23 @@
 """
-   SOAP Sequence module, a module for process protein sequences in pir format.
+   A module for processing protein sequences in PIR format.
 """
 
 from env import *
 
 class pir(object):
     """
-    Process pir files for use by MDT.
+    Process PIR files for use by MDT.
 
-    MDT calculate statistics from structures by looping throgh
-    a pir file contains all pir sequences for the structures.
+    MDT calculates statistics from structures by looping through
+    a PIR file containing all sequences for the structures.
 
-    The last two fields in the pir header( X-ray resolution and the r factor)
-    can be overwiritten to define the error bar parameters associated
+    The last two fields in the PIR header (X-ray resolution and the r factor)
+    can be repurposed to define the error bar parameters associated
     with each structure, used by MDT to calculate the error bar
     on the position of each atom.
 
     :Parameters:
-      - `path`: path to the pir file.
+      - `path`: path to the PIR file.
     """
     def __init__(self, path=''):
         self.pirpath=path
