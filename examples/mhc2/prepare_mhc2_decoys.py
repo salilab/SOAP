@@ -1,10 +1,14 @@
 import SOAP.decoys
 import shutil
+import os
+import sys
+import pickle
 
-#define the paths for the decoys
-workingPath='/bell2/gqdong/rawdecoyfiles/pep/'
-originalDecoyPath=os.path.join(workingPath,'mhc2_original')
-preparedDecoyPath=os.path.join(workingPath,'mhc2/')
+# define the paths for the decoys; assume they are found under the directory
+# containing this script
+workingPath = os.path.abspath(os.path.dirname(sys.argv[0]))
+originalDecoyPath = os.path.join(workingPath,'mhc2_original')
+preparedDecoyPath = os.path.join(workingPath,'mhc2')
 decoySetName='mhc2'
 
 #copy the files from originalDecoyPath to target path
@@ -39,8 +43,6 @@ for f in fl:
     pickle.dump(rmsddict,open('rmsd.pickle','w'))
     pickle.dump(scoredict,open('score.pickle','w'))
         
-print os.system('rm -rf '+os.path.join('/bell3/gqdong/statpot/Decoys/mhc2'))
-
 # the decoys are now in the format that SOAP can process;
 # use SOAP.decoys to build the decoyset
 do=SOAP.decoys.decoyset(dsname=decoySetName, sourcedir=preparedDecoyPath)
