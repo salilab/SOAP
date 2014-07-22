@@ -5,6 +5,7 @@
 
 
 from env import *
+import subprocess
 from utility import mypickle
 from sequences import *
 #sys.modules['sp']=sys.modules[__name__]
@@ -193,13 +194,14 @@ class decoys4single(object):
 
     def copy2ddb(self):
         #copy decoys to jobserver
-        tdir=runenv.serverUserPath+'decoys/'+self.dsname+'/'+self.code
-        print os.system('gzip *pdb')
-        print os.system('gunzip *base*')
+        tdir = os.path.join(runenv.serverUserPath, 'decoys', self.dsname,
+                            self.code)
+        subprocess.check_call(['gzip', '*.pdb'])
+        subprocess.check_call(['gunzip', '*base*'])
         pdblist=" ".join([item+'.pdb.gz' for item in self.dnlist])
-        print os.system('ssh '+runenv.jobserver+' mkdir '+tdir)
-        print os.system('scp *.pdb.gz '+runenv.jobserver+':'+tdir)
-        print os.system('scp *base* '+runenv.jobserver+':'+tdir)
+        subprocess.check_call(['ssh', runenv.jobserver, 'mkdir', '-p', tdir])
+        subprocess.check_call(['scp', '*.pdb.gz', runenv.jobserver+':'+tdir])
+        subprocess.check_call(['scp', '*base*', runenv.jobserver+':'+tdir])
 
     def calc_rmsd(self,nativepattern='*native*pdb$'):
         """Calculate the RMSDs for the decoys
@@ -461,10 +463,11 @@ class decoys4single(object):
         self.extrapar=[('dg','f4'),('dasa','f4'),('irmsd','f4')]
         self.build_sa(rmsdlist)
         #copy to cluster
-        tdir=runenv.serverUserPath+'decoys/'+self.dsname+'/'+self.code
-        print os.system('ssh '+runenv.jobserver+' mkdir '+tdir)
-        print os.system('scp *base* '+runenv.jobserver+':'+tdir)
-        print os.system('scp need* '+runenv.jobserver+':'+tdir)
+        tdir = os.path.join(runenv.serverUserPath, 'decoys', self.dsname,
+                            self.code)
+        subprocess.check_call(['ssh', runenv.jobserver, 'mkdir', '-p', tdir])
+        subprocess.check_call(['scp', '*base*', runenv.jobserver+':'+tdir])
+        subprocess.check_call(['scp', 'need*', runenv.jobserver+':'+tdir])
         self.save()
 
     def build_dockingdecoys_zdock(self):
@@ -534,10 +537,11 @@ class decoys4single(object):
         fh.write(totalpir)
         fh.close()
         #copy files to cluster
-        tdir=runenv.serverUserPath+'decoys/'+self.dsname+'/'+self.code
-        print os.system('ssh '+runenv.jobserver+' mkdir '+tdir)
-        print os.system('scp *base* '+runenv.jobserver+':'+tdir)
-        print os.system('scp need* '+runenv.jobserver+':'+tdir)
+        tdir = os.path.join(runenv.serverUserPath, 'decoys', self.dsname,
+                            self.code)
+        subprocess.check_call(['ssh', runenv.jobserver, 'mkdir', '-p', tdir])
+        subprocess.check_call(['scp', '*base*', runenv.jobserver+':'+tdir])
+        subprocess.check_call(['scp', 'need*', runenv.jobserver+':'+tdir])
         self.save()
 
     def build_dockingdecoys_withtransformation(self):
@@ -601,13 +605,15 @@ class decoys4single(object):
         fh=open(self.code+'.pir','w')
         fh.write(totalpir)
         fh.close()
-        tdir=runenv.serverUserPath+'decoys/'+self.dsname+'/'+self.code
-        print os.system('ssh '+runenv.jobserver+' mkdir '+tdir)
-        print os.system('scp *base* '+runenv.jobserver+':'+tdir)
-        print os.system('scp need* '+runenv.jobserver+':'+tdir)
-        print os.system('scp '+sd['lpdb']+' '+runenv.jobserver+':'+tdir)
-        print os.system('scp '+sd['rpdb']+' '+runenv.jobserver+':'+tdir)
-        print os.system('scp '+'firedockinput.pickle '+runenv.jobserver+':'+tdir)
+        tdir = os.path.join(runenv.serverUserPath, 'decoys', self.dsname,
+                            self.code)
+        subprocess.check_call(['ssh', runenv.jobserver, 'mkdir', '-p', tdir])
+        subprocess.check_call(['scp', '*base*', runenv.jobserver+':'+tdir])
+        subprocess.check_call(['scp', 'need*', runenv.jobserver+':'+tdir])
+        subprocess.check_call(['scp', sd['lpdb'], runenv.jobserver+':'+tdir])
+        subprocess.check_call(['scp', sd['rpdb'], runenv.jobserver+':'+tdir])
+        subprocess.check_call(['scp', 'firedockinput.pickle',
+                               runenv.jobserver+':'+tdir])
         self.save()
 
     def update_ppdt_pir(self):
@@ -825,8 +831,8 @@ class decoyset(object):
                 fll.append(f)
         self.codelist=fll
         sdl=[]
-        tdir=runenv.serverUserPath+'decoys/'+self.dsname
-        print os.system('ssh '+runenv.jobserver+' mkdir '+tdir)
+        tdir = os.path.join(runenv.serverUserPath, 'decoys', self.dsname)
+        subprocess.check_call(['ssh', runenv.jobserver, 'mkdir', '-p', tdir])
         sal=self.cat_singles()
         self.bulid_rmsd_array(sal)
         print "building array finished"
@@ -890,7 +896,6 @@ class decoyset(object):
         dnlist=[]
         sal=[]
         pirlist=''
-        print os.system('ssh '+runenv.jobserver+' mkdir ~/decoys/'+self.dsname)
         print '##############################################buiding decoys'+self.dsname
         #runtask=task()
         #runtask.parallel_local(self.build_single,inputlist=self.codelist,nors=10)
