@@ -28,7 +28,7 @@ class decoys4single(object):
         self.code=code
         self.dsname=dsname
         self.dir=path
-        self.path=self.dir+self.code
+        self.path = os.path.join(self.dir, self.code)
         self.score=[]
         self.dtype=[('decoyset','i1'),('decoyseqposn','i2'),('decoyposn','i4'),('rmsd','f4'),('score','f4'),('score2','f4')]
         self.extrapar=[]
