@@ -18,7 +18,7 @@ def cat_files(infiles, outfile):
         for line in open(f):
             outfile.write(line)
 
-class decoys4single(object):
+class Decoys4Single(object):
     """Single set of decoys, serving as the building block for :class:`decoyset`, corresponding to a single subfolder in the :class:`decoyset`'s folder. All the decoy structure files should present in this subfolder.
 
     This class contains method for converting the input decoy strctures in the subfolder into formats necessary for using the decoy structures for statistical potential training, and for copying the prepared decoys into the correponding folders in SGE cluster.
@@ -363,17 +363,17 @@ class decoys4single(object):
 
     def build(self,filter=False):
         """
-        Build the decoys4single object from the files in the directory, and copy the built decoys into SGE cluster.
+        Build the Decoys4Single object from the files in the directory, and copy the built decoys into SGE cluster.
 
         The directory should have the following files:
             Decoy structure files
                 * structure pdbs
-                * needtransformation: a base pdb file *base* and a transformation file *res*, see :meth:`decoys4single.build_dockingdecoys_withtransformation()`
+                * needtransformation: a base pdb file *base* and a transformation file *res*, see :meth:`Decoys4Single.build_dockingdecoys_withtransformation()`
                 * needattachtobase: a base pdb file *base* and files with the remaining parts of decoy structures, the final decoy structure files are assembled on the fly by attaching the decoy file to the base file.
                 * needcombinewithbase: a base pdb file *base* and files with the remaining parts of decoy structures. The base file should contains "replacethis" str, which will be replaced by the decoy file on the fly.
             .. note::
                 Example: *base* can be the receptor file shared by all decoys/ligands/peptides
-            rmsd.pickle | rosetta sc file |  a native structure \*native\*, see :meth:`decoys4single.calc_rmsd`
+            rmsd.pickle | rosetta sc file |  a native structure \*native\*, see :meth:`Decoys4Single.calc_rmsd`
         """
         #pdb.set_trace()
         os.chdir(self.dir)
@@ -836,7 +836,7 @@ class decoyset(object):
               ...
 
         .. seealso::
-            :meth:`decoys4single.build`
+            :meth:`Decoys4Single.build`
         """
         dir=self.sourcedir
         self.mkdir()
@@ -921,7 +921,7 @@ class decoyset(object):
         for code in self.codelist:
             print "***********building "+code
             self.build_single(code)
-            sd=decoys4single(code,self.dsname,
+            sd=Decoys4Single(code,self.dsname,
                              os.path.join(self.sourcedir, code))
             sd.get()
             fh=open(os.path.join(self.sourcedir, code, code+'.pickle'),'rb')
@@ -939,7 +939,7 @@ class decoyset(object):
         return sal
 
     def build_single(self,code):
-        sd=decoys4single(code,self.dsname, os.path.join(self.sourcedir, code))
+        sd=Decoys4Single(code,self.dsname, os.path.join(self.sourcedir, code))
         print 'generating decoy for '+code
         sd=sd.get()
         print 'generating finished '+code
@@ -986,7 +986,7 @@ class decoyset(object):
         ss=self.load()
         for code in ss.codelist:
             os.chdir(self.sourcedir+code)
-            sd=decoys4single(code,self.dsname,self.sourcedir+code+'/')
+            sd=Decoys4Single(code,self.dsname,self.sourcedir+code+'/')
             sd.update_ppdt_pir()
             pirlist.append(sd.path+'.pir')
         cat_files(pirlist, open(self.pirpath, 'w'))
@@ -1042,7 +1042,7 @@ class decoyset(object):
         for i in range(len(self.codelist)):
             try:
                 singlecode=self.dnlist[self.pos[i]].split('.')[1]
-                decoys4single(singlecode).add_property_tosa(self.sa[self.pos[i]:self.pos[i+1]],self.dnlist[self.pos[i]:self.pos[i+1]],property,ddbdir=ddbdir+singlecode+'/')
+                Decoys4Single(singlecode).add_property_tosa(self.sa[self.pos[i]:self.pos[i+1]],self.dnlist[self.pos[i]:self.pos[i+1]],property,ddbdir=ddbdir+singlecode+'/')
             except:
                 pdb.set_trace()
         self.save()
