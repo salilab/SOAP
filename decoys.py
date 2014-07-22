@@ -914,7 +914,7 @@ class decoyset(object):
         dnlist=[]
         sal=[]
         pirlist=[]
-        print '##############################################buiding decoys'+self.dsname
+        print '##############################################building decoys '+self.dsname
         #runtask=task()
         #runtask.parallel_local(self.build_single,inputlist=self.codelist,nors=10)
         #pdb.set_trace()
