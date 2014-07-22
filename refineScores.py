@@ -20,7 +20,7 @@ class sprefinescore(object):
         self.bm=bm
         self.dslist=dslist
         self.criteria=criteria
-        self.codelist=decoysets(self.dslist).get_nativelist()
+        self.codelist=DecoySets(self.dslist).get_nativelist()
 
     def get_refprotein_list(self):
         pass

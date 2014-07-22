@@ -48,6 +48,6 @@ for f in fl:
     pickle.dump(scoredict,open('score.pickle','w'))
         
 # the decoys are now in the format that SOAP can process;
-# use SOAP.decoys to build the decoyset
-do=SOAP.decoys.decoyset(dsname=decoySetName, sourcedir=preparedDecoyPath)
+# use SOAP.decoys to build the DecoySet
+do=SOAP.decoys.DecoySet(dsname=decoySetName, sourcedir=preparedDecoyPath)
 do.build()

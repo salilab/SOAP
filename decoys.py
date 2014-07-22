@@ -19,15 +19,15 @@ def cat_files(infiles, outfile):
             outfile.write(line)
 
 class Decoys4Single(object):
-    """Single set of decoys, serving as the building block for :class:`decoyset`, corresponding to a single subfolder in the :class:`decoyset`'s folder. All the decoy structure files should present in this subfolder.
+    """Single set of decoys, serving as the building block for :class:`DecoySet`, corresponding to a single subfolder in the :class:`DecoySet`'s folder. All the decoy structure files should present in this subfolder.
 
     This class contains method for converting the input decoy strctures in the subfolder into formats necessary for using the decoy structures for statistical potential training, and for copying the prepared decoys into the correponding folders in SGE cluster.
 
 
     :Parameters:
       - `code`: the name for this single set of decoys, which is also the subfolder name.
-      - `dsname`: the :class:`decoyset` name.
-      - `path`: the path to the :class:`decoyset`, the place to create the subfoler for this set of decoys.
+      - `dsname`: the :class:`DecoySet` name.
+      - `path`: the path to the :class:`DecoySet`, the place to create the subfoler for this set of decoys.
       - `dtype`: list of numpy data types defining the strctured array (you should not change this)
       - `extrapar`: numpy data types for additonal propertites of each decoy structure is define here
         specially for atom class features (see :class:`features.AtomType`)"""
@@ -765,7 +765,7 @@ class Decoys4Single(object):
         rer=re.search('([0-9]{1,4})([a-zA-Z\s]{1,2})([0-9]{1,4})',lcode)
         self.loops=[[rer.group(2),int(rer.group(1)),int(rer.group(3)),int(rer.group(1))+int(rer.group(3))-1]]
 
-class decoyset(object):
+class DecoySet(object):
     """
     A single set of decoys
     """
@@ -1053,10 +1053,10 @@ class decoyset(object):
             codelist.append(self.dnlist[self.pos[i]].split('.')[1])
         self.codelist=codelist
 
-class decoysets(decoyset):
+class DecoySets(DecoySet):
     def __init__(self,dslist=[],sourcedir=''):
         self.dslist=dslist
-        decoyset.__init__(self,'_'.join(dslist))
+        DecoySet.__init__(self,'_'.join(dslist))
         self.sourcedir=sourcedir
 
     def get(self,rebuild=False):
@@ -1068,7 +1068,7 @@ class decoysets(decoyset):
         self.codelist=[]
         self.spos=[0]
         for dsname in self.dslist:
-            ds=decoyset(dsname,sourcedir=self.sourcedir+dsname+'/')
+            ds=DecoySet(dsname,sourcedir=self.sourcedir+dsname+'/')
             ds=ds.get(rebuild)
             dss.append(ds)
             self.dnlist=self.dnlist+ds.dnlist
@@ -1100,7 +1100,7 @@ class decoysets(decoyset):
 
     def filter2good(self):
         for dsname in self.dslist:
-            decoyset(dsname=dsnmae).filter2good()
+            DecoySet(dsname=dsnmae).filter2good()
         self.build()
 
     def load_oldlist(self):
@@ -1135,7 +1135,7 @@ class decoysets(decoyset):
 
     def gen_pir(self):
         for i in range(0, len(self.dslist)):
-            shutil.copy(decoyset(self.dslist[i]).pirpath,
+            shutil.copy(DecoySet(self.dslist[i]).pirpath,
                         self.dir+'set'+str(i)+'.pir')
         cat_files(glob.glob(os.path.join(self.dir, 'set*pir')),
                   open(self.pirpath, 'w'))
@@ -1180,7 +1180,7 @@ class decoysets(decoyset):
         from numpy.lib.recfunctions import append_fields
         self.sa=append_fields(self.sa,data=np.zeros(len(self.sa)),names=property,dtypes='f4',usemask=False)
         for i in range(len(self.dslist)):
-            decoyset(dsname=self.dslist[i]).add_property_tosa(self.sa[self.spos[i]:self.spos[i+1]],property,ddbdir=ddbdir+self.dslist[i]+'/')
+            DecoySet(dsname=self.dslist[i]).add_property_tosa(self.sa[self.spos[i]:self.spos[i+1]],property,ddbdir=ddbdir+self.dslist[i]+'/')
         self.save()
 
     def load(self,mode='dss'):
@@ -1190,7 +1190,7 @@ class decoysets(decoyset):
                 return mypickle().load('dss')
             else:
                 if len(self.dslist)==1:
-                    ndss=decoyset.load(self)
+                    ndss=DecoySet.load(self)
                 else:
                     ndss=self.get()
                 ndss.rebuild_codelist()
@@ -1199,7 +1199,7 @@ class decoysets(decoyset):
                 ndss.build_index_list()
                 ndss.get_codepos_fordifferentset()
                 ndss.rename_codes()
-                nds=decoysets(self.dslist)
+                nds=DecoySets(self.dslist)
                 del ndss.dnlist
                 nds.pos=copy.copy(ndss.pos)
                 #self.ds.spos=copy.copy(nds.spos)
@@ -1214,7 +1214,7 @@ class decoysets(decoyset):
                 return nds
         else:
             if len(self.dslist)==1:
-                ndss=decoyset.load(self)
+                ndss=DecoySet.load(self)
             else:
                 ndss=self.get()
             ndss.rebuild_codelist()
@@ -1250,7 +1250,7 @@ class decoysets(decoyset):
         #self.setpos #setpos in codelist #
         #pdb.set_trace()
         #if len(self.indexlist) != len(self.pos)-1:
-        #    raise Exception('decoysets.filter() can only be run on full decoy set, indexlist must cover all decoys')
+        #    raise Exception('DecoySets.filter() can only be run on full decoy set, indexlist must cover all decoys')
         self.sa=self.sa[fa]
         pos=[0]
         spos=[0]

@@ -8,7 +8,7 @@
 from env import *
 from recoveryFunction import *
 from statsTable import *
-from decoys import decoysets
+from decoys import DecoySets
 
 
 class dsscore(object):
@@ -205,7 +205,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
         else:
             residuepower=2
         self.nors=2000
-        pir(decoysets( self.dslist).pirpath).sep_pir('./',self.nors,permin=scoreminnumber,residuepower=residuepower)
+        pir(DecoySets( self.dslist).pirpath).sep_pir('./',self.nors,permin=scoreminnumber,residuepower=residuepower)
         nors=int(os.popen('ls | grep -c pdbs').read())
         self.nors=nors
         self.runpath=runenv.serverUserPath+self.scorename+'/'

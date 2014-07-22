@@ -123,6 +123,6 @@ for d in fl:
     replace_end(sd['olpdbAB'])
 
 #the decoys are now in the format that SOAP can process, use SOAP.decoys to build the decoyset
-do=decoyset(dsname=decoySetName, sourcedir=preparedDecoyPath)
+do=DecoySet(dsname=decoySetName, sourcedir=preparedDecoyPath)
 do.build()
 pdb.set_trace()

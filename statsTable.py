@@ -6,7 +6,7 @@
 from feature import *
 from env import *
 from sequences import *
-from decoys import decoysets
+from decoys import DecoySets
 
 class rawsp(object):
     """Statistics from a set of structures
@@ -540,7 +540,7 @@ class rawsp(object):
         else:
             residuepower=2
         if self.decoy:
-            pir(decoysets( self.pdbset.split('_')).pirpath).sep_pir('./',nors,permin=scoreminnumber,residuepower=residuepower)
+            pir(DecoySets( self.pdbset.split('_')).pirpath).sep_pir('./',nors,permin=scoreminnumber,residuepower=residuepower)
         else:
             print os.system('cp '+runenv.basedir+'pdbpir/pdb_'+self.pdbset+'.pir ./')
             pir('pdb_'+self.pdbset+'.pir').sep_pir('./',nors,residuepower=residuepower)

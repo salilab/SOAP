@@ -405,7 +405,7 @@ class sprefine(object):
         self.assess_method=assess
         self.criteria=criteria
         self.saveStructure=saveStructure
-        #self.codelist=decoysets(self.dslist).get_nativelist()  not applicalbel for loops
+        #self.codelist=DecoySets(self.dslist).get_nativelist()  not applicalbel for loops
         self.refpot=['$(LIB)/atmcls-mf.lib','$(LIB)/dist-mf.lib']
         bml=bm.split('.')
         self.refinetype=bml[0]
@@ -432,9 +432,9 @@ class sprefine(object):
                     self.dslist=self.dslist+'.pickle'
                 self.initialize_dslist()
             elif isinstance(self.dslist,list):
-                self.codedict=decoysets(dslist=self.dslist).get_loopdict()
+                self.codedict=DecoySets(dslist=self.dslist).get_loopdict()
         elif self.refinetype=='native':
-            codelist=copy.deepcopy(decoysets(dslist=self.dslist).codelist)
+            codelist=copy.deepcopy(DecoySets(dslist=self.dslist).codelist)
             for code in codelist:
                 self.codedict[code]={'toberefined':[code]}
         elif self.refinetype.startswith('decoys'):
@@ -442,7 +442,7 @@ class sprefine(object):
             rtrl=rtr.split('-')
             rmsd=float(rtrl[0])
             nofdecoy=int(rtrl[1])
-            ds=decoysets(dslist=self.dslist)
+            ds=DecoySets(dslist=self.dslist)
             codelist=copy.deepcopy(ds.codelist)
             for code,i in zip(codelist,range(codelist)):
                 self.codedict[code]={}
@@ -980,8 +980,8 @@ class sprefine(object):
                 pickle.dump(rmsddict,open(os.path.join(sdspath,'rmsd.pickle'),'w'))
                 pickle.dump(scoredict,open(os.path.join(sdspath,'score.pickle'),'w'))
                 pickle.dump([('mcrmsd','f4')],open(os.path.join(sdspath,'extrapar.pickle'),'w'))
-        from decoys import decoyset
-        do=decoyset(dsname=dsname, sourcedir=dspath)
+        from decoys import DecoySet
+        do=DecoySet(dsname=dsname, sourcedir=dspath)
         do.build()
 
 

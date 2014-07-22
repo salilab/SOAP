@@ -3,7 +3,7 @@
 
 """
 from env import *
-from decoys import decoysets
+from decoys import DecoySets
 from rankScores import dsscore
 
 class dsscorestats(object):
@@ -29,8 +29,8 @@ class dsscorestats(object):
         #self.sal=[]
 
     def get_rmsdlist(self):
-        self.ds=decoysets(self.dslist)
-        #clean up the decoysets object to eliminate unnecessary objects
+        self.ds=DecoySets(self.dslist)
+        #clean up the DecoySets object to eliminate unnecessary objects
         self.ds=self.ds.load(mode='dss')
         if not self.ds.sa.flags['OWNDATA']:
             self.ds.sa=copy.deepcopy(self.ds.sa)
