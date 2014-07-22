@@ -8,7 +8,15 @@ from env import *
 import subprocess
 from utility import mypickle
 from sequences import *
+import shutil
+import glob
 #sys.modules['sp']=sys.modules[__name__]
+
+def cat_files(infiles, outfile):
+    """Concatenate `infiles` to the file handle `outfile`"""
+    for f in infiles:
+        for line in open(f):
+            outfile.write(line)
 
 class decoys4single(object):
     """Single set of decoys, serving as the building block for :class:`decoyset`, corresponding to a single subfolder in the :class:`decoyset`'s folder. All the decoy structure files should present in this subfolder.
@@ -43,9 +51,9 @@ class decoys4single(object):
             if file[0:(2+len(self.code)+len(self.dsname))]==self.dsname+'.'+self.code+'.':
                 continue
             elif file[0:len(self.code)+1]==self.code+'.':
-                print os.system('mv '+file+' '+self.dsname+'.'+file)
+                shutil.move(file, self.dsname+'.'+file)
             else:
-                print os.system('mv '+file+' '+self.dsname+'.'+self.code+'.'+file)
+                shutil.move(file, self.dsname+'.'+self.code+'.'+file)
         #print os.system('for file in *pdb; do mv $file '+self.dsname+'.'+self.code+'.$file; done')
 
     def filter_pdb(self):
@@ -101,13 +109,13 @@ class decoys4single(object):
             except:
                 print tatomline
                 print 'structure problem '+otherprotein
-                print os.system('mv '+otherprotein+' '+otherprotein[:-4]+'.atombad')
+                shutil.move(otherprotein, otherprotein[:-4]+'.atombad')
                 continue
             posdiff=self.align_seq(seqnamel,seqnuml,tseqnamel,tseqnuml)
             if posdiff==-9999:
                 #if the decoy structure can not be aligned with the native structure, mark it as a bad structure
                 print 'can not align with native '+otherprotein
-                print os.system('mv '+otherprotein+' '+otherprotein[:-4]+'.alnbad')
+                shutil.move(otherprotein, otherprotein[:-4]+'.alnbad')
                 continue
             posdiffl.append(posdiff)
             tatomlist=[]
@@ -159,7 +167,7 @@ class decoys4single(object):
                     index=atomnames.index(atom)
                 except:
                     print otherprotein+' missing atoms '+atom
-                    print os.system('mv '+otherprotein+' '+otherprotein[:-3]+atom+'.bad')
+                    shutil.move(otherprotein, otherprotein[:-3]+atom+'.bad')
                     break
                 fs=fs+atomlines[index]+'\n'
             fht=open(otherprotein,'w')
@@ -196,12 +204,13 @@ class decoys4single(object):
         #copy decoys to jobserver
         tdir = os.path.join(runenv.serverUserPath, 'decoys', self.dsname,
                             self.code)
-        subprocess.check_call(['gzip', '*.pdb'])
-        subprocess.check_call(['gunzip', '*base*'])
+        subprocess.check_call(['gzip'] + glob.glob('*.pdb'))
+        subprocess.check_call(['gunzip'] + glob.glob('*base*.gz'))
         pdblist=" ".join([item+'.pdb.gz' for item in self.dnlist])
         subprocess.check_call(['ssh', runenv.jobserver, 'mkdir', '-p', tdir])
-        subprocess.check_call(['scp', '*.pdb.gz', runenv.jobserver+':'+tdir])
-        subprocess.check_call(['scp', '*base*', runenv.jobserver+':'+tdir])
+        subprocess.check_call(['scp', '-q'] + glob.glob('*.pdb.gz') \
+                              + glob.glob('*base*') \
+                              + [runenv.jobserver+':'+tdir])
 
     def calc_rmsd(self,nativepattern='*native*pdb$'):
         """Calculate the RMSDs for the decoys
@@ -438,13 +447,16 @@ class decoys4single(object):
         print 'building docking decoys'
         fl=os.listdir('./')
         #renaming the chains
-        print os.system('PatchDock/mainchain.pl '+self.code+'_r_u.pdb A')#use unbound
-        print os.system('PatchDock/mainchain.pl '+self.code+'_l_u.pdb B')
+        subprocess.check_call(['PatchDock/mainchain.pl',
+                               self.code+'_r_u.pdb', 'A'])#use unbound
+        subprocess.check_call(['PatchDock/mainchain.pl',
+                               self.code+'_l_u.pdb', 'B'])
         #combine the two files
         fh=open(self.code+'_r_b.pdb','a')
         fh.write('\n')
         fh.close()
-        print os.system(' cat '+self.code+'_r_u.pdb '+self.code+'_l_u.pdb > '+self.dsname+'.'+self.code+'.base.pdb')
+        cat_files((self.code+'_r_u.pdb', self.code+'_l_u.pdb'),
+                  open(self.dsname+'.'+self.code+'.base.pdb', 'w'))
         #generate pir file for the base structure
         self.make_basepir(self.dsname+'.'+self.code+'.base.pdb')
         basepir=open('base.pir').read()
@@ -475,16 +487,21 @@ class decoys4single(object):
         fl=os.listdir('./')
         pdbfilelist=[item for item in fl if item.endswith('pdb')]
         #renaming the chains
-        print os.system('cp '+runenv.ddbdir+'ppd/benchmark4/'+self.code+'* ./')
-        print os.system('PatchDock/mainchain.pl '+self.code.upper()+'_r_u.pdb A')
-        print os.system('PatchDock/mainchain.pl '+self.code.upper()+'_l_u.pdb B')
+        for g in glob.glob(os.path.join(runenv.ddbdir, 'ppd', 'benchmark4',
+                                        self.code, '*')):
+            shutil.copy(g, '.')
+        subprocess.check_call(['PatchDock/mainchain.pl',
+                               self.code.upper()+'_r_u.pdb', 'A'])
+        subprocess.check_call(['PatchDock/mainchain.pl',
+                               self.code.upper()+'_l_u.pdb', 'B'])
         #combine the two files
         fh=open(self.code.upper()+'_r_u.pdb','a')
         fh.write('\n')
         fh.close()
-        print os.system(' cat '+self.code.upper()+'_r_u.pdb '+self.code.upper()+'_l_u.pdb > '+self.dsname+'.'+self.code+'.base.pdb')
+        cat_files((self.code.upper()+'_r_u.pdb', self.code.upper()+'_l_u.pdb'),
+                  open(self.dsname+'.'+self.code+'.base.pdb', 'w'))
         #generate pir file for the base structure
-        print os.system('touch needtransformation')
+        open('needtransformation', 'w')
         self.make_basepir(self.dsname+'.'+self.code+'.base.pdb')
         #Read in the rmad, transformation matrix
         fh=open('rmsd.res')
@@ -558,7 +575,8 @@ class decoys4single(object):
         #print os.system('PatchDock/mainchain.pl '+sd['rpdb'][:-3]+' A')
         #print os.system('PatchDock/mainchain.pl '+sd['lpdb'][:-3]+' B')
         #combine the two files
-        print os.system(' cat '+sd['rpdb']+' '+sd['lpdb']+' > '+self.dsname+'.'+self.code+'.base.pdb')
+        cat_files((sd['rpdb'], sd['lpdb']),
+                  open(self.dsname+'.'+self.code+'.base.pdb', 'w'))
         #generate pir file for the base structure
         self.make_basepir(self.dsname+'.'+self.code+'.base.pdb')
         #Read in the rmad, transformation matrix
@@ -801,8 +819,8 @@ class decoyset(object):
                 #    print os.system('python ../ergePDB.py '+subfolder[:-10]+' '+folder+' '+subfolder[:-10])
                 #    print os.system('rm '+subfolder)
                 #print os.system('mv  ./'+subfolder+'/'+subfolder+'.pdb ./'+folder+'/'+subfolder+'/'+subfolder+'.native.pdb')
-                print os.system('mv  ./'+subfolder+' ../'+subfolder)
-            print os.system('rm -r ../'+folder)
+                shutil.move(subfolder, '..')
+            shutil.rmtree(os.path.join('..', folder))
 
     def build(self):
         """
@@ -895,7 +913,7 @@ class decoyset(object):
         pos=[0]
         dnlist=[]
         sal=[]
-        pirlist=''
+        pirlist=[]
         print '##############################################buiding decoys'+self.dsname
         #runtask=task()
         #runtask.parallel_local(self.build_single,inputlist=self.codelist,nors=10)
@@ -914,10 +932,10 @@ class decoyset(object):
             pos.append(pos[-1]+len(sd.dnlist))
             if len(sd.dnlist)==1:
                 raise Bugs('Only 1 decoys in the decoy set, probably something wrong with it')
-            pirlist=pirlist+sd.path+'.pir '
+            pirlist.append(sd.path+'.pir')
         self.pos=pos
         self.dnlist=dnlist
-        print os.system('cat '+pirlist+' >'+self.pirpath)
+        cat_files(pirlist, open(self.pirpath, 'w'))
         return sal
 
     def build_single(self,code):
@@ -964,14 +982,14 @@ class decoyset(object):
                 print code1+' '+str(l1)+' '+str(l2)
 
     def update_ppdt_pir(self):
-        pirlist=''
+        pirlist=[]
         ss=self.load()
         for code in ss.codelist:
             os.chdir(self.sourcedir+code)
             sd=decoys4single(code,self.dsname,self.sourcedir+code+'/')
             sd.update_ppdt_pir()
-            pirlist=pirlist+sd.path+'.pir '
-        print os.system('cat '+pirlist+' >'+self.pirpath)
+            pirlist.append(sd.path+'.pir')
+        cat_files(pirlist, open(self.pirpath, 'w'))
 
     def get_loopdict(self,dp):
         ld={}
@@ -1117,9 +1135,12 @@ class decoysets(decoyset):
 
     def gen_pir(self):
         for i in range(0, len(self.dslist)):
-            print os.system('cp '+decoyset(self.dslist[i]).pirpath+' '+self.dir+'set'+str(i)+'.pir')
-        print os.system('cat '+self.dir+'set*pir > '+self.pirpath)
-        print os.system('rm '+self.dir+'set*pir')
+            shutil.copy(decoyset(self.dslist[i]).pirpath,
+                        self.dir+'set'+str(i)+'.pir')
+        cat_files(glob.glob(os.path.join(self.dir, 'set*pir')),
+                  open(self.pirpath, 'w'))
+        for g in glob.glob(os.path.join(self.dir, 'set*pir')):
+            os.unlink(g)
 
     def get_ds_part(self,sample):
         sset=set(sample)
