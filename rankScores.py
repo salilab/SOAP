@@ -6,6 +6,7 @@
 """
 
 from env import *
+import shutil
 from recoveryFunction import *
 from statsTable import *
 from decoys import DecoySets
@@ -182,15 +183,16 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
 
     def prepare_task_input(self):
         os.chdir(self.dir)
-        os.system('rm -r '+self.scorename)
+        if os.path.exists(self.scorename):
+            shutil.rmtree(self.scorename)
         os.mkdir(self.scorename)
         os.chdir(self.dir+self.scorename)
         if self.decomposition:
             self.svdu,self.svdv=self.get_svd()
-            print os.system('cp '+self.ssppath+'svdu.npy ./')
-            print os.system('cp '+self.ssppath+'svdv.npy ./')
+            shutil.copy(os.path.join(self.ssppath, 'svdu.npy'), '.')
+            shutil.copy(os.path.join(self.ssppath, 'svdv.npy'), '.')
         if self.tlib:
-            os.system('cp '+runenv.libdir+self.tlib+' ./')
+            shutil.copy(os.path.join(runenv.libdir, self.tlib), '.')
         freememory=feature(self.features).get_runmem()
         if self.features=='epad':
             freememory=3.0

@@ -597,11 +597,12 @@ class k2cvcluster(k2cvlocal):
             self.initialize_model()
         if runenv.hostn==0 and len(model)>0:
             try:
-                bdir=runenv.basedir+'results/'
-                tdir=bdir+'_'.join(self.model['bmtype']['dslist'])
+                bdir=os.path.join(runenv.basedir, 'results')
+                tdir=os.path.join(bdir,
+                                  '_'.join(self.model['bmtype']['dslist']))
                 if not os.path.isdir(tdir):
                     os.mkdir(tdir)
-                tdir=tdir+'/'+self.model['bmtype']['criteria']
+                tdir=os.path.join(tdir, self.model['bmtype']['criteria'])
                 if not os.path.isdir(tdir):
                     os.mkdir(tdir)
                 self.logdir=tdir+'/'

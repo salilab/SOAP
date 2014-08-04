@@ -4,6 +4,7 @@
 """
 
 from env import *
+import shutil
 
 
 class sprefinescore(object):
@@ -30,9 +31,10 @@ class sprefinescore(object):
 
     def prepare_task_input(self):
         os.chdir(self.dir)
-        os.system('rm -r '+self.scorename)
+        if os.path.exists(self.scorename):
+            shutil.rmtree(self.scorename)
         os.mkdir(self.scorename)
-        os.chdir(self.dir+self.scorename)
+        os.chdir(os.path.join(self.dir, self.scorename))
         nors=len(self.codelist)
         #write the input list for different runs
         inputlist=open('inputlist','w')
@@ -41,7 +43,7 @@ class sprefinescore(object):
         #copy scripts to this rundir
         #generate the lib file for modeller refinement
         self.ssp.write_lib_dist150()
-        os.system('cp '+self.ssppath+'.lib ./')
+        shutil.copy(self.ssppath+'.lib', '.')
         #write the run python script file
         makemdt=open('runme.py','w')
         makemdt.write('from SOAP import *\nimport sys \n \nrsp=rawsp(e,\''+self.pdbset+'\',\''
@@ -60,15 +62,16 @@ class sprefinescore(object):
         runmdt.flush()
 
     def process_task_output(self):
-        os.chdir(self.dir+self.scorename)
+        os.chdir(os.path.join(self.dir, self.scorename))
         self.score=np.zeros(len(self.codelist),dtype=[('codeposn','i2'),('nativetotalscore','f4'),('nativescscore','f4')
                                               ,('nativespscore','f4'),('decoytotalscore','f4'),('decoyscscore','f4')
                                               ,('decoyspscore','f4'),('rmsd','f4')])
         print self.score
         for i in range(0,len(self.codelist)):
             code=self.codelist[i]
-            if os.path.isfile(self.scorepath+'/'+code+'.refine.score'):
-                fh=open(self.scorepath+'/'+code+'.refine.score')
+            if os.path.isfile(os.path.join(self.scorepath,
+                                           code+'.refine.score')):
+                fh=open(os.path.join(self.scorepath, code+'.refine.score'))
                 fc=fh.read()
                 self.score['codeposn'][i]=i
                 rer=re.search(code+' score: ([0-9.-]*),([0-9.-]*),([0-9.-]*)',fc)
@@ -90,19 +93,19 @@ class sprefinescore(object):
 
     def start_get_score(self):
         self.prepare_task_input()
-        sj=task(self.scorepath+'/',self.scorename)
+        sj=task(os.path.join(self.scorepath, self.scorename))
         sj.run_task_cluster()
 
     def calc_score_cluster(self):
         self.prepare_task_input()
-        sj=task(self.scorepath+'/',self.scorename)
+        sj=task(os.path.join(self.scorepath, self.scorename))
         sj.run_task_cluster()
         self.process_task_output()
         self.save()
 
     def calc_score_local(self):
         self.prepare_task_input()
-        sj=task(self.scorepath+'/',self.scorename)
+        sj=task(os.path.join(self.scorepath, self.scorename))
         sj.run_task_local(self.refine,self.codelist)
 
     def refine(self,code):

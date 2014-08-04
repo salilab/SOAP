@@ -281,9 +281,9 @@ class feature(object):
             mlibr=self.mlib
         libfile=self.get_lib()
         if re.search('dicls',libfile):
-            mlibr.tuple_classes.read(runenv.libdir+libfile)
+            mlibr.tuple_classes.read(os.path.join(runenv.libdir, libfile))
         else:
-            mlibr.atom_classes.read(runenv.libdir+libfile)
+            mlibr.atom_classes.read(os.path.join(runenv.libdir, libfile))
 
 
     def issymetry(self):

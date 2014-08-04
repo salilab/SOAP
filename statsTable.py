@@ -5,6 +5,8 @@
 
 from feature import *
 from env import *
+import shutil
+import subprocess
 from sequences import *
 from decoys import DecoySets
 
@@ -101,13 +103,12 @@ class rawsp(object):
             pdbset='o'+pdbset
         genmethod=self.genmethod
         features=self.features
-        if not (os.access(basedir+pdbset,os.F_OK)):
-            os.mkdir(basedir+pdbset)
-        if not (os.access(basedir+pdbset+'/'+features+'-'+genmethod,os.F_OK)):
-            os.mkdir(basedir+pdbset+'/'+features+'-'+genmethod)
-        os.chdir(basedir+pdbset+'/'+features+'-'+genmethod)
+        newdir = os.path.join(basedir, pdbset, features+'-'+genmethod)
+        if not os.path.exists(newdir):
+            os.makedirs(newdir)
+        os.chdir(newdir)
         if self.tlib:
-            print os.system('cp '+runenv.libdir+self.tlib+' ./')
+            shutil.copy(os.path.join(runenv.libdir, self.tlib), '.')
 
     def isatompairclustering(self):
         genmethod=self.genmethod
@@ -120,7 +121,7 @@ class rawsp(object):
             self.apca=np.load(runenv.libdir+apname+'.npy')
 
     def subset_of_existing(self):
-        if not os.path.isdir(runenv.basedir+self.pdbset):
+        if not os.path.isdir(os.path.join(runenv.basedir, self.pdbset)):
             return []
         rangelist=self.get_allsp_range()
         nal=[]
@@ -164,14 +165,15 @@ class rawsp(object):
             return []
 
     def get_allsp_range(self):
-        fl=os.listdir(runenv.basedir+self.pdbset)
-        fl=[f for f in fl if os.path.isdir(runenv.basedir+self.pdbset+'/'+f)]
+        fl=os.listdir(os.path.join(runenv.basedir, self.pdbset))
+        fl=[f for f in fl if os.path.isdir(os.path.join(runenv.basedir,
+                                                        self.pdbset, f))]
         rangelist=[]
         for f in fl:
             fs=f.split('-')
             fs=['-'.join(fs[:-1]),fs[-1]]
-            spdir=runenv.basedir+self.pdbset+'/'+f+'/'+'.'.join([self.pdbset]+fs)
-            if os.path.isfile(spdir+self.ftype) or os.path.isdir(runenv.basedir+self.pdbset+'/'+f+'/'+self.prd):
+            spdir=os.path.join(runenv.basedir, self.pdbset, f, '.'.join([self.pdbset]+fs))
+            if os.path.isfile(os.path.join(spdir, self.ftype)) or os.path.isdir(os.path.join(runenv.basedir, self.pdbset, f, self.prd)):
                 rangelist.append([spdir, fs[0],decode_genmethod(fs[1])])
         return rangelist
 
@@ -260,10 +262,10 @@ class rawsp(object):
                 m.write_hdf5(temppath+str(runnumber)+'.result.hdf5',gzip=True)
             except:
                 try:
-                    temppath=runenv.serverScrathPath+'/'+os.getenv('JOB_ID')+'/'
+                    temppath=os.path.join(runenv.serverScrathPath, os.getenv('JOB_ID'))
                     os.makedirs(temppath)
-                    print os.system('mkdir '+temppath)
-                    m.write_hdf5(temppath+str(runnumber)+'.result.hdf5',gzip=True)
+                    m.write_hdf5(os.path.join(temppath,
+                                       str(runnumber)+'.result.hdf5'),gzip=True)
                     runsuccess=True
                 except:
                     runsuccess=False
@@ -305,7 +307,7 @@ class rawsp(object):
                 return tasklist(tasklist=tl,afterprocessing=dummy)
             self.nors=1000
         if not tc:
-            sj=task(self.dir+self.prd+'/',self.spname,afterprocessing=self,preparing=self,targetfile=self.sppath+self.filetype)
+            sj=task(os.path.join(self.dir, self.prd),self.spname,afterprocessing=self,preparing=self,targetfile=self.sppath+self.filetype)
             return sj
         else:
             return 0
@@ -315,34 +317,34 @@ class rawsp(object):
         if self.justwait and len(self.waittarget)==0:
             pass
         elif self.justwait and len(self.waittarget)>0: # the sp need to be combined with others
-            os.chdir(self.dir+self.prd+'/')
+            os.chdir(os.path.join(self.dir, self.prd))
             self.get_targetsp_fromexistingsps()
         else:
-            os.chdir(self.dir+self.prd+'/')
+            os.chdir(os.path.join(self.dir, self.prd))
             if self.routine=='calc_sp_all':
                 self.sp_sum()
-                print os.system('cp sum.hdf5 '+self.sppath+'.hdf5')
+                shutil.copy('sum.hdf5', self.sppath+'.hdf5')
                 if 0:
                     self.sp_stderr2(nolog=True)
-                    print os.system('mv ostderr2.hdf5 '+self.sppath+'.ostderr2.hdf5')
-                    print os.system('mv omean.hdf5 '+self.sppath+'.omean.hdf5')
+                    shutil.move('ostderr2.hdf5', self.sppath+'.ostderr2.hdf5')
+                    shutil.move('omean.hdf5', self.sppath+'.omean.hdf5')
                     self.sp_stderr2(nolog=False)
-                    print os.system('mv stderr2.hdf5 '+self.sppath+'.stderr2.hdf5')
-                    print os.system('mv mean.hdf5 '+self.sppath+'.mean.hdf5')
+                    shutil.move('stderr2.hdf5', self.sppath+'.stderr2.hdf5')
+                    shutil.move('mean.hdf5', self.sppath+'.mean.hdf5')
             elif self.routine=='calc_sp_i':
                 allarray=self.cat_spi()
                 if self.atompairclustering:
                     #process atom pair features
                     for i in range(allarray.shape[1]):
-                        sdir=runenv.basedir+self.pdbset+'/'+self.features+'-'+self.genmethod+'n'+str(i)+'/'
-                        scorepath=sdir+self.pdbset+'.'+self.features+'.'+self.genmethod+'n'+str(i)
+                        sdir = os.path.join(runenv.basedir, self.pdbset, self.features+'-'+self.genmethod+'n'+str(i))
+                        scorepath=os.path.join(sdir, self.pdbset+'.'+self.features+'.'+self.genmethod+'n'+str(i))
                         if not os.path.isdir(sdir):
                             os.mkdir(sdir)
                         np.save(scorepath,allarray[:,i,...].squeeze())
-                print os.system('mv all.npy ../'+self.spname+'.npy')#
+                shutil.move('all.npy', os.path.join('..', self.spname+'.npy'))
             print os.system('rm -r *')
             os.chdir('..')
-        print os.system('rm -r '+self.dir+self.prd)
+        shutil.rmtree(os.path.join(self.dir, self.prd))
         return 1
 
     def get_targetsp_fromexistingsps(self):
@@ -534,7 +536,7 @@ class rawsp(object):
         nors=self.nors
         os.chdir(self.prd)
         if self.tlib:
-            os.system('cp '+runenv.libdir+self.tlib+' ./')
+            shutil.copy(os.path.join(runenv.libdir, self.tlib), '.')
         if 'l' in self.fo.fclist:
             residuepower=1
         else:
@@ -542,7 +544,7 @@ class rawsp(object):
         if self.decoy:
             pir(DecoySets( self.pdbset.split('_')).pirpath).sep_pir('./',nors,permin=scoreminnumber,residuepower=residuepower)
         else:
-            print os.system('cp '+runenv.basedir+'pdbpir/pdb_'+self.pdbset+'.pir ./')
+            shutil.copy(os.path.join(runenv.basedir, 'pdbpir', 'pdb_'+self.pdbset+'.pir'), '.')
             pir('pdb_'+self.pdbset+'.pir').sep_pir('./',nors,residuepower=residuepower)
         nors=int(os.popen('ls | grep -c pdbs').read())
         self.nors=nors
@@ -573,9 +575,9 @@ class rawsp(object):
                 np.save(temppath+str(runnumber)+'.result.npy',idist)
             except:
                 try:
-                    temppath=runenv.serverScrathPath+'/'+os.getenv('JOB_ID')+'/'
-                    print os.system('mkdir '+temppath)
-                    np.save(temppath+str(runnumber)+'.result.npy',idist)
+                    temppath=os.path.join(runenv.serverScrathPath, os.getenv('JOB_ID'))
+                    os.mkdir(temppath)
+                    np.save(os.path.join(temppath, str(runnumber)+'.result.npy'),idist)
                     runsuccess=True
                 except:
                     runsuccess=False
@@ -1304,8 +1306,10 @@ class rawsp(object):
             plt.savefig(type+figtype)
             plt.clf()
         if len(libname)>0:
-            print os.system('mv '+type+'.npy '+runenv.libdir+'/'+libname)
-            print os.system('scp '+runenv.libdir+'/'+libname+' '+runenv.jobserver+':~/lib/')
+            shutil.move(type+'.npy', os.path.join(runenv.libdir, libname))
+            subprocess.check_call('scp ' + os.path.join(runenv.libdir,
+                                                        libname) \
+                                  +' '+runenv.jobserver+':~/lib/')
 
     def write_hdf5(self,path, mdtarray, permute=False):
         env = environ()
