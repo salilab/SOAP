@@ -6,7 +6,7 @@
 import mdt
 import mdt.features
 from env import *
-
+import os
 
 class feature(object):
     """

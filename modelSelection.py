@@ -5,6 +5,10 @@
 from env import *
 from crossValidate import *
 import filelock
+import shutil
+import glob
+import os
+import subprocess
 
 debug=True
 
@@ -16,7 +20,8 @@ def cvplot(cl):
         return 0
     cvcluster=mypickle().load('figinput')
     cvcluster.plot()
-    print os.system('rm '+cl+'figinput*')
+    for g in glob.glob(os.path.join(cl, 'figinput*')):
+        os.unlink(g)
     print 'ploting finished'
     del cvcluster
     gc.collect()
@@ -440,11 +445,11 @@ class spss(object):
         return path
 
     def setup_logdir(self):
-        bdir=runenv.basedir+'results/'
+        bdir=os.path.join(runenv.basedir, 'results')
         tdir=bdir+'_'.join(self.model['bmtype']['dslist'])
         if not os.path.isdir(tdir):
             os.mkdir(tdir)
-        tdir=tdir+'/'+self.model['bmtype']['criteria']
+        tdir=os.path.join(tdir, self.model['bmtype']['criteria'])
         if not os.path.isdir(tdir):
             os.mkdir(tdir)
         self.baselogdir=tdir+'/'
@@ -704,12 +709,13 @@ class spss(object):
             self.write2log('\n'+str(self.resultdict[str(self.bestpar)][4]))
             self.write2log('\n'+str(self.resultdict[str(self.bestpar)][3]))
             #self.dump()
-            fl=os.listdir(self.baselogdir+'runs/')
+            fl=os.listdir(os.path.join(self.baselogdir, 'runs'))
             bbd=[f for f in fl if f.startswith(self.resultdict[str(self.bestpar)][2])][0]
-            bbd='runs/'+bbd
-            print os.system('cp '+self.baselogdir+bbd+'/bestmodel.pickle '+self.logdir)
-            print os.system('touch '+self.logdir+'BMF-'+bbd)
-            print os.system('cp '+sys.path[1]+'/'+sys.argv[0]+' '+self.logdir)
+            bbd = os.path.join('runs', bbd)
+            shutil.copy(os.path.join(self.baselogdir, bbd, 'bestmodel.pickle'),
+                        self.logdir)
+            open(os.path.join(self.logdir, 'BMF-'+bbd), 'w') # touch
+            shutil.copy(os.path.join(sys.path[1], sys.argv[0]), self.logdir)
             #print os.system('cp '+self.logdir+'log '+self.logdir2)# keep the log in dropbox
             #print os.system('cp '+self.logdir+'*py '+self.logdir2)# keep the log in dropbox
             #print "Waiting for pool to finish"
@@ -722,16 +728,19 @@ class spss(object):
             os.chdir(self.logdir)
             for key in self.resultdict:
                 bd=[f for f in fl if f.startswith(self.resultdict[key][2])][0]
-                print os.system('rm '+self.baselogdir+'runs/'+bd+'/figinput*')
+                for g in glob.glob(os.path.join(self.baselogdir, 'runs',
+                                                bd, 'figinput*')):
+                    os.unlink(g)
             #print os.system('cp '+self.baselogdir+bbd+'/*eps '+self.logdir2)
-            print os.system('mv '+self.logdir+' '+self.logdir[:-1]+'-'+bd[5:])
+            shutil.move(self.logdir, self.logdir[:-1]+'-'+bd[5:])
             #print os.system('mv '+self.logdir2+' '+self.logdir2[:-1]+'-'+bd[5:])
             self.logdir=self.logdir[:-1]+'-'+bd[5:]+'/'
             #self.logdir2=self.logdir2[:-1]+'-'+bd[5:]+'/'
             with filelock.FileLock("spsslog.shelve", timeout=100,
                                    delay=2) as lock:
                 print("Lock acquired.")
-                resultdictlog=shelve.open(self.baselogdir+'spsslog.shelve')
+                resultdictlog=shelve.open(os.path.join(self.baselogdir,
+                                                       'spsslog.shelve'))
                 resultdictlog[self.modelstr]=self.logdir[:-1]+'-'+bd[5:]
                 resultdictlog.close()
                 print("lock released")
@@ -781,7 +790,7 @@ def pickle2shelf(prefix):
     fh=open(prefix+'.pickle')
     a=pickle.load(fh)
     fh.close()
-    print os.system('rm '+prefix+'.pickle')
+    os.unlink(prefix+'.pickle')
     nd=shelve.open(prefix+'.shelve')
     for key in a:
         nd[key]=a[key]
