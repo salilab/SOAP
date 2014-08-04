@@ -1,5 +1,4 @@
 from SOAP import *
-import profile
 
 #define recovery fucntions
 rfeature=[['d',0,20,0.05]]
@@ -128,6 +127,3 @@ spl.maximumround=10
 #search for the best model
 spl.find_best_par()
 spl.log()
-pdb.set_trace()
-
-
