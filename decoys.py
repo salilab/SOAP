@@ -214,7 +214,7 @@ class Decoys4Single(object):
 
     def calc_rmsd(self,nativepattern='*native*pdb$'):
         """Calculate the RMSDs for the decoys
-        It takes either the rosetta sc file, rmsd.pickle, or raw decoys files with a native structure (named *native*pdb).
+        It takes either the rosetta sc file, rmsd.pickle, or raw decoys files with a native structure (named \*native\*pdb).
         rmsd.pickle
         {decoyname:rmsdvalue} or {decoyname:[rmsdvalue,extra properties defined by extrapar]}
         """
