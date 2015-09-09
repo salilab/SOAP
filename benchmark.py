@@ -215,16 +215,16 @@ class dsscorestats(object):
 
     def initialize_topmodels(self,slevel):
         """
-        slevel: define the stats we want to calculateate
+        slevel: define the stats we want to calculate
             top+(cn)+'_'+(cp)+_+(cv)+_+(cf)
         cn: number of top models to look at
         cf: top model filter: defines which part of the top model we are looking at
             lessthan: bool values whether the rmsd is less than the specified value,"rmsd10"
             First:take the property of the first model
             None: or no filter
-        cp: propertis of the filtered top model set
+        cp: properties of the filtered top model set
             (rmsd,rank,rmsddiff,irmsd,rrank,rrankr,rlrank,rlrankr,"")
-        cs: combine the propertite, default
+        cs: combine the properties, default
             (mean,min,sum,max)
             "": the value itself, only for first pass models.
             len:len()
