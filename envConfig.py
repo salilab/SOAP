@@ -192,12 +192,12 @@ import gzip
 import traceback
 import gc
 import h5py
-import numpy as np
-import numpy.linalg
-import scipy.cluster
-import scipy.interpolate
-import scipy.optimize
-import scipy.stats
+#import numpy as np
+#import numpy.linalg
+#import scipy.cluster
+#import scipy.interpolate
+#import scipy.optimize
+#import scipy.stats
 from pymc import *
 import copy
 import bottleneck
