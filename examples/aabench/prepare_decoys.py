@@ -115,7 +115,7 @@ for d in fl:
     #complete_pdbfile(rpdb)
     #complete_pdbfile(lpdb)
     sd['complextype']=ct
-    fh2=open('firedockinput.pickle','w')
+    fh2=open('firedockinput.pickle','wb')
     pickle.dump(sd,fh2)
     fh2.close()
     replace_end(lpdb)

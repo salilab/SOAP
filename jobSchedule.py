@@ -851,7 +851,7 @@ class tasklist(task):
         import gzip
         tl=[]
         for d in dl:
-            ro=pickle.load(gzip.open(os.path.join(d,'input.pickle.gz')))
+            ro=pickle.load(gzip.open(os.path.join(d,'input.pickle.gz'), 'rb'))
             ro.task.reload_existingruns()
             tl.append(ro.task)
         return tl

@@ -13,7 +13,7 @@ import pdb
 logpath=runenv.basedir+'results/mhc2/dcg/runs/57466-nan,nan_nan+nan_nan+nan_2297.581_0.000__nan+nan_nan+nan_0.000_0.000 /'
 print(logpath)
 
-bm=pickle.load(open(logpath+'cvmodel.pickle'))
+bm=pickle.load(open(logpath+'cvmodel.pickle', 'rb'))
 
 so=scorer(model=bm['model'])
 
@@ -26,7 +26,7 @@ so.write_potential(filetype='hdf5')
 
 #write out detailed score for comparison with other implementation of SOAP_mhc2
 np.save('allscore.npy',so.score)
-jdso=pickle.load(open(runenv.basedir+'Decoys/mhc2/mhc2.pickle'))
+jdso=pickle.load(open(runenv.basedir+'Decoys/mhc2/mhc2.pickle', 'rb'))
 rl=[', '.join([dso.dnlist[i],str(so.score[i]),str(so.scorearray[9,i]*so.ratioarray[9]),str(sum(so.scorearray[4:9,i]*so.ratioarray[4:9])),str(sum(so.scorearray[:4,i])+so.scorearray[10,i])]+map(str,list(so.scorerlist[-1].idist[i]))) for  i in range(len(dso.dnlist))]
 open('scores','w').write('\n'.join(rl))
 print(os.getcwd())

@@ -519,7 +519,7 @@ class optimizer(object):
 
     def save_currentbest(self):
         os.system('rm -f ./'+str(self.scorerid)+'/'+'B'+str(self.optmind)+'est'+str(self.scorerid)+'#'+str(self.jobid)+'#*')
-        fh=open('./'+str(self.scorerid)+'/B'+str(self.optmind)+'est'+str(self.scorerid)+'#'+str(self.jobid)+'#'+str(self.bestresult)+'#'+str(self.likehoodstd)+'#.pickle','w')
+        fh=open('./'+str(self.scorerid)+'/B'+str(self.optmind)+'est'+str(self.scorerid)+'#'+str(self.jobid)+'#'+str(self.bestresult)+'#'+str(self.likehoodstd)+'#.pickle','wb')
         pickle.dump([self.currentpar,self.currentresult,self.bestpar,self.bestresult],fh)
         fh.flush()
         fh.close()
@@ -558,13 +558,13 @@ class optimizer(object):
             print('Global Bestresult '+bestf+'   '+str(bestresult))
             time.sleep(0.1)
             try:
-                fh=open('./'+str(self.scorerid)+'/'+bestf)
+                fh=open('./'+str(self.scorerid)+'/'+bestf, 'rb')
                 bp=pickle.load(fh)
                 fh.close()
             except:
                 self.allfilelist=os.listdir('./'+str(self.scorerid)+'/')
                 bestf=[f for f in self.allfilelist if f.startswith(bestf.split('#')[0]+'#')][0]
-                fh=open('./'+str(self.scorerid)+'/'+bestf)
+                fh=open('./'+str(self.scorerid)+'/'+bestf, 'rb')
                 bp=pickle.load(fh)
                 fh.close()
             self.globalbestresult=bp[-1]
@@ -899,7 +899,7 @@ class optimizer(object):
             elif lfn in fl:
                 print("currentresult "+str(self.currentresult))
                 time.sleep(0.5)
-                self.currentpar, self.currentresult=pickle.load(open('./'+str(self.scorerid)+'/'+lfn))
+                self.currentpar, self.currentresult=pickle.load(open('./'+str(self.scorerid)+'/'+lfn, 'rb'))
                 print("exchange to result "+str(self.currentresult))
                 print(os.system('rm ./'+str(self.scorerid)+'/'+lfn))
                 break
@@ -920,7 +920,7 @@ class optimizer(object):
         grl=self.globalresultlist
         #loading actual result
         for sr in grl:
-            sr.append(pickle.load(open('./'+str(self.scorerid)+'/'+sr[-1])))
+            sr.append(pickle.load(open('./'+str(self.scorerid)+'/'+sr[-1], 'rb')))
         #starting exhange
         if self.optm['exchange_method']==0:
             il=range(len(self.globalresultlist)-1)
@@ -947,7 +947,7 @@ class optimizer(object):
                 rj[-1]=si
         #save exchange result
         for rl in self.globalresultlist:
-            fh=open('./'+str(self.scorerid)+'/'+rl[2].replace('B'+str(self.optmind)+'est','p'+str(self.optmind)+'t')+'#'+str(rl[3])+'.pickle','w')
+            fh=open('./'+str(self.scorerid)+'/'+rl[2].replace('B'+str(self.optmind)+'est','p'+str(self.optmind)+'t')+'#'+str(rl[3])+'.pickle','wb')
             pickle.dump(rl[-1][:2],fh)
             fh.flush()
             fh.close()
@@ -1010,7 +1010,7 @@ class optimizer(object):
         pa[...]=pa/pa.sum()
         pa=pa.cumsum()
         i=np.searchsorted(pa, np.random.rand())
-        gb=pickle.load(open(grl[i][2]))
+        gb=pickle.load(open(grl[i][2], 'rb'))
         gbp=gb[0]
         gbr=gb[1]
         if gbr>self.bestresult:

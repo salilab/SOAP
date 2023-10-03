@@ -201,7 +201,7 @@ if 0:
 
 if 0:#load old result, can be used to detect sampling or other problems
                 logpath='/bell3/gqdong/statpot/results/mhc2/dcg/runs/57295-nan,nan_nan+nan_nan+nan_2312.403_0.000__nan+nan_nan+nan_0.000_0.000 /'
-                bestmodel=pickle.load(open(os.path.join(logpath,'bestmodel.pickle')))
+                bestmodel=pickle.load(open(os.path.join(logpath,'bestmodel.pickle'), 'rb'))
                 for j in range(len(allsearches[i]['object'][allsearches[i]['key']])):
                     allsearches[i]['object'][allsearches[i]['key']][j]=bestmodel['searches'][k]['object'][allsearches[i]['key']][j]
 

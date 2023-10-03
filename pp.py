@@ -15,8 +15,11 @@ from modeller.optimizers import actions
 import sys
 import pdb
 import numpy as np
-import cPickle
 import pickle
+if sys.version_info[0] >= 3:
+    cPickle = pickle
+else:
+    import cPickle
 from operator import itemgetter, attrgetter
 import copy
 import SOAP
@@ -54,7 +57,7 @@ class entirepdb(object):
         self.xslist=[]
         self.update=update
         if update:
-            fh=open('xslist.pickle')
+            fh=open('xslist.pickle', 'rb')
             self.oxslist=cPickle.load(fh)
             fh.close()
         else:
@@ -79,7 +82,7 @@ class entirepdb(object):
                 self.xslist.append(code)
         self.xslist=list(set(self.xslist))
         if self.update:
-            fh=open('xslist.pickle')
+            fh=open('xslist.pickle', 'rb')
             self.oxslist=cPickle.load(fh)
             fh.close()
             self.nxslist=[item for item in self.xslist if not item in self.oxslist]
@@ -87,7 +90,7 @@ class entirepdb(object):
             self.nxslist=self.xslist
             self.oxslist=[]
         #pdb.set_trace()
-        fh=open('xslist.pickle','w')
+        fh=open('xslist.pickle','wb')
         cPickle.dump(self.xslist,fh)
         fh.close()
 
@@ -100,7 +103,7 @@ class entirepdb(object):
 
     def load_xslist(self):
         os.chdir(originaldir)
-        fh=open('xslist.pickle')
+        fh=open('xslist.pickle', 'rb')
         self.xslist=cPickle.load(fh)
         self.nxslist=self.xslist
         fh.close()
@@ -907,7 +910,7 @@ class loop(object): #loopchain,looplength,loopstart,loopend,looptype
         return (biso.mean(), biso.std())
 
     def get_loop_subset(self,inputloop='selectedloop.pickle', outputloop='m5l4t20.pickle',length=range(4,21),maxn=20):
-        fh=open(inputloop)
+        fh=open(inputloop, 'rb')
         als=pickle.load(fh)
         fh.close()
         nld={}
@@ -929,7 +932,7 @@ class loop(object): #loopchain,looplength,loopstart,loopend,looptype
                     if k>=maxn:
                         break
         pdb.set_trace()
-        fh=open(outputloop,'w')
+        fh=open(outputloop,'wb')
         pickle.dump(nld,fh)
         fh.close()
 

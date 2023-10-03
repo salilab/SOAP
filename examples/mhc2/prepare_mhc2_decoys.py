@@ -44,8 +44,8 @@ for f in fl:
         il=item.split(',')
         rmsddict[il[0].strip()[:-4]]=float(il[2])
         scoredict[il[0].strip()[:-4]]=float(il[1])
-    pickle.dump(rmsddict,open('rmsd.pickle','w'))
-    pickle.dump(scoredict,open('score.pickle','w'))
+    pickle.dump(rmsddict,open('rmsd.pickle','wb'))
+    pickle.dump(scoredict,open('score.pickle','wb'))
         
 # the decoys are now in the format that SOAP can process;
 # use SOAP.decoys to build the DecoySet

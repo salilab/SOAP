@@ -9,7 +9,7 @@ import pdb
 logpath='/bell3/gqdong/statpot/results/DecoysRUS_baker1/top1_rmsd_mean_+10xNativeSelection+cc/runs/54251-nan,nan_nan+nan_nan+nan_3.276_0.000__nan+nan_nan+nan_0.000_0.000 /'
 
 print(logpath)
-bm=pickle.load(open(logpath+'cvmodel.pickle'))
+bm=pickle.load(open(logpath+'cvmodel.pickle', 'rb'))
 #bestpars=bm['allresult'][0]['repna']
 bestpar=bm['originalresult'][0][0]['bestpar']
 #looplist=['mgl'+str(i) for i in range(4,21)]

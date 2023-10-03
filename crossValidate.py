@@ -170,7 +170,7 @@ class k2cv(object):
     def get_scorer_list(self):
         if 'filter' in self.spsfo.scorer.model:
             fl=self.spsfo.scorer.model['filter']
-            cvmodel=pickle.load(open(fl['filterpath']))
+            cvmodel=pickle.load(open(fl['filterpath'], 'rb'))
             if len(cvmodel['allresult'])!=len(self.inputlist):
                 raise Exception('The model filter can not be applied to this  cv case, number of tries different')
         self.scorerlist=[]
@@ -269,7 +269,7 @@ class k2cv(object):
         #self.clusters.figpath=cdp
         self.logpath=cdp
         #mypickle().dump(self.clusters, 'figinput')
-        fh=open('cvmodel.pickle','w')
+        fh=open('cvmodel.pickle','wb')
         pickle.dump({'model':self.spsfo.scorer.originalmodel, 'runtime':self.task.runduration,
                      'inputlist':self.inputlist,'allresult':self.rdlist,'originalresult':self.originalresult},fh)
         fh.close()
@@ -277,7 +277,7 @@ class k2cv(object):
         print(os.system('cp '+sys.path[1]+'/'+sys.argv[0]+' ./'))
         if self.withlastone:
             self.bestmodel=self.spsfo.scorer.build_model(self.finaloptpar)
-            fh=open('bestmodel.pickle','w')
+            fh=open('bestmodel.pickle','wb')
             pickle.dump(self.bestmodel,fh)
             fh.close()
             fh=open('bestmodel','w')
@@ -288,7 +288,7 @@ class k2cv(object):
             fh.close()
         else:
             self.bestmodel=self.spsfo.scorer.originalmodel
-            fh=open('bestmodel.pickle','w')
+            fh=open('bestmodel.pickle','wb')
             pickle.dump(self.bestmodel,fh)
             fh.close()
             fh=open('bestmodel','w')
@@ -621,7 +621,7 @@ class k2cvcluster(k2cvlocal):
         self.get_scorer_list()
 
     def load_fromlogdir(self,lp=''): #note that repeat is ignored here
-        cvmodel=pickle.load(open(os.path.join(lp,'cvmodel.pickle')))
+        cvmodel=pickle.load(open(os.path.join(lp,'cvmodel.pickle'), 'rb'))
         self.rdlist=cvmodel['allresult']
         if 'testperc' in cvmodel['model']:
             self.withlastone=True
@@ -630,7 +630,7 @@ class k2cvcluster(k2cvlocal):
         self.originalmodel=cvmodel['model']
         self.spsfo=None
         if 0:
-            bm=pickle.load(open(os.path.join(lp,'bestmodel.pickle')))
+            bm=pickle.load(open(os.path.join(lp,'bestmodel.pickle'), 'rb'))
             if 'repeat' in bm:
                 bm['repeat']=1
             so=scorer(model=bm)
@@ -696,7 +696,8 @@ class k2cvcluster(k2cvlocal):
             path=[path]
         csp=0
         for currentpath in path:
-            cvm=pickle.load(open(os.path.join(currentpath,'cvmodel.pickle')))
+            cvm=pickle.load(
+                open(os.path.join(currentpath,'cvmodel.pickle'), 'rb'))
             om=cvm['model']
             #if om['cvk']!=self.model['cvk'] or ('fold' in self.model and om['fold']!=self.model['fold']) or ('testperc' in self.model and om['testperc']!=self.model['testperc']):
             #    raise Bugs('Models does not match, can not load the model as initial conditions')
@@ -930,7 +931,7 @@ class k2cvcluster(k2cvlocal):
                     break
             print(os.system('touch Finished'+str(self.spsfo.scorerid)+'#'+str(self.spsfo.jobid)+'#'+str(int(time.time()-self.spsfo.starttime))))
             print(os.system('touch '+self.runpath+self.inputcode+'.pickle'))
-            fh=open(self.runpath+self.inputcode+'.pickle','w')
+            fh=open(self.runpath+self.inputcode+'.pickle','wb')
             pickle.dump(res,fh)
             fh.close()
         try:
@@ -995,7 +996,7 @@ class k2cvcluster(k2cvlocal):
             while tnt>0 and not success:
                 tnt=tnt-1
                 try:
-                    fh=open(self.runpath+str(i)+'.pickle')
+                    fh=open(self.runpath+str(i)+'.pickle', 'rb')
                     ndl=pickle.load(fh)
                     fh.close()
                     for nd in ndl:
@@ -1066,7 +1067,7 @@ class k2cvcluster(k2cvlocal):
             'bestpar':bestpar, 'bestresult':resultlist[0],'testresult':testscorer.assess(bestpar),
             'fulltestresult':testscorer.assess(bestpar,report='full'), 'allna':allna
             ,'pd':pd/k,'rlpd':rlpd,'finalbestresult':finalbestresult,'finaltestresult':finaltestresult}
-        fh=open(self.inputcode+'.optimizer.pickle','w')
+        fh=open(self.inputcode+'.optimizer.pickle','wb')
         pickle.dump(sd,fh)
         fh.close()
 
@@ -1189,7 +1190,7 @@ class k2cvcluster(k2cvlocal):
 
     def save(self):
         self.spsfo.arraysize=mypickle().dump([self.spsfo.scorer,self.scorerlist],'input')
-        fh=open('input.pickle','w')
+        fh=open('input.pickle','wb')
         pickle.dump(self,fh)
         fh.close()
         # the scorer object will be useless unlesed the savednumpy is loaded from numpy arrays.

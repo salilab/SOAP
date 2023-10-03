@@ -348,7 +348,7 @@ inimp=''#copy values from initial model
 if len(inimp)>0:
     #blp='/bell3/gqdong/statpot/results/ppd4s_zdock_ppd4/top1000_rlrank__rmsd10ORirmsd4FIRST+top1000_rlrank__rmsd5ORirmsd2FIRST/runs/38772-nan,nan_nan+nan_nan+nan_2.836_0.000/'
     blp=inimp
-    bm=pickle.load(open(blp+'cvmodel.pickle'))
+    bm=pickle.load(open(blp+'cvmodel.pickle', 'rb'))
     bestpars=bm['allresult'][0]['repna']
     bm['model']['bmtype']['dslist']=['ppd4s']    
     so=scorer(model=bm['model'])
@@ -417,7 +417,7 @@ elif rrn==3:
 elif rrn==4:
     #blp='/bell3/gqdong/statpot/results/ppd4s_zdock_ppd4/top1000_rlrank__rmsd10ORirmsd4FIRST+top1000_rlrank__rmsd5ORirmsd2FIRST/runs/38772-nan,nan_nan+nan_nan+nan_2.836_0.000/'
     blp=inimp
-    bm=pickle.load(open(blp+'cvmodel.pickle'))
+    bm=pickle.load(open(blp+'cvmodel.pickle', 'rb'))
     bestpars=bm['allresult'][0]['repna']
     so=scorer(model=bm['model'])
     bm['model']['bmtype']['dslist']=['ppd4s']
@@ -440,7 +440,7 @@ elif rrn==4:
                     logpath=spso.logpathlist[0][-1]
                 else:
                     logpath=spso.cvlist[0].logpath
-                bestmodel=pickle.load(open(os.path.join(logpath,'bestmodel.pickle')))
+                bestmodel=pickle.load(open(os.path.join(logpath,'bestmodel.pickle'), 'rb'))
                 k=-1
                 for i in block:
                     k=k+1

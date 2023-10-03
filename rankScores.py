@@ -747,7 +747,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
         scorestr=''
         for fd,sml in zip(fdl,tmml):
             print(os.system('rm *'))
-            fh2=open(fd+'firedockinput.pickle')
+            fh2=open(fd+'firedockinput.pickle', 'rb')
             fid=pickle.load(fh2)
             fh2.close()
             print(os.system('cp '+os.path.join(fd,fid['rpdb'])+' ./'))

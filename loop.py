@@ -466,14 +466,14 @@ class sprefine(object):
 
     def initialize_dslist(self):
         if runenv.hostn:
-            fh=open(self.dslist+'.pickle')
+            fh=open(self.dslist+'.pickle', 'rb')
             self.codedict=pickle.load(fh)
         else:
             self.codedict={}
             if not isinstance(self.dslist,list):
                 self.dslist=[self.dslist]
             for ds in self.dslist:
-                fh=open(runenv.basedir+'loop/'+ds+'.pickle')
+                fh=open(runenv.basedir+'loop/'+ds+'.pickle', 'rb')
                 self.codedict.update(pickle.load(fh))
 
         if 'runenv' in self.codedict:
@@ -742,7 +742,7 @@ class sprefine(object):
         result=self.model_loops_list(self.codedict)
         #if self.criteria=='bestrmsd':
         #    result=self.assess_bestrmsd(result)
-        pickle.dump(result,open(self.dslist+'.pickle','w'))
+        pickle.dump(result,open(self.dslist+'.pickle','wb'))
         report_job_runstatus(self.runpath, True, self.dslist, '',inputname='runme.py',temppath=scratchdir)
 
     def afterprocessing(self,returnDetails=False):
@@ -940,7 +940,7 @@ class sprefine(object):
         print(self.nors)
         for i in range(self.nors):
             if os.path.isfile(str(i+1)+'.pickle'):
-                inputdict=pickle.load(gzip.open(str(i+1)+'.pickle.gz'))
+                inputdict=pickle.load(gzip.open(str(i+1)+'.pickle.gz', 'rb'))
                 del inputdict['runenv']
                 fh=open(str(i+1)+'.pickle','rb')
                 res=pickle.load(fh)
@@ -955,8 +955,8 @@ class sprefine(object):
                     rmsddict={}
                     scoredict={}
                 else:
-                    rmsddict=pickle.load(open(os.path.join(sdspath,'rmsd.pickle')))
-                    scoredict=pickle.load(open(os.path.join(sdspath,'score.pickle')))
+                    rmsddict=pickle.load(open(os.path.join(sdspath,'rmsd.pickle'), 'rb'))
+                    scoredict=pickle.load(open(os.path.join(sdspath,'score.pickle'), 'rb'))
                 env=environ()
                 env.io.atom_files_directory = [os.path.join(runenv.loopStructurePath,self.dslist),scratchdir,runenv.opdbdir,'.']
                 basem=Mymodel(env)
@@ -978,9 +978,9 @@ class sprefine(object):
                     rmsddict[dn]=[r[1],r[0]]
                     scoredict[dn]=r[2]
                 print(os.system('touch '+os.path.join(sdspath,'needcombinewithbase')))
-                pickle.dump(rmsddict,open(os.path.join(sdspath,'rmsd.pickle'),'w'))
-                pickle.dump(scoredict,open(os.path.join(sdspath,'score.pickle'),'w'))
-                pickle.dump([('mcrmsd','f4')],open(os.path.join(sdspath,'extrapar.pickle'),'w'))
+                pickle.dump(rmsddict,open(os.path.join(sdspath,'rmsd.pickle'),'wb'))
+                pickle.dump(scoredict,open(os.path.join(sdspath,'score.pickle'),'wb'))
+                pickle.dump([('mcrmsd','f4')],open(os.path.join(sdspath,'extrapar.pickle'),'wb'))
         from decoys import DecoySet
         do=DecoySet(dsname=dsname, sourcedir=dspath)
         do.build()

@@ -315,7 +315,7 @@ class Decoys4Single(object):
             dopedict=pickle.load(fh)
             fh.close()
         if os.path.isfile('extrapar.pickle'):
-            self.extrapar=pickle.load(open('extrapar.pickle'))
+            self.extrapar=pickle.load(open('extrapar.pickle', 'rb'))
         for key in rmsddict:
             if dopescore:
                 if not (key in dopedict):
@@ -564,7 +564,7 @@ class Decoys4Single(object):
 
     def build_dockingdecoys_withtransformation(self):
         """Build decoys that need transformation, for pathdock only?"""
-        fh=open('firedockinput.pickle')
+        fh=open('firedockinput.pickle', 'rb')
         sd=pickle.load(fh)
         fh.close()
         print('building docking decoys')
@@ -952,7 +952,7 @@ class DecoySet(object):
             mypickle().dump(self,self.dsname)
         except Exception as e:
             traceback.print_exc()
-            fh=open(self.dsname)
+            fh=open(self.dsname, 'rb')
             pickle.dump(fh)
             fh.close()
             pdb.set_trace()
@@ -1005,7 +1005,7 @@ class DecoySet(object):
                 ld[code[0:4]].append([cc,cl,cs,cs+cl-1])
             else:
                 ld[code[0:4]]=[[cc,cl,cs,cs+cl-1]]
-            fh=open(dp,'w')
+            fh=open(dp,'wb')
             pickle.dump(ld,fh)
             fh.close()
 

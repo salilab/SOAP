@@ -165,7 +165,7 @@ class bndsep(object):
         self.load_bndsepdict()
 
     def load_bndsepdict(self):
-        fh=open(runenv.libdir+'bndsep.pickle')
+        fh=open(runenv.libdir+'bndsep.pickle', 'rb')
         self.bndsepdict=pickle.load(fh)
 
     def get_bndsep(self,atm1n,atm2n,res1, res2,ss):
@@ -570,7 +570,7 @@ def any2str(anything):
 
 def build_scorer(scorerpath='./'):
     os.chdir(scorerpath)
-    fh=open(scorerpath+'bestmodel.pickle')
+    fh=open(scorerpath+'bestmodel.pickle', 'rb')
     model=pickle.load(fh)
     fh.close()
     for scorer in model['scorers']:

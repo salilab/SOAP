@@ -23,9 +23,9 @@ for t in tl[1:]:
     #print(os.system('scp fiser-structures/'+ts[0]+'.sali.pdb gqdong@baton2:'+os.path.join(rloopdir,'pdb'+ts[0]+'.ent')))
 
 
-pickle.dump(dict(ll),open(loopdir+'.pickle','w'))
+pickle.dump(dict(ll),open(loopdir+'.pickle','wb'))
 for l in ld:
-    pickle.dump(dict(ld[l]),open(loopdir+l+'.pickle','w'))
+    pickle.dump(dict(ld[l]),open(loopdir+l+'.pickle','wb'))
     loopdir='/bell3/gqdong/statpot/loop/'+loopsetname+l
     rloopdir='/netapp/sali/gqdong/loop/'+loopsetname+l
     if not os.path.isdir(loopdir):

@@ -1429,7 +1429,7 @@ class scaledsp(rawsp):
         gps.lib=self.tlib
         gps.stretchdict,gps.priorkw=self.get_stretch_dictionary(self.pm)
         gps.sm=self.pm
-        fh=open('input.pickle','w')
+        fh=open('input.pickle','wb')
         pickle.dump(gps,fh)
         fh.close()
         if self.pm.startswith('gps'):
@@ -2061,7 +2061,7 @@ class gpsmoothing(object):
     def runtask_cluster(self,runnum):
         print(runnum)
         self.runpath=runenv.basedir
-        fh=open('input.pickle')
+        fh=open('input.pickle', 'rb')
         nso=pickle.load(fh)
         fh.close()
         nso.smoothing_2d_npa(runnum)

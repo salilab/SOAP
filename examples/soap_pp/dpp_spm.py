@@ -243,7 +243,7 @@ if 1:
                 logpath=spso.logpathlist[0][-1]
             else:
                 logpath=spso.cvlist[0].logpath
-            bestmodel=pickle.load(open(os.path.join(logpath,'bestmodel.pickle')))
+            bestmodel=pickle.load(open(os.path.join(logpath,'bestmodel.pickle'), 'rb'))
             k=-1
             for i in block:
                 k=k+1

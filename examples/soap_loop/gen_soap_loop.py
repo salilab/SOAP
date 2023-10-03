@@ -8,7 +8,7 @@ import pdb
 
 logpath='/bell3/gqdong/statpot/results/mgl9_mgl10_mgl11_ml9_ml10_ml11/3xtop1_rmsd_mean_+10xNativeSelection+top3_rmsd_mean_+0.001xlbslope6-20-wn/runs/49331--2.36250,-35358.180_-2.030+0.105_-2.363+0.187_0.000_0.000/'
 print(logpath)
-bm=pickle.load(open(logpath+'cvmodel.pickle'))
+bm=pickle.load(open(logpath+'cvmodel.pickle', 'rb'))
 bestpars=bm['allresult'][0]['repna']
 bestpar=bm['originalresult'][0][0]['bestpar']
 looplist=['mgl'+str(i) for i in range(4,21)]

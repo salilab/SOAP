@@ -7,7 +7,7 @@ import pdb
 
 
 logpath='/bell3/gqdong/statpot/results/ppd4s/top1000_rlrank__rmsd10ORirmsd4FIRST+top1000_rlrank__rmsd5ORirmsd2FIRST/runs/39882-2.62460,-261.084_2.808+0.035_2.625+0.073_2.773_0.000/'
-bm=pickle.load(open(logpath+'cvmodel.pickle'))
+bm=pickle.load(open(logpath+'cvmodel.pickle', 'rb'))
 bestpars=bm['allresult'][0]['bestpar']#bm['allresult'][0]['repna']
 bm['model']['bmtype']['dslist']=['ppd4']
 bm['model']['scorers'][-2]['refs']=[bm['model']['scorers'][-1]]

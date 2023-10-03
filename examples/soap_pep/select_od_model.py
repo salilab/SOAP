@@ -214,7 +214,7 @@ pdb.set_trace()
 
 logpath=spso.cvlist[0].logpath
 print(logpath)
-bm=pickle.load(open(logpath+'cvmodel.pickle'))
+bm=pickle.load(open(logpath+'cvmodel.pickle', 'rb'))
 bestpars=bm['allresult'][0]['repna']
 so=scorer(model=bm['model'])
 print(so.assess(bm['allresult'][0]['bestpar']))

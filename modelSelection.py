@@ -221,7 +221,7 @@ class sps(object):
         plt.show()
 
     def loadlog(self):
-        fh=open(runenv.basedir+'log.pickle','r')
+        fh=open(runenv.basedir+'log.pickle','rb')
         self.resultdict=pickle.load(fh)
         fh.close()
 
@@ -389,7 +389,7 @@ class spss(object):
         if len(path)>0:
             print(path+'/spss.pickle')
             print('skipping')
-            fh=open(path+'/spss.pickle')
+            fh=open(path+'/spss.pickle', 'rb')
             a=pickle.load(fh)
             fh.close()
             for key in self.__dict__.keys():
@@ -751,7 +751,7 @@ class spss(object):
 
     def write_best_pot(self):
         print("only works for the case with single pot, single reference state")
-        fh=open(self.logdir+'bestmodel.pickle')
+        fh=open(self.logdir+'bestmodel.pickle', 'rb')
         bm=pickle.load(fh)
         fh.close()
         #pdb.set_trace()
@@ -765,7 +765,7 @@ class spss(object):
 
     def dump(self):
         os.chdir(self.logdir)
-        fh=open('spss.pickle','w')
+        fh=open('spss.pickle','wb')
         pickle.dump(self,fh)
         fh.close()
 
@@ -788,7 +788,7 @@ class spss(object):
             print(self.resultdict[key][1]+', '+str(key))
 
 def pickle2shelf(prefix):
-    fh=open(prefix+'.pickle')
+    fh=open(prefix+'.pickle', 'rb')
     a=pickle.load(fh)
     fh.close()
     os.unlink(prefix+'.pickle')
@@ -900,7 +900,7 @@ def get_best_model(path2logdir):
     #fh=open(os.path.join(path2logdir,'bestmodel.pickle'))
     #bm=pickle.load(fh)
     #fh.close()
-    fh=open(os.path.join(path2logdir,'cvmodel.pickle'))
+    fh=open(os.path.join(path2logdir,'cvmodel.pickle'), 'rb')
     bm=pickle.load(fh)
     fh.close()
     so=scorer(model=bm['model'])
