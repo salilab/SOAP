@@ -16,7 +16,10 @@ import os
 hostname=os.getenv('HOSTNAME')
 print(hostname)
 from modeller import *
-import Queue
+if sys.version_info[0] >= 3:
+    import queue
+else:
+    import Queue as queue
 import threading
 
 
@@ -118,7 +121,7 @@ class SOAPenv(object):
         self.mcmc_pt=(1,10)
         self.queues=''
         self.numofthread=0
-        self.queue=Queue.Queue() #queue item format [func, [paras]]
+        self.queue=queue.Queue() #queue item format [func, [paras]]
         self.spdsscoreTasks={}
 
     def log(self,sdict):#obsolete
