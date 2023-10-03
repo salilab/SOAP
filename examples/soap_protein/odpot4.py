@@ -1,3 +1,4 @@
+from __future__ import print_function
 from sps import *
 import os
 import profile
@@ -206,16 +207,16 @@ spl.log()
 pdb.set_trace()
 
 logpath=spso.cvlist[0].logpath
-print logpath
+print(logpath)
 bm=pickle.load(open(logpath+'cvmodel.pickle'))
 bestpars=bm['allresult'][0]['repna']
 so=scorer(model=bm['model'])
-print so.assess(bm['allresult'][0]['bestpar'])
-print so.assess_model()
+print(so.assess(bm['allresult'][0]['bestpar']))
+print(so.assess_model())
 bm['model']['bmtype']['dslist']=mjloop
 so=scorer(model=bm['model'])
-print so.assess(bm['allresult'][0]['bestpar'])
-print so.assess_model()
+print(so.assess(bm['allresult'][0]['bestpar']))
+print(so.assess_model())
 
 pdb.set_trace()
 

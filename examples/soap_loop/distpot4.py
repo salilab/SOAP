@@ -1,3 +1,4 @@
+from __future__ import print_function
 from sps import *
 import os
 import profile
@@ -137,7 +138,7 @@ model1={'scorers':[scaledsp1,ref1],'bmtype':bmtype,'searches':[search1,search2],
     'dsearches':[ dsearch2, dsearch4,dsearch5,dsearch7,dsearch10,dsearch21,dsearch22],'sml':sml,'cvk':2,'repeat':1,'fold':3}#,dsearch2,dsearch5,dsearch6,dsearch7 #,'testperc':0.33
 #dsearch1,dsearch2,dsearch6,dsearch7
 #so=scorer(model=convert2old(model1))
-#print so.assess_ideal()
+#print(so.assess_ideal())
 #opt=optimizer(scorer=so)
 #opt.get_initial_value()
 #optres=opt.optimize()

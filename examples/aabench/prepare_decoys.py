@@ -1,3 +1,4 @@
+from __future__ import print_function
 from SOAP.decoys import *
 
 
@@ -13,12 +14,12 @@ fl=os.listdir(originalDecoyPath)
 for f in fl:
     if not os.path.isdir(os.path.join(originalDecoyPath,f)):
         continue
-    print os.system('rm -rf '+os.path.join(preparedDecoyPath,f))
+    print(os.system('rm -rf '+os.path.join(preparedDecoyPath,f)))
     os.makedirs(os.path.join(preparedDecoyPath,f))
     os.chdir(os.path.join(preparedDecoyPath,f))
-    print os.system('cp '+os.path.join(originalDecoyPath,f,'docking.res')+' ./')
-    print os.system('cp '+os.path.join(originalDecoyPath,f,'*pdb')+' ./')
-    print os.system('touch needtransformation')
+    print(os.system('cp '+os.path.join(originalDecoyPath,f,'docking.res')+' ./'))
+    print(os.system('cp '+os.path.join(originalDecoyPath,f,'*pdb')+' ./'))
+    print(os.system('touch needtransformation'))
 
 #pre-prepare the decoys
 
@@ -28,7 +29,7 @@ def replace_end(lpdb):
     nofe=fc.count('END')
     fh.close()
     if nofe!=1:
-        print "more than one END in model"
+        print("more than one END in model")
         pdb.set_trace()
     else:
         fc=fc.replace('END','TER')
@@ -41,16 +42,16 @@ bd=preparedDecoyPath
 fl=os.listdir(bd)
 wd={}
 for d in fl:
-    print ' '+d
+    print(' '+d)
     sd={}
     wd[d]=sd
     os.chdir(bd+d)
-    print os.system('rm '+d+'.pickle')
-    print os.system('rm *base.pdb')
+    print(os.system('rm '+d+'.pickle'))
+    print(os.system('rm *base.pdb'))
     try:
         fh=open('docking.res')
     except:
-        print os.system('rm -rf '+bd+d)
+        print(os.system('rm -rf '+bd+d))
         continue
         pdb.set_trace()
     fc=fh.read()
@@ -92,12 +93,12 @@ for d in fl:
     m2.write(sd['olpdb'],no_ter=True)
     #m1=model(env)
     #m2=model(env)
-    print os.system('cp '+sd['orpdb']+' '+sd['orpdb']+'.AB')
-    print os.system('cp '+sd['olpdb']+' '+sd['olpdb']+'.AB')
+    print(os.system('cp '+sd['orpdb']+' '+sd['orpdb']+'.AB'))
+    print(os.system('cp '+sd['olpdb']+' '+sd['olpdb']+'.AB'))
     sd['orpdbAB']=sd['orpdb']+'.AB'
     sd['olpdbAB']=sd['olpdb']+'.AB'
-    #print os.system('/bell1/home/gqdong/Download/PatchDock/mainchain.pl '+sd['orpdbAB']+' A')
-    #print os.system('/bell1/home/gqdong/Download/PatchDock/mainchain.pl '+sd['olpdbAB']+' B')
+    #print(os.system('/bell1/home/gqdong/Download/PatchDock/mainchain.pl '+sd['orpdbAB']+' A'))
+    #print(os.system('/bell1/home/gqdong/Download/PatchDock/mainchain.pl '+sd['olpdbAB']+' B'))
     #m1.read(sd['orpdbAB'])
     #m2.read(sd['olpdbAB'])
     #m1.write(sd['orpdbAB'],no_ter=True)

@@ -1,3 +1,4 @@
+from __future__ import print_function
 from SOAP import *
 import os
 import profile
@@ -160,8 +161,8 @@ if 0:
             spl.log()
 
 #so=scorer(model=convert2old(model1))
-#print so.assess_ideal()
-#print so.assess_worst()
+#print(so.assess_ideal())
+#print(so.assess_worst())
 
 #pdb.set_trace()
 

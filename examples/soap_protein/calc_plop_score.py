@@ -1,3 +1,4 @@
+from __future__ import print_function
 from sps import *
 import profile
 import sys
@@ -17,8 +18,8 @@ model1={'scorers':[scaledsp1],'bmtype':bmtype,'searches':[],'sm':['powell'],'cvk
 so=scorer(model=model1)
 #ov=[0.00425609,  0.04942771,  0.38919625,  1.        ]
 res=so.assess_basescore()
-print res
-print so.assess_ideal()
+print(res)
+print(so.assess_ideal())
 pdb.set_trace()
 #so.assess_sascore()
 #so.assess_randomized_score(ov)

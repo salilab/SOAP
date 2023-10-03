@@ -1,3 +1,4 @@
+from __future__ import print_function
 from SOAP import *
 import profile
 import sys
@@ -155,9 +156,9 @@ model1={'scorers':[scaledsp1,ref1],'bmtype':bmtype,'searches':[search1,search2],
 
 model1['refineProtocal']=refineProtocal
 #so=scorer(model=convert2old(model1))
-#print so.assess_ideal()
-#print so.assess_worst()
-#print so.assess_model()  
+#print(so.assess_ideal())
+#print(so.assess_worst())
+#print(so.assess_model())
 #pdb.set_trace()
 
 #opt=optimizer(scorer=so)

@@ -1,5 +1,6 @@
 #functions to process pdb lists
 
+from __future__ import print_function
 from modeller import *
 import re
 import os
@@ -66,7 +67,7 @@ class entirepdb(object):
 
     def get_xray_structure_list(self,path=originaldir):
         os.chdir(path)
-        print os.system('scp gqdong@baton2:/netapp/database/pdb/remediated/pdball.pir '+basedir+'pdbpir/pdball.pir')
+        print(os.system('scp gqdong@baton2:/netapp/database/pdb/remediated/pdball.pir '+basedir+'pdbpir/pdball.pir'))
         fh=open(basedir+'pdbpir/pdball.pir')
         fc=fh.read()
         pl=fc.split('>P1;')
@@ -93,9 +94,9 @@ class entirepdb(object):
     def copy_xray_structures(self,path=originaldir):
         os.chdir(path)
         for code in self.nxslist:
-            print os.system('cp /salilab/park2/database/pdb/divided/'+code[1:3]+'/pdb'+code+'.ent.gz ./')
-            print os.system('gunzip pdb'+code+'.ent.gz')
-            print os.system('mv '+'pdb'+code+'.ent '+'pdb'+code+'.pdb')
+            print(os.system('cp /salilab/park2/database/pdb/divided/'+code[1:3]+'/pdb'+code+'.ent.gz ./'))
+            print(os.system('gunzip pdb'+code+'.ent.gz'))
+            print(os.system('mv '+'pdb'+code+'.ent '+'pdb'+code+'.pdb'))
 
     def load_xslist(self):
         os.chdir(originaldir)
@@ -124,9 +125,9 @@ class entirepdb(object):
             try:
                 ss=SingleStructure(code)
                 ss.preprocess()
-            except Exception,e:
-                print code
-                print e
+            except Exception as e:
+                print(code)
+                print(e)
                 self.errfh.write(code+'\n'+str(e))
 
     def collect_dict(self):
@@ -135,7 +136,7 @@ class entirepdb(object):
         fl=[f for f in fl if f[5:]=='pickle']
         pdbdict={}
         for f in fl:
-            print f
+            print(f)
             fh=open(f)
             sd=cPickle.load(fh)
             fh.close
@@ -227,7 +228,7 @@ class entirepdb(object):
                     raise Exception('Do not know the property: '+key)
             if not collect:
                 continue
-            print code
+            print(code)
             if complexpir==2:
                 if len(codedict['chains'])>1:
                     pirlist.append((codedict['pir'],codedict['resolution'],codedict['rfree']))
@@ -255,7 +256,7 @@ class entirepdb(object):
                             break
                     if not ctc:
                         continue
-                    print cd['missingatomnum']
+                    print(cd['missingatomnum'])
                     if cnom and cd['missingatomnum']>0:
                         continue
                     if (cd['length']-cd['missingresnum'])>self.minchainlen:
@@ -304,7 +305,7 @@ class entirepdb(object):
         for code in self.pdbdict:
             for dictkey in ['T','H','B']:
                 if code in self.THBdict[dictkey]:
-                    print code
+                    print(code)
                     self.pdbdict[code]['type']=self.pdbdict[code]['type']+dictkey
                     for cc in self.pdbdict[code]['chains']:
                         if cc in self.THBdict[dictkey][code]:
@@ -343,10 +344,10 @@ class tmhpdb(entirepdb):
         for f in fl:
             os.chdir(path)
             if f[0:4] not in ep.pdbdict:
-                print 'skipping because of not in pdbdict'+f
+                print('skipping because of not in pdbdict'+f)
                 continue
             if  not os.path.isfile(path+f+'.log'):
-                print 'skipping because of no log'+f
+                print('skipping because of no log'+f)
                 continue
             #mdlo=mymodel(env,code=f+'.pdb')
             #mdlo.convert_tmh_tochains(path,f)
@@ -389,7 +390,7 @@ class tmhmcpdb(entirepdb):
         for pdbkey in fd:
             os.chdir(path)
             if pdbkey not in ep.pdbdict:
-                print 'skipping because of not in pdbdict'+f
+                print('skipping because of not in pdbdict'+f)
                 continue
             combine_models(fd[pdbkey],'THMC'+pdbkey+'.pdb')
             mdl=mymodel(env,code='THMC'+pdbkey+'.pdb')
@@ -424,17 +425,17 @@ class bioupdb(entirepdb):
                 continue
             cdir=opath+f1+'/'
             os.chdir(cdir)
-            print os.system('gunzip *gz')
-            print os.system('rm *r')
-            print os.system('rm *.model*')
+            print(os.system('gunzip *gz'))
+            print(os.system('rm *r'))
+            print(os.system('rm *.model*'))
             fl2=os.listdir(cdir)
             for f2 in fl2:
-                print f2
+                print(f2)
                 os.chdir(cdir)
                 pdbcode=f2[0:4]
                 mycode='BIOU'+pdbcode+f2[-1]
                 if pdbcode not in ep.pdbdict or pdbcode in ['1smv']:
-                    print 'skipping because of not in pdbdict'+f2
+                    print('skipping because of not in pdbdict'+f2)
                     continue
                 mdl=model(env)
                 try:
@@ -444,13 +445,13 @@ class bioupdb(entirepdb):
                         except:
                             continue
                         if len(mdl.chains)<=1:
-                            print "single chain structure, skipping...."
+                            print("single chain structure, skipping....")
                             continue
                         self.rebuild_model(f2)
-                        print os.system('cp '+f2+'r '+tpath+mycode+'.pdb')
-                except Exception,e:
+                        print(os.system('cp '+f2+'r '+tpath+mycode+'.pdb'))
+                except Exception as e:
                     if re.search('Too many chains',str(e)):
-                        print os.system('touch '+opath+f2)
+                        print(os.system('touch '+opath+f2))
                         continue
                     else:
                         traceback.print_exc()
@@ -469,7 +470,7 @@ class bioupdb(entirepdb):
         if ml:
             combine_models(ml,fp+'r')
         else:
-            print os.system('cp '+fp+' '+fp+'r')
+            print(os.system('cp '+fp+' '+fp+'r'))
 
     def copy_pdb(self,tpath):
         os.chdir(self.tpath)
@@ -502,13 +503,13 @@ class loop(object): #loopchain,looplength,loopstart,loopend,looptype
         dsspdict={}
         try:
             for file in dssplist:
-                print file
+                print(file)
                 if file[-4:]!='dssp':
                     continue
                 try:
                     fh=open(file,'r')
                 except:
-                    print 'Open file problem '+file
+                    print('Open file problem '+file)
                     continue
                 dssplist=[]
                 startrecord=False
@@ -522,13 +523,13 @@ class loop(object): #loopchain,looplength,loopstart,loopend,looptype
                             chain=line[11]
                             resname=line[13]
                             ssc=line[16]
-                        except Exception,e:
+                        except Exception as e:
                             traceback.print_exc()
-                            print line
+                            print(line)
                             continue
                         dssplist.append([chain,resnum,resname,ssc])
                 dsspdict[file[:-5]]=dssplist
-        except Exception,e:
+        except Exception as e:
             traceback.print_exc()
         return dsspdict
 
@@ -627,7 +628,7 @@ class loop(object): #loopchain,looplength,loopstart,loopend,looptype
             self.clash=clash
             self.contact=contact
             for loop in loops:
-                print loop
+                print(loop)
                 sacc=self.aveacc(loop,accmdl)
                 aacc.append(str(sacc))
                 #try:
@@ -636,7 +637,7 @@ class loop(object): #loopchain,looplength,loopstart,loopend,looptype
                         if loop[4]>0:
                             continue
                     if loop[1]<looplength[0] or loop[1]>looplength[1]:
-                        print 'loop length '+str(loop[1])
+                        print('loop length '+str(loop[1]))
                         continue
                     if not (nonstdres or missingatoms):
                         try:
@@ -654,26 +655,26 @@ class loop(object): #loopchain,looplength,loopstart,loopend,looptype
                                 residuedict[atom.residue.num][1].append(atom.name)
                                 residuedict[atom.residue.num][2]=residuedict[atom.residue.num][2]+atom.biso
                         if len(residuedict)!=loop[1]:
-                            print 'missing residue'
+                            print('missing residue')
                             continue
                         select=True
                         for key in residuedict:
                             if (not (set(residuedict[key][1])>=set(resatoms['resatomdict'][residuedict[key][0]]))):
                                 select=False
-                                print 'missing atoms'
-                                print residuedict[key][1]
-                                print resatoms['resatomdict'][residuedict[key][0]]
+                                print('missing atoms')
+                                print(residuedict[key][1])
+                                print(resatoms['resatomdict'][residuedict[key][0]])
                                 break
                             if (residuedict[key][2]/len(residuedict[key][1]))>bisothresd:
-                                print 'disorder'
+                                print('disorder')
                                 select=False
                                 break
                         if select==False:
                             continue
                     else:
-                        print 'please update filter_loops function to do this, non implemented yet'
+                        print('please update filter_loops function to do this, non implemented yet')
                     if sacc>accessibilitycutoff[1] or sacc<accessibilitycutoff[0]:
-                        print 'Accessibility too high '+str(sacc)
+                        print('Accessibility too high '+str(sacc))
                         continue
                     if self.clash_filter(loop):
                         continue
@@ -681,17 +682,17 @@ class loop(object): #loopchain,looplength,loopstart,loopend,looptype
                         continue
                     if self.ca_distance_filter(loop,mdl,maxcacadist=maxcacadist):
                         continue
-                #except Exception,e:
-                #    print loop
+                #except Exception as e:
+                #    print(loop)
                 #    traceback.print_exc()
-                print 'selected:', loop
+                print('selected:', loop)
                 selectedloops.append(loop)
             if selectedloops:
-                print "#######################################"+code+'    '+str(mdl.rfactor)+'   '+str(mdl.resolution)
+                print("#######################################"+code+'    '+str(mdl.rfactor)+'   '+str(mdl.resolution))
                 selectedloopdict[code[0:4]]=selectedloops
                 numofloops=numofloops+len(selectedloops)
-        print 'num of selected loops: '+str(numofloops)
-        print 'numof structures: '+str(len(selectedloopdict))
+        print('num of selected loops: '+str(numofloops))
+        print('numof structures: '+str(len(selectedloopdict)))
         fh=open('/bell3/gqdong/statpot/acc','w')
         fh.write(','.join(aacc))
         fh.close()
@@ -744,7 +745,7 @@ class loop(object): #loopchain,looplength,loopstart,loopend,looptype
             self.clash=clash
             self.contact=contact
             for loop in loops:
-                print loop
+                print(loop)
                 sacc=self.aveacc(loop,accmdl)
                 aacc.append(str(sacc))
                 #try:
@@ -753,7 +754,7 @@ class loop(object): #loopchain,looplength,loopstart,loopend,looptype
                         if loop[4]>0:
                             continue
                     if loop[1]<looplength[0] or loop[1]>looplength[1]:
-                        print 'loop length '+str(loop[1])
+                        print('loop length '+str(loop[1]))
                         continue
                     if not (nonstdres or missingatoms):
                         try:
@@ -771,26 +772,26 @@ class loop(object): #loopchain,looplength,loopstart,loopend,looptype
                                 residuedict[atom.residue.num][1].append(atom.name)
                                 residuedict[atom.residue.num][2]=residuedict[atom.residue.num][2]+atom.biso
                         if len(residuedict)!=loop[1]:
-                            print 'missing residue'
+                            print('missing residue')
                             continue
                         select=True
                         for key in residuedict:
                             if (not (set(residuedict[key][1])>=set(resatoms['resatomdict'][residuedict[key][0]]))):
                                 select=False
-                                print 'missing atoms'
-                                print residuedict[key][1]
-                                print resatoms['resatomdict'][residuedict[key][0]]
+                                print('missing atoms')
+                                print(residuedict[key][1])
+                                print(resatoms['resatomdict'][residuedict[key][0]])
                                 break
                             if (residuedict[key][2]/len(residuedict[key][1]))>bisothresd:
-                                print 'disorder'
+                                print('disorder')
                                 select=False
                                 break
                         if select==False:
                             continue
                     else:
-                        print 'please update filter_loops function to do this, non implemented yet'
+                        print('please update filter_loops function to do this, non implemented yet')
                     if sacc>accessibilitycutoff[1] or sacc<accessibilitycutoff[0]:
-                        print 'Accessibility too high '+str(sacc)
+                        print('Accessibility too high '+str(sacc))
                         continue
                     if self.clash_filter(loop):
                         continue
@@ -798,17 +799,17 @@ class loop(object): #loopchain,looplength,loopstart,loopend,looptype
                         continue
                     if self.ca_distance_filter(loop,mdl,maxcacadist=maxcacadist):
                         continue
-                #except Exception,e:
-                #    print loop
+                #except Exception as e:
+                #    print(loop)
                 #    traceback.print_exc()
-                print 'selected:', loop
+                print('selected:', loop)
                 selectedloops.append(loop)
             if selectedloops:
-                print "#######################################"+code+'    '+str(mdl.rfactor)+'   '+str(mdl.resolution)
+                print("#######################################"+code+'    '+str(mdl.rfactor)+'   '+str(mdl.resolution))
                 selectedloopdict[code[0:4]]=selectedloops
                 numofloops=numofloops+len(selectedloops)
-        print 'num of selected loops: '+str(numofloops)
-        print 'numof structures: '+str(len(selectedloopdict))
+        print('num of selected loops: '+str(numofloops))
+        print('numof structures: '+str(len(selectedloopdict)))
         fh=open('/bell3/gqdong/statpot/acc','w')
         fh.write(','.join(aacc))
         fh.close()
@@ -828,7 +829,7 @@ class loop(object): #loopchain,looplength,loopstart,loopend,looptype
                 clashlist.append(item[1][1]+item[1][2])
         for item in clashlist:
             if item in loopres:
-                print 'clash with '+','.join(item)+'  '
+                print('clash with '+','.join(item)+'  ')
                 return True
         return False
 
@@ -851,11 +852,11 @@ class loop(object): #loopchain,looplength,loopstart,loopend,looptype
                         element=mdl.residues[item[1][2]+':'+item[1][1]].atoms[atomname].element
                     if element in metalset:
                         if -float(item[2])<ionmindist:
-                            print 'metal ion too close, ',item
+                            print('metal ion too close, ',item)
                             return True
                     else:
                         if -float(item[2])<mindist:
-                            print 'other atoms too close, ',item
+                            print('other atoms too close, ',item)
                             return True
             except:
                 pdb.set_trace()
@@ -866,7 +867,7 @@ class loop(object): #loopchain,looplength,loopstart,loopend,looptype
         atom2=mdl.residues[str(loop[3])+':'+loop[0]].atoms['CA']
         dist=np.sqrt((atom1.x-atom2.x)**2+(atom1.y-atom2.y)**2+(atom1.z-atom2.z)**2)
         if dist>maxcacadist*(loop[1]-1):
-            print 'distance between ca atoms are too large: '+str(dist)
+            print('distance between ca atoms are too large: '+str(dist))
             return True
         return False
 
@@ -881,9 +882,9 @@ class loop(object): #loopchain,looplength,loopstart,loopend,looptype
         for i in range(0,haa.shape[0]):
             for j in range(0,len(loopsel)):
                 if np.sqrt(np.sum((haa[i]-laa[j])**2))<mindist:
-                    print 'hetatm too close'
-                    print haa[i]
-                    print laa[j]
+                    print('hetatm too close')
+                    print(haa[i])
+                    print(laa[j])
                     return False
         return True
 
@@ -892,8 +893,8 @@ class loop(object): #loopchain,looplength,loopstart,loopend,looptype
             try:
                 if int(mdl.residues[i].num)==loop[2]:
                     break
-            except Exception,e:
-                print e
+            except Exception as e:
+                print(e)
         aveacc=0
         for j in range(i,i+loop[1]):
             aveacc=aveacc+mdl.residues[j].atoms[0].biso
@@ -980,8 +981,8 @@ class mymodel(model):
             self.chains[0].name=cl[k]
             s=self.select_loop_atoms([[self.chains[0].name,-1,tmr[0],tmr[1]]])
             s.write('tmregiontemp'+cl[k])
-        print os.system('cat tmregiontemp* > THAC'+fn+'.pdb')
-        print os.system('rm tmregiontemp*')
+        print(os.system('cat tmregiontemp* > THAC'+fn+'.pdb'))
+        print(os.system('rm tmregiontemp*'))
 
     def get_ph(self):
         return sp.get_ph(self.code)
@@ -1004,9 +1005,9 @@ class mymodel(model):
         cs=[]
         for c in self.chains:
             filename=self.code
-            print "Wrote out ",' ',filename, self.seq_id
+            print("Wrote out ",' ',filename, self.seq_id)
             atom_file, align_code = c.atom_file_and_code(filename)
-            #print os.system('touch '+code+'.pir')
+            #print(os.system('touch '+code+'.pir'))
             c.write('temp.pir', atom_file, align_code, format='PIR',
                 chop_nonstd_termini=False)
             cc.append(align_code[-1])
@@ -1081,7 +1082,7 @@ class mymodel(model):
             nonhetdict[chaincode]=hetset
             sequencedict[chaincode]=sequencel
         #if len(sequencedict)!=len(self.chains):
-        #    print 0
+        #    print(0)
         #    raise Exception('Modeller model has multiple chains with the same chain code '+self.code)
         return [nonhetdict,sequencedict,resnumdict]
 
@@ -1123,7 +1124,7 @@ class SingleStructure(object):
         pno='NULL'
         rwrfactor=0;
         pnn=self.code
-        print self.code
+        print(self.code)
         cdict={}
         collect=1
         # read the data from file and calculate the scale factor
@@ -1165,15 +1166,15 @@ class SingleStructure(object):
         if 1:
             brer=bre.findall(pline)
             bl=0
-            #print brer
+            #print(brer)
             for j in range(0,len(brer)):
-                #print brer[j][0]
+                #print(brer[j][0])
                 if brer[j]:
                     bl=bl+float(brer[j])
     #          if len(brer)>0:
             abfactor=bl/len(brer)
         cdict['aveB']=abfactor
-        print  'abfactor: '+str(abfactor)
+        print('abfactor: '+str(abfactor))
         #completeness
         completeness=0
         if completenessre.search(pline):
@@ -1184,8 +1185,8 @@ class SingleStructure(object):
         if completeness<50:
             completeness=100-completeness
         cdict['completeness']=completeness
-        #print  'completeness: '+str(completeness)
-        #print  'number of reflection: '+str(nor)
+        #print('completeness: '+str(completeness))
+        #print('number of reflection: '+str(nor))
         atomnrer=atomre.findall(pline)
         atomn=len(atomnrer)
         cdict['atomnum']=atomn
@@ -1205,20 +1206,20 @@ class SingleStructure(object):
         if not os.path.isdir(self.code):
             os.mkdir(self.code)
         file='pdb'+code+'.pdb'
-        print os.system('cp '+file+' ./'+self.code+'/')
+        print(os.system('cp '+file+' ./'+self.code+'/'))
         inputdir=originaldir+self.code+'/'
         outputdir=flippeddir
-        print os.system('/bell1/home/gqdong/software/molprobity3/cmdline/reduce-build '+inputdir+' '+outputdir)
-        print os.system('rm -r '+self.code)
+        print(os.system('/bell1/home/gqdong/software/molprobity3/cmdline/reduce-build '+inputdir+' '+outputdir))
+        print(os.system('rm -r '+self.code))
 
     def molprobity_analysis(self):
         os.chdir(flippeddir)
         file='pdb'+self.code+'.pdb'
         if not os.path.isdir(file[:-4]):
             os.mkdir(file[:-4])
-        print os.system('cp '+file+' ./'+file[:-4]+'/' )
-        print os.system('/bell1/home/gqdong/software/molprobity3/cmdline/oneline-analysis '+file[:-4]+' >'+file[:-4]+'.molprobity')
-        print os.system('rm -r '+file[:-4])
+        print(os.system('cp '+file+' ./'+file[:-4]+'/' ))
+        print(os.system('/bell1/home/gqdong/software/molprobity3/cmdline/oneline-analysis '+file[:-4]+' >'+file[:-4]+'.molprobity'))
+        print(os.system('rm -r '+file[:-4]))
 
     def load_molprobity(self):
         f='pdb'+self.code+'.molprobity'
@@ -1548,7 +1549,7 @@ class SingleStructure(object):
             return 0
         if codedict['rfree']:
             aveerr=((codedict['atomnum']/codedict['numofreflections'])**0.5)*((codedict['completeness']/100)**(-0.33333333))*codedict['rfree']*codedict['resolution']
-            #print  'number of atom: '+str(atomn)
+            #print('number of atom: '+str(atomn))
         else:
             aveerr=((codedict['atomnum']/codedict['numofreflections'])**0.5)*((codedict['completeness']/100)**(-0.33333333))*codedict['r']*codedict['resolution']
         codedict['aveerr']=aveerr
@@ -1566,7 +1567,7 @@ class SingleStructure(object):
 
 def combine_models(modellist,fmn):
     if len(modellist)==1:
-        print os.system('cp '+modellist[0]+' '+fmn)
+        print(os.system('cp '+modellist[0]+' '+fmn))
         return 0
     env=environ()
     env.io.hetatm=False
@@ -1590,7 +1591,7 @@ def combine_models(modellist,fmn):
         mdl.write(mn)
         mnl=mnl+' '+mn
         k=k+1
-    print os.system('cat '+mnl+' >'+fmn)
+    print(os.system('cat '+mnl+' >'+fmn))
 
 def seperate_models(fp):
     fh=open(fp)
@@ -1660,7 +1661,7 @@ def precalc_errorscale(pdbdir):
     pdbdict={}
     for f in fl:
         pnn=f[3:-4]
-        print pnn
+        print(pnn)
         pdbdict[pnn]={}
         collect=1
         # read the data from file and calculate the scale factor
@@ -1702,15 +1703,15 @@ def precalc_errorscale(pdbdir):
         if 1:
             brer=bre.findall(pline)
             bl=0
-            #print brer
+            #print(brer)
             for j in range(0,len(brer)):
-            #print brer[j][0]
+            #print(brer[j][0])
                 if brer[j]:
                     bl=bl+float(brer[j])
   #          if len(brer)>0:
             abfactor=bl/len(brer)
         pdbdict[pnn]['aveB']=abfactor
-        print  'abfactor: '+str(abfactor)
+        print('abfactor: '+str(abfactor))
         #completeness
         completeness=0
         if completenessre.search(pline):
@@ -1721,8 +1722,8 @@ def precalc_errorscale(pdbdir):
         if completeness<50:
             completeness=100-completeness
         pdbdict[pnn]['completeness']=completeness
-        #print  'completeness: '+str(completeness)
-        #print  'number of reflection: '+str(nor)
+        #print('completeness: '+str(completeness))
+        #print('number of reflection: '+str(nor))
         atomnrer=atomre.findall(pline)
         atomn=len(atomnrer)
         pdbdict[pnn]['atomnum']=atomn
@@ -1758,7 +1759,7 @@ def combine_dict1d(dict1,dict2):
             dict1[key]=dict2[key]
 
 def update_pdball():
-    print os.system('scp gqdong@baton2:/netapp/database/pdb/remediated/pdball.pir '+basedir+'pdbpir/pdball.pir')
+    print(os.system('scp gqdong@baton2:/netapp/database/pdb/remediated/pdball.pir '+basedir+'pdbpir/pdball.pir'))
     pir_err(pfd+'pdball.pir')
 
 def gen_pdb_A():
@@ -1776,13 +1777,13 @@ def gen_pdb_A():
                         minimal_stdres=1, chop_nonstd_termini=True,
                         structure_types='structureX structureN'):
                         filename = re.findall('pdb\w{4}',fname)[0]
-                        print "Wrote out ",str(k),' ',filename, m.seq_id
+                        print("Wrote out ",str(k),' ',filename, m.seq_id)
                         atom_file, align_code = c.atom_file_and_code(filename)
                         c.write(pdball, atom_file, align_code, format='PIR',
                             chop_nonstd_termini=True)
                         k+=1
             except:
-                print e
+                print(e)
     pir_cc(pfd+'pdb_A_temp.pir',pfd+'pdb_A.pir')
     pir_err(pfd+'pdb_A.pir')
 
@@ -1792,7 +1793,7 @@ def opm_mpl():
     mlfc=mlf.read()
     mpl=re.findall('Text\[\d*\]=\[\"([0-9a-z]{4})',mlfc)
     for pn in mpl:
-        print pn
+        print(pn)
         time.sleep(1)
         mlf=urllib.urlopen('http://opm.phar.umich.edu/protein.php?pdbid='+pn)
         mlfc=mlf.read()
@@ -1810,7 +1811,7 @@ def opm_tmcl():
     mpl=re.findall('>([0-9a-z]{4})([^>]*)>',fc)
     tmcl=''
     for pn in mpl:
-        print pn[0]
+        print(pn[0])
         opt=re.findall('\\n([A-Z0-9]{1})\s{1}Tilt',pn[1])
         for item in opt:
             tmcl=tmcl+pn[0]+item+" "
@@ -1843,7 +1844,7 @@ def opm_tmpl():
     sfn=open(basedir+'pdbpir/tmplts','w') # this file contains the tilt angles and the transmembrane segments of unique transmembrane proteins defined by OPM
     for pn in mpl:
         time.sleep(1)
-        print pn
+        print(pn)
         sfn.write('>'+pn+'\n')
         mlf=urllib.urlopen('http://opm.phar.umich.edu/protein.php?pdbid='+pn)
         mlfc=mlf.read()
@@ -1860,7 +1861,7 @@ def opm_tmpl():
 
 def gen_pir(pdbfiles):
     pfd=basedir+'pdbpir/'
-    print 'Generating pdb file ' + pdbfiles
+    print('Generating pdb file ' + pdbfiles)
     env = environ()
     aln = alignment(env)
     pdbfile='pdb_'+pdbfiles+'.pir'
@@ -1868,7 +1869,7 @@ def gen_pir(pdbfiles):
         rer=re.search('([0-9]{1}\.[0-9]{1})A',pdbfiles)
         rsvs=rer.group(1)
         stresolution=float(rsvs)
-        print stresolution
+        print(stresolution)
     else:
         stresolution=99.0
     if not re.search('_[0-9]{2}$',pdbfiles):
@@ -1912,16 +1913,16 @@ def gen_pir(pdbfiles):
     elif pdbfiles[0:2]=='ST':
         pir_ief(pfd+'pdb_SX'+pdb1name[6:],pfd+pdb1name,pfd+'tmpl')
     else:
-        print 'pp.py unsupported pdb database file type (example X_2.2A_60): '+pdbfiles
+        print('pp.py unsupported pdb database file type (example X_2.2A_60): '+pdbfiles)
     if re.search('_[0-9]*$',pdbfiles):
         sic=int(pdbfiles[-2:])
         pir_sif(pfd+pdb1name, pfd+pdbfile,si=sic)
     return pdbfile
 
 def pir_ief(inputpirfile,outputpirfile,mlist,inc=1,fnl=4):
-    print 'converting '+inputpirfile+' to '+outputpirfile
+    print('converting '+inputpirfile+' to '+outputpirfile)
     if not (os.access(inputpirfile,os.F_OK)):
-        print "please generate "+inputpirfile+" first"
+        print("please generate "+inputpirfile+" first")
     f=open(mlist,'r' )
     fc=f.read()
     out=file(outputpirfile,"w")
@@ -1936,15 +1937,15 @@ def pir_ief(inputpirfile,outputpirfile,mlist,inc=1,fnl=4):
             pn=mg.group(1)
             pnn=pn[0:fnl]
             if bool(inc)==bool(re.search(pnn,fc,re.IGNORECASE)):
-                print pnn
+                print(pnn)
                 pno=1
                 n=n+1
         if pno:
             out.write(line)
-    print n
+    print(n)
 
 def pir_xrf(inputpirfile,outputpirfile,structuretype='structureX',structureresolution=99.0):
-    print 'converting '+inputpirfile+' to '+outputpirfile
+    print('converting '+inputpirfile+' to '+outputpirfile)
     env = environ()
     env.io.atom_files_directory=['/salilab/park2/database/pdb/divided/']
     aln = alignment(env)
@@ -1955,7 +1956,7 @@ def pir_xrf(inputpirfile,outputpirfile,structuretype='structureX',structureresol
 #    while rs and b:
 #        try:
 #            b=aln.read_one(input, allow_alternates=True)
-#            print a[0].code
+#            print(a[0].code)
 #            rs=0
 #        except Exception:
 #            rs=1
@@ -1965,7 +1966,7 @@ def pir_xrf(inputpirfile,outputpirfile,structuretype='structureX',structureresol
 #        while rs and b:
 #            try:
 #                b=aln.read_one(input, allow_alternates=True)
-#                print a[0].code
+#                print(a[0].code)
 #                rs=0
 #            except Exception:
 #                rs=1
@@ -1973,7 +1974,7 @@ def pir_xrf(inputpirfile,outputpirfile,structuretype='structureX',structureresol
     output.close()
 
 def pir_sif(inputpirfile,outputpirfile,si=30):
-    print 'converting '+inputpirfile+' to '+outputpirfile
+    print('converting '+inputpirfile+' to '+outputpirfile)
     log.verbose()
     env = environ()
     sdb = sequence_db(env, seq_database_file=inputpirfile,
@@ -1996,7 +1997,7 @@ def pir_sif(inputpirfile,outputpirfile,si=30):
             out.write(line)
 
 def pir_err(inputpirfile):
-    print os.system('cp '+inputpirfile+' '+inputpirfile+'.temp')
+    print(os.system('cp '+inputpirfile+' '+inputpirfile+'.temp'))
     pirfile=inputpirfile+'.temp'
     pdbdir='/salilab/park2/database/pdb/divided/'
     os.chdir('/bell2/gqdong/temp/')
@@ -2022,17 +2023,17 @@ def pir_err(inputpirfile):
             mg=pirhead.match(line)
             pn=mg.group(1)
             pnn=pn[0:4]
-            print pnn
+            print(pnn)
             collect=1
             # read the data from file and calculate the scale facbasedir+'pdbpirtor
             ppathgz=pdbdir+pnn[1:3]+'/pdb'+pnn+'.ent.gz'
             if not (os.access(ppathgz,os.F_OK)):
                 error.write(ppathgz)
-                print ppathgz
+                print(ppathgz)
                 continue
-            print os.system('cp '+ppathgz+' /bell2/gqdong/temp/')
+            print(os.system('cp '+ppathgz+' /bell2/gqdong/temp/'))
             if not (os.access('/bell2/gqdong/temp/pdb'+pnn+'.ent',os.F_OK)):
-                print os.system('gunzip '+' /bell2/gqdong/temp/pdb'+pnn+'.ent.gz')
+                print(os.system('gunzip '+' /bell2/gqdong/temp/pdb'+pnn+'.ent.gz'))
             pdbfile=open('/bell2/gqdong/temp/pdb'+pnn+'.ent')
             pline=pdbfile.read()
             if frfactorre.search(pline):
@@ -2046,7 +2047,7 @@ def pir_err(inputpirfile):
                 frfactor=float(rfrer.group(1))
             else:
                 collect=0
-            #print  'free R factor: '+str(frfactor)
+            #print('free R factor: '+str(frfactor))
             if resolre.search(pline):
                 resolrer=resolre.search(pline)
                 resol=float(resolrer.group(1))
@@ -2059,21 +2060,21 @@ def pir_err(inputpirfile):
                     collect=0
             else:
                 collect=0
-            #print  'resolution: '+str(resol)
+            #print('resolution: '+str(resol))
             abfactor=0
             if 1:
                 brer=bre.findall(pline)
                 bl=0
-                #print brer
+                #print(brer)
                 for j in range(0,len(brer)):
-                    #print brer[j][0]
+                    #print(brer[j][0])
                     if brer[j]:
                         bl=bl+float(brer[j])
   #              if len(brer)>0:
                 abfactor=bl/len(brer)
             if abfactor==0:
                 collect=0
-            print  'abfactor: '+str(abfactor)
+            print('abfactor: '+str(abfactor))
             completeness=0
             if completenessre.search(pline):
                 completenessrer=completenessre.search(pline)
@@ -2082,13 +2083,13 @@ def pir_err(inputpirfile):
                 completeness=100
             if completeness<50:
                 completeness=100-completeness
-            #print  'completeness: '+str(completeness)
-            #print  'number of reflection: '+str(nor)
+            #print('completeness: '+str(completeness))
+            #print('number of reflection: '+str(nor))
             atomnrer=atomre.findall(pline)
             atomn=len(atomnrer)
-            #print  'number of atom: '+str(atomn)
-            print n
-            #print sf
+            #print('number of atom: '+str(atomn))
+            print(n)
+            #print(sf)
             if collect==0:
                 if abfactor==0:
                     sf=0.001
@@ -2099,7 +2100,7 @@ def pir_err(inputpirfile):
             else:
                 sf=((atomn/nor)**0.5)*((completeness/100)**(-0.33333333))*frfactor*resol/abfactor
             scalefactor=str(sf*1000)
-            print 'Mean error: '+str(sf*abfactor)+'   Scale factor:'+str(scalefactor)
+            print('Mean error: '+str(sf*abfactor)+'   Scale factor:'+str(scalefactor))
             rwrfactor=1
             out.write(line)
             continue
@@ -2107,7 +2108,7 @@ def pir_err(inputpirfile):
             rwrfactor=0
             n=n+1
             line=line[:-6]+scalefactor[0:5]
-            print os.system('rm '+' /bell2/gqdong/temp/pdb'+pnn+'.ent*')
+            print(os.system('rm '+' /bell2/gqdong/temp/pdb'+pnn+'.ent*'))
             out.write(line+'\n')
             continue
         if collect:
@@ -2115,11 +2116,11 @@ def pir_err(inputpirfile):
    # if n>1:
    #     break;
     input.close()
-    print os.system('rm  '+inputpirfile+'.temp')
+    print(os.system('rm  '+inputpirfile+'.temp'))
 
 #combine chains in the same proteins
 def pir_cc(inputfile,outputfile):
-    print 'converting '+inputfile+' to '+outputfile
+    print('converting '+inputfile+' to '+outputfile)
     pdball=open(inputfile,'r')
     out=open(outputfile,'w')
     pirhead=re.compile(">P1;(\S*)$")
@@ -2186,13 +2187,13 @@ def gen_sc():
                             minimal_stdres=30, chop_nonstd_termini=True,
                             structure_types='structureX structureN'):
                         filename = re.findall('pdb\w{4}',fname)[0]
-                        print "Wrote out ",str(k),' ',filename, m.seq_id
+                        print("Wrote out ",str(k),' ',filename, m.seq_id)
                         atom_file, align_code = c.atom_file_and_code(filename)
                         c.write(pdball, atom_file, align_code, format='PIR',
                         chop_nonstd_termini=True)
                         k+=1
             except:
-                print e
+                print(e)
 
 def decoys_pir(ddir):
     e = environ()
@@ -2204,12 +2205,12 @@ def decoys_pir(ddir):
         try:
             m = model(e, file=ddir+name)
             for c in m.chains:
-                print name
+                print(name)
                 c.write(pirfile, name[:-4], name[:-4], format='PIR',chop_nonstd_termini=True)
                 k+=1
-                print k;
+                print(k)
         except:
-            print e
+            print(e)
 
 def pir2fsa(inputfile):
     input=file(pfd+inputfile)
@@ -2232,5 +2233,5 @@ def pir2fsa(inputfile):
         if pirhead.match(line):
             sly=1;
             output.write(line)
-            #print line
+            #print(line)
     return 0

@@ -1,3 +1,4 @@
+from __future__ import print_function
 from sps import *
 import profile
 import sys
@@ -23,9 +24,9 @@ for p in tnr:
     tcp=int(10**(p/10.0))
     ara[p]=so.assess_model(slevel='top'+str(tcp)+'__nonempty_rmsd10ORirmsd4FIRST')
 
-print res
+print(res)
 
-print so.assess_ideal()
+print(so.assess_ideal())
 pdb.set_trace()
 #so.assess_sascore()
 #so.assess_randomized_score(ov)

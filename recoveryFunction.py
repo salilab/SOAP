@@ -3,6 +3,7 @@
 
 """
 
+from __future__ import print_function
 from statsTable import *
 import numpy as np
 import scipy.interpolate
@@ -37,8 +38,8 @@ class sf(object):
 
     def write_potential(self,affix,genmethod, ratio=1):
         ro=rawsp(pdbset='X_2.2A',features=self.features,genmethod=genmethod)
-        print "table"
-        print ratio*self.get_sf()
+        print("table")
+        print(ratio*self.get_sf())
         ro.write_hdf5(self.features+'.'+affix+'.hdf5', ratio*self.get_sf(), permute=False)
 
     def initialize(self):
@@ -98,7 +99,7 @@ class sf(object):
                 self.rsi.append(0)
         self.sfv=np.zeros(self.rs)
         if self.nlen*self.slen!=len(self.parvalue):
-            print 'The length of parvalue is not matched'
+            print('The length of parvalue is not matched')
             pdb.set_trace()
             raise Exception('The length of parvalue is not the same as needed for building the reference distribution')
 
@@ -270,8 +271,8 @@ class sf(object):
                 else:
                     parvalue=parvalue/parvalue[-1]
             #how to generate the splines
-            print par
-            print parvalue
+            print(par)
+            print(parvalue)
             if ptype[4]=='e':
                 us=scipy.interpolate.pchip(par,np.log(parvalue))
                 svalue=us(self.bins[pi])
@@ -302,19 +303,19 @@ class sf(object):
             return np.log(np.abs(us(self.bins[pi]))+0.00000000000000000001)
         elif ptype.startswith('psn3'):
             #positive monotonic spline, normailized at last bin=1, search interval
-            #print par
-            #print parvalue
+            #print(par)
+            #print(parvalue)
             pl=list(par)
             newparvalue=list(parvalue)+[1]
             pl.append(self.bins[pi][-1])
             par=np.array(pl)
             parvalue=np.cumsum(newparvalue)
             parvalue=parvalue/parvalue[-1]
-            #print par
-            #print parvalue
+            #print(par)
+            #print(parvalue)
             #valuelist=pypchip.pchip(par,np.abs(parvalue),self.bins[pi])
-            #print self.bins[pi]
-            #print valuelist
+            #print(self.bins[pi])
+            #print(valuelist)
             #return np.log(np.abs(valuelist)+0.00000000000000000001)
             us=scipy.interpolate.pchip(par,np.abs(parvalue))
             return np.log(np.abs(us(self.bins[pi]))+0.00000000000000000001)
@@ -322,40 +323,40 @@ class sf(object):
             #return us(self.bins[pi])
         elif ptype.startswith('psn2'):
             #positive  spline, not normalized,
-            #print par
-            #print parvalue
+            #print(par)
+            #print(parvalue)
             pl=list(par)
             newparvalue=list(parvalue)
             pl.append(self.bins[pi][-1])
             par=np.array(pl)
             parvalue=np.array(newparvalue)
-            #print par
-            #print parvalue
+            #print(par)
+            #print(parvalue)
             us=scipy.interpolate.InterpolatedUnivariateSpline(par,np.abs(parvalue))
             return np.log(np.abs(us(self.bins[pi]))+0.00000000000000000001)
         elif ptype.startswith('psn'):
             #positive spline, normailized at last bin=1,
-            #print par
-            #print parvalue
+            #print(par)
+            #print(parvalue)
             pl=list(par)
             newparvalue=list(parvalue)
             pl.append(self.bins[pi][-1])
             newparvalue.append(1)
             par=np.array(pl)
             parvalue=np.array(newparvalue)
-            #print par
-            #print parvalue
+            #print(par)
+            #print(parvalue)
             us=scipy.interpolate.InterpolatedUnivariateSpline(par,np.abs(parvalue))
             return np.log(np.abs(us(self.bins[pi]))+0.00000000000000000001)
         elif ptype.startswith('ps'):
-            #print par
-            #print parvalue
+            #print(par)
+            #print(parvalue)
             pl=list(par)
             newparvalue=list(parvalue)
             par=np.array(pl)
             parvalue=np.array(newparvalue)
-            #print par
-            #print parvalue
+            #print(par)
+            #print(parvalue)
             us=scipy.interpolate.InterpolatedUnivariateSpline(par,np.abs(parvalue))
             return np.log(np.abs(us(self.bins[pi]))+0.00000000000000000001)
         elif ptype=='ig':

@@ -4,6 +4,7 @@
 """
 
 
+from __future__ import print_function
 from env import *
 import subprocess
 from utility import mypickle
@@ -54,7 +55,7 @@ class Decoys4Single(object):
                 shutil.move(file, self.dsname+'.'+file)
             else:
                 shutil.move(file, self.dsname+'.'+self.code+'.'+file)
-        #print os.system('for file in *pdb; do mv $file '+self.dsname+'.'+self.code+'.$file; done')
+        #print(os.system('for file in *pdb; do mv $file '+self.dsname+'.'+self.code+'.$file; done'))
 
     def filter_pdb(self):
         #filter the decoys to eliminate bad ones, used for filter HR decoys. Ideally, the input decoys need not be filtered.
@@ -62,7 +63,7 @@ class Decoys4Single(object):
         rmsdlist=[]
         flist=os.listdir(self.dir)
         nativepattern='native.*pdb$'
-        print 'running'+self.code
+        print('running'+self.code)
         nativef=[elem for elem in flist if re.search(nativepattern,elem)][0]
         fh=open(nativef)
         fhc=fh.read()
@@ -107,14 +108,14 @@ class Decoys4Single(object):
                         tseqnamel.append(tatomline[17:20])
                         oldseqnum=int(tatomline[22:26])
             except:
-                print tatomline
-                print 'structure problem '+otherprotein
+                print(tatomline)
+                print('structure problem '+otherprotein)
                 shutil.move(otherprotein, otherprotein[:-4]+'.atombad')
                 continue
             posdiff=self.align_seq(seqnamel,seqnuml,tseqnamel,tseqnuml)
             if posdiff==-9999:
                 #if the decoy structure can not be aligned with the native structure, mark it as a bad structure
-                print 'can not align with native '+otherprotein
+                print('can not align with native '+otherprotein)
                 shutil.move(otherprotein, otherprotein[:-4]+'.alnbad')
                 continue
             posdiffl.append(posdiff)
@@ -148,10 +149,10 @@ class Decoys4Single(object):
             if item in tatomlist:
                 newatomlist.append(item)
             else:
-                print 'native structure and decoys uncommon atom '+item
+                print('native structure and decoys uncommon atom '+item)
         if len(newatomlist)< len(atomlist)*0.90:
-            print nativef
-            print 'too many missing atoms'
+            print(nativef)
+            print('too many missing atoms')
             pdb.set_trace()
         atomlist=newatomlist
         #now filter both the native and the decoy structure based on the list
@@ -166,7 +167,7 @@ class Decoys4Single(object):
                 try:
                     index=atomnames.index(atom)
                 except:
-                    print otherprotein+' missing atoms '+atom
+                    print(otherprotein+' missing atoms '+atom)
                     shutil.move(otherprotein, otherprotein[:-3]+atom+'.bad')
                     break
                 fs=fs+atomlines[index]+'\n'
@@ -191,7 +192,7 @@ class Decoys4Single(object):
                 posdiff=seqpos-tseqpos
                 fail=0
                 break
-            except Exception,e:
+            except Exception as e:
                 if k==0:
                     i=k
                 i=i+1
@@ -227,7 +228,7 @@ class Decoys4Single(object):
             raise Exception('more than 1 score file, do not know how to handle')
         flist=os.listdir(self.dir)
         rmsdfl=[elem for elem in flist if re.search('rmsd',elem) and not re.search('matlab',elem)]
-        print rmsdfl
+        print(rmsdfl)
         if len(rmsdfl)==0:
             self.calc_rmsd_fromfiles()
             return 0
@@ -259,7 +260,7 @@ class Decoys4Single(object):
         self.build_sa(rmsdlist)
 
     def build_sa(self,rmsdlist):
-        print "building sa"
+        print("building sa")
         self.sa=np.zeros(len(self.dnlist), dtype=self.dtype+self.extrapar)
         for i in range(0,len(self.dnlist)):
             self.sa['rmsd'][i]=rmsdlist[i][1]
@@ -270,7 +271,7 @@ class Decoys4Single(object):
             k=k+1
         if len(self.score)>0:
             self.sa['score']=self.score
-        print "building sa finished"
+        print("building sa finished")
 
     def read_rmsd_rosettadock(self,rmsdf):
         fh=open(rmsdf)
@@ -354,7 +355,7 @@ class Decoys4Single(object):
                 rmsdv=self.rmsd_2file(self.dir+'/'+nativef,self.dir+'/'+i)
                 rmsdfile.write('RMSD between '+nativef+' and '+i+' is   '+str(rmsdv)+'\n')
                 rmsdlist.append([i[:-4],rmsdv])
-            except Exception, e:
+            except Exception as e:
                 traceback.print_exc()
         rmsdfile.close()
         rmsdlist.sort(key=itemgetter(1))
@@ -444,7 +445,7 @@ class Decoys4Single(object):
         aln.write('base.pir')
 
     def build_dockingdecoys_ma(self):
-        print 'building docking decoys'
+        print('building docking decoys')
         fl=os.listdir('./')
         #renaming the chains
         subprocess.check_call(['PatchDock/mainchain.pl',
@@ -483,7 +484,7 @@ class Decoys4Single(object):
         self.save()
 
     def build_dockingdecoys_zdock(self):
-        print 'building docking decoys'
+        print('building docking decoys')
         fl=os.listdir('./')
         pdbfilelist=[item for item in fl if item.endswith('pdb')]
         #renaming the chains
@@ -566,14 +567,14 @@ class Decoys4Single(object):
         fh=open('firedockinput.pickle')
         sd=pickle.load(fh)
         fh.close()
-        print 'building docking decoys'
+        print('building docking decoys')
         fl=os.listdir('./')
         #pf=[item for item in fl if re.search('_r_',item)][0]
         #lf=[item for item in fl if re.search('_l_',item)][0]
         resfile=[item for item in fl if item[-3:]=='res'][0]
         #renaming the chains
-        #print os.system('PatchDock/mainchain.pl '+sd['rpdb'][:-3]+' A')
-        #print os.system('PatchDock/mainchain.pl '+sd['lpdb'][:-3]+' B')
+        #print(os.system('PatchDock/mainchain.pl '+sd['rpdb'][:-3]+' A'))
+        #print(os.system('PatchDock/mainchain.pl '+sd['lpdb'][:-3]+' B'))
         #combine the two files
         cat_files((sd['rpdb'], sd['lpdb']),
                   open(self.dsname+'.'+self.code+'.base.pdb', 'w'))
@@ -584,7 +585,7 @@ class Decoys4Single(object):
         collect=False
         rmsdlist=[]
         transmatrixlist=[]
-        print "Getting list"
+        print("Getting list")
         for line in fh:
             if re.search('# | rmsd',line):
                 collect=True
@@ -600,9 +601,9 @@ class Decoys4Single(object):
                 except:
                     pass
                     #pdb.set_trace()
-        print "Finished getting list"
+        print("Finished getting list")
         rmsdlist.sort(key=itemgetter(1))
-        print "sort finished"
+        print("sort finished")
         self.dnlist=[item[0] for item in rmsdlist]
         transmatrixlist=[item[-1] for item in rmsdlist]
         rmsdlist=[item[:-1] for item in rmsdlist]
@@ -615,11 +616,11 @@ class Decoys4Single(object):
         residuecodes=''.join(['A' for i in range(0,sl)])
         basepir=bpl[0]+'-1.00\n'+residuecodes+'*\n\n'
         totalpir=''
-        print "generating pir"
+        print("generating pir")
         basepirlist=basepir.split('base')
         basepirlist=basepirlist[:2]+basepirlist[-1].split('tbrname')
         totalpir=''.join([basepirlist[0]+self.dnlist[k]+basepirlist[1]+self.dnlist[k]+basepirlist[2]+transmatrixlist[k]+basepirlist[3] for k in range(0,len(self.dnlist))])
-        print "generating pir finished"
+        print("generating pir finished")
         fh=open(self.code+'.pir','w')
         fh.write(totalpir)
         fh.close()
@@ -640,7 +641,7 @@ class Decoys4Single(object):
         bpl=basepir.split('-1.00\n')
         sl=int(len(''.join(bpl[1:]))/50+0.5)
         basepir=''.join(['A' for i in range(0,sl)])
-        print basepir
+        print(basepir)
         fh=open(self.code+'.pir','r')
         fc=fh.read()
         fh.close()
@@ -676,16 +677,16 @@ class Decoys4Single(object):
         self.rmsdlist=newrmsdlist
 
     def get_sorted_pir_str(self):
-        print 0
+        print(0)
 
     def rmsd_2file(self,file1,file2,rmsdtype='all',looprmsd=False, nofit=True):
         e=runenv.env
         aln=alignment(runenv.env)
         m1=Mymodel(e,file=file1)
-        print 'start calculating rmsd'
-        print file1
+        print('start calculating rmsd')
+        print(file1)
         aln.append_model(m1, align_codes='c1', atom_files=file1)
-        print file2
+        print(file2)
         m2=Mymodel(e,file=file2)
         aln.append_model(m2, align_codes='c2', atom_files=file2)
         if looprmsd:
@@ -707,8 +708,8 @@ class Decoys4Single(object):
         # We can now use the calculated RMS, DRMS, etc. from the returned 'r' object:
         rms = r.rms
         drms = r.drms
-        print rms
-        print 'finished calculating rmsd'
+        print(rms)
+        print('finished calculating rmsd')
         return rms
 
     def save(self):
@@ -752,7 +753,7 @@ class Decoys4Single(object):
         e = environ()
         e.io.atom_files_directory = ['./']
         for i in range(len(dnlist)):
-            print dnlist[i] + '  '+str(sa[i]['rmsd'])
+            print(dnlist[i] + '  '+str(sa[i]['rmsd']))
             sa[i][property]=self.rmsd_2file(e,nativefile+'.pdb',dnlist[i]+'.pdb',rmsdtype=property,looprmsd=looprmsd)
 
     def get_loop_region(self,dname):
@@ -814,11 +815,11 @@ class DecoySet(object):
             for subfolder in subfolderlist:
                 #if subfolder[-10:]=='.coord.pdb':
                 #    if os.path.isfile(subfolder[-10:]+'.pdb'):
-                #        print os.system('rm '+subfolder)
+                #        print(os.system('rm '+subfolder))
                 #        continue
-                #    print os.system('python ../ergePDB.py '+subfolder[:-10]+' '+folder+' '+subfolder[:-10])
-                #    print os.system('rm '+subfolder)
-                #print os.system('mv  ./'+subfolder+'/'+subfolder+'.pdb ./'+folder+'/'+subfolder+'/'+subfolder+'.native.pdb')
+                #    print(os.system('python ../ergePDB.py '+subfolder[:-10]+' '+folder+' '+subfolder[:-10]))
+                #    print(os.system('rm '+subfolder))
+                #print(os.system('mv  ./'+subfolder+'/'+subfolder+'.pdb ./'+folder+'/'+subfolder+'/'+subfolder+'.native.pdb'))
                 shutil.move(subfolder, '..')
             shutil.rmtree(os.path.join('..', folder))
 
@@ -853,7 +854,7 @@ class DecoySet(object):
         subprocess.check_call(['ssh', runenv.jobserver, 'mkdir', '-p', tdir])
         sal=self.cat_singles()
         self.bulid_rmsd_array(sal)
-        print "building array finished"
+        print("building array finished")
         self.save()
 
     def filter2good(self,bnors=2000,scorefile=''):
@@ -881,7 +882,7 @@ class DecoySet(object):
         ind=[]
         dpn=0
         for i in range(0,len(self.codelist)):
-            print "filtering "+self.codelist[i]
+            print("filtering "+self.codelist[i])
             k=0
             for j in range(self.pos[i],self.pos[i+1]):
                 if (odnlist[j] in ndnlist) and odnlist[j][0:len(self.dsname)]==self.dsname:
@@ -897,7 +898,7 @@ class DecoySet(object):
             pos.append(pos[-1]+k)
             dpn=dpn+1
         if len(dnlist)<0.8*len(odnlist):
-            print 'Error: too many decoys (>20%) are filtered out using the filter, please check code for bugs'
+            print('Error: too many decoys (>20%) are filtered out using the filter, please check code for bugs')
             sys.exit('Error: too many decoys (>20%) are filtered out using the filter, please check code for bugs')
         self.pos=pos
         #self.rmsds=rmsdlist
@@ -914,12 +915,12 @@ class DecoySet(object):
         dnlist=[]
         sal=[]
         pirlist=[]
-        print '##############################################building decoys '+self.dsname
+        print('##############################################building decoys '+self.dsname)
         #runtask=task()
         #runtask.parallel_local(self.build_single,inputlist=self.codelist,nors=10)
         #pdb.set_trace()
         for code in self.codelist:
-            print "***********building "+code
+            print("***********building "+code)
             self.build_single(code)
             sd=Decoys4Single(code,self.dsname,
                              os.path.join(self.sourcedir, code))
@@ -940,16 +941,16 @@ class DecoySet(object):
 
     def build_single(self,code):
         sd=Decoys4Single(code,self.dsname, os.path.join(self.sourcedir, code))
-        print 'generating decoy for '+code
+        print('generating decoy for '+code)
         sd=sd.get()
-        print 'generating finished '+code
+        print('generating finished '+code)
         return sd
 
     def save(self):
         os.chdir(self.dir)
         try:
             mypickle().dump(self,self.dsname)
-        except Exception, e:
+        except Exception as e:
             traceback.print_exc()
             fh=open(self.dsname)
             pickle.dump(fh)
@@ -979,7 +980,7 @@ class DecoySet(object):
             l1=len(re.findall('\\nATOM',fh1c))
             l2=len(re.findall('\\nATOM',fh2c))
             if l1!=l2:
-                print code1+' '+str(l1)+' '+str(l2)
+                print(code1+' '+str(l1)+' '+str(l2))
 
     def update_ppdt_pir(self):
         pirlist=[]
@@ -1239,7 +1240,7 @@ class DecoySets(DecoySet):
             nod.append(self.setpos[i+1]-self.setpos[i])
             srmsd=self.rmsdarray[self.ds.setpos[i]:self.ds.setpos[i+1]]
             rmsdl[self.ds.dslist[i]]=[srmsd.mean(), srmsd.std(),srmsd.min(),srmsd.max()]
-        print rmsdl
+        print(rmsdl)
         return rmsdl
 
     def filter(self,fa):

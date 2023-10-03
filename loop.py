@@ -2,6 +2,7 @@
    SOAP loop model.
 
 """
+from __future__ import print_function
 from env import *
 from modeller import physical
 from modeller.automodel import loopmodel
@@ -144,7 +145,7 @@ class MyLoop(loopmodel):
             dopescore=999999999 if np.isnan(dopescore) else dopescore
             soapscore=999999999 if np.isnan(soapscore) else soapscore
             out['trace'].append((mcrmsd,dopescore,soapscore))
-        print r.rms
+        print(r.rms)
         return r.rms
 
     def load_native_model(self):
@@ -312,7 +313,7 @@ class ORLoop(loopmodel):
             dopescore=999999999 if np.isnan(dopescore) else dopescore
             soapscore=999999999 if np.isnan(soapscore) else soapscore
             out['trace'].append((mcrmsd,dopescore,soapscore))
-        print r.rms
+        print(r.rms)
         return r.rms
 
     def single_loop_model(self, atmsel, ini_model, num, id1, sched,
@@ -515,8 +516,8 @@ class sprefine(object):
         if input[-7:]!='.pickle':
             input=input+'.pickle'
         self.input=input[:-7]
-        print input
-        print input[:-7]
+        print(input)
+        print(input[:-7])
         fh=open(input,'rb')
         loopdict=cPickle.load(fh)
         fh.close()
@@ -524,30 +525,30 @@ class sprefine(object):
         fl=os.listdir('./')
         fl=[item for item in fl if item[-3:]=='pdb']
         for item in fl:
-            print os.system('mv '+item+' loop'+str(self.input)+'.'+item)
+            print(os.system('mv '+item+' loop'+str(self.input)+'.'+item))
 
     def model_loops_list_old(self,loopdict):
         resultdict={}
         for key in loopdict:
-            print key
+            print(key)
             loops=loopdict[key]
             for loop in loops:
-                print loop
+                print(loop)
                 loopname=key+str(loop[1])+loop[0]+str(loop[2])
-                print os.system('rm -r '+'loop.'+loopname)
-                #print os.mkdir('loop.'+loopname)
-                #print os.chdir('loop.'+loopname)
+                print(os.system('rm -r '+'loop.'+loopname))
+                #print(os.mkdir('loop.'+loopname))
+                #print(os.chdir('loop.'+loopname))
                 res=self.loop_model_single_protein(modelfile='pdb'+key+'.ent',loops=[loop], modelname=loopname)
                 resultdict[loopname]=res
-                    #print os.system('mv '+loopname+'.output.pickle loop'+str(self.input)+'.'+loopname+'.output.pickle')
-                print os.system('rm '+loopname+'.lrsr')
-                print os.system('rm '+loopname+'.DL*')
-                #print os.chdir('..')
+                    #print(os.system('mv '+loopname+'.output.pickle loop'+str(self.input)+'.'+loopname+'.output.pickle'))
+                print(os.system('rm '+loopname+'.lrsr'))
+                print(os.system('rm '+loopname+'.DL*'))
+                #print(os.chdir('..'))
         return resultdict
 
     def loop_model_single_protein(self,modelfile,loops,modelname):
         numofmodels=self.nofloops
-        print "number of loops to be calculated: "+str(numofmodels)
+        print("number of loops to be calculated: "+str(numofmodels))
         try:
             rs=-2-int(self.dslist)
         except:
@@ -579,8 +580,8 @@ class sprefine(object):
         #m.load_native_model()
         m.loop.starting_model= self.startNum           # index of the first loop model
         m.loop.ending_model  = self.endNum
-        print "refine"
-        print self.refinemethod
+        print("refine")
+        print(self.refinemethod)
         if self.refinemethod=='fast':
             m.loop.md_level = refine.fast
         elif self.refinemethod=='none':
@@ -590,7 +591,7 @@ class sprefine(object):
         elif self.refinemethod=='slow':
             m.loop.md_level= refine.slow
         elif self.refinemethod=='sgmd':
-            print "sgmd"
+            print("sgmd")
             m.loop.md_lvel=sgmd
         m.loop.write_selection_only=True
         if len(self.j)>0:
@@ -604,8 +605,8 @@ class sprefine(object):
             try:
                 lastone='trace' if self.assess_method=='SOAP' else 'DOPE score'
                 resultlist.append((loopoutput[i]['rmsd'],loopoutput[i]['mcrmsd'],loopoutput[i][lastone]))
-            except Exception,e:
-                print >> sys.stderr, e
+            except Exception as e:
+                print(e, file=sys.stderr)
                 continue
         #rmsddict[modelname+'.native.pdb']=0.0
         #dopedict[modelname+'.native.pdb']=nativescore
@@ -668,7 +669,7 @@ class sprefine(object):
             k=k+1
         if len(ndict)>0:
             dictlist.append(ndict)
-        print k
+        print(k)
         tnt=k*self.nofloops
         numofruns=min(self.nors,tnt/20)
         nrpl=max(1,numofruns/k)
@@ -713,27 +714,27 @@ class sprefine(object):
     def model_loops_list(self,loopdict):
         resultdict={}
         for key in loopdict:
-            print key
+            print(key)
             loops=loopdict[key]
             for i,loop in enumerate(loops):
-                print loop
+                print(loop)
                 loopname=key+str(i)
-                print os.system('rm -r '+'loop.'+loopname)
+                print(os.system('rm -r '+'loop.'+loopname))
                 #try:
                 if 1:
                     res=self.loop_model_single_protein(modelfile='pdb'+key+'.ent',loops=loop, modelname=loopname)
                     resultdict[loopname]=res
-                #except Exception,e:
-                #    print >> sys.stderr, e
+                #except Exception as e:
+                #    print(e, file=sys.stderr)
                     #pdb.set_trace()
-                print os.system('rm '+loopname+'.lrsr')
-                print os.system('rm '+loopname+'.DL*')
+                print(os.system('rm '+loopname+'.lrsr'))
+                print(os.system('rm '+loopname+'.DL*'))
                 if self.saveStructure:
                     fl=[f for f in os.listdir('./') if f.startswith(loopname+'.BL')]
-                    print os.system('mkdir '+self.dslist)
+                    print(os.system('mkdir '+self.dslist))
                     for f in fl:
-                        print os.system('mv '+f+' '+self.dslist+'/'+f)
-                    print os.system('cd '+self.dslist+';gzip *;cd ..')
+                        print(os.system('mv '+f+' '+self.dslist+'/'+f))
+                    print(os.system('cd '+self.dslist+';gzip *;cd ..'))
         return resultdict
 
     def assess_cluster_node(self):
@@ -747,8 +748,8 @@ class sprefine(object):
     def afterprocessing(self,returnDetails=False):
         os.chdir(self.dir+self.rundir)
         rd={}
-        print self.nrpl
-        print self.nors
+        print(self.nrpl)
+        print(self.nors)
         for i in range(self.nors):
             if os.path.isfile(str(i+1)+'.pickle'):
                 fh=open(str(i+1)+'.pickle','rb')
@@ -760,7 +761,7 @@ class sprefine(object):
                 #    for item in res.values()[0]:
                 #        rd[res.keys()[0]].extend(item[-1])
                 rd[res.keys()[0]].extend(res.values()[0])
-        #print os.system('rm -r '+self.dir+self.rundir)
+        #print(os.system('rm -r '+self.dir+self.rundir))
         #del self.clusters
         self.result=rd
         #pdb.set_trace()
@@ -847,13 +848,13 @@ class sprefine(object):
                 soapMinInd=np.argmin(ra[:,2])
                 dopemins.append(ra[dopeMinInd,0])
                 soapmins.append(ra[soapMinInd,0])
-                print ra.shape
-            print mcrmsds
-            print mcrmsds2
-            print 'mcrmsd',np.mean(mcrmsds)
-            print 'mcrmsd2',np.mean(mcrmsds2)
-            print 'dope',np.mean(dopemins)
-            print 'soap',np.mean(soapmins)
+                print(ra.shape)
+            print(mcrmsds)
+            print(mcrmsds2)
+            print('mcrmsd',np.mean(mcrmsds))
+            print('mcrmsd2',np.mean(mcrmsds2))
+            print('dope',np.mean(dopemins))
+            print('soap',np.mean(soapmins))
             self.averageRMSD=np.mean(mcrmsds)
             if returnDetails:
                 rlen=min([len(r) for r in rrl])
@@ -866,7 +867,7 @@ class sprefine(object):
                 mcrmsds.append(min([item[1] for item in result[key]]))
                 if len(result[key])<mn:
                     mn=len(result[key])
-            print "min n "+str(mn)
+            print("min n "+str(mn))
             #mn=1000
             ra=np.zeros([len(result.keys()),mn,3])
             k=0
@@ -876,8 +877,8 @@ class sprefine(object):
             self.averageRMSD=ra[:,:,1].min(axis=1).mean()
             if not self.mcrmsdonly:
                 self.averageRMSD+=ra[:,:,0].min(axis=1).mean()
-            print 'mcrmsd',np.mean(mcrmsds)
-        print self.averageRMSD
+            print('mcrmsd',np.mean(mcrmsds))
+        print(self.averageRMSD)
         if self.cv!=None:
             self.cv.resultsummary=-self.averageRMSD
             self.cv.resultarray[-1]=-self.averageRMSD
@@ -889,7 +890,7 @@ class sprefine(object):
         for key in result:
             if len(result[key])<mn:
                 mn=len(result[key])
-        print "min n "+str(mn)
+        print("min n "+str(mn))
         #mn=1000
         ra=np.zeros([len(result.keys()),mn,3])
         k=0
@@ -901,13 +902,13 @@ class sprefine(object):
         minmcrmsd=[]
         minscored=[]
         for i in range(interval,mn,interval):
-            print i
+            print(i)
             minrmsd.append(ra[:,:i,0].min(axis=1).mean())
             minmcrmsd.append(ra[:,:i,1].min(axis=1).mean())
             minind=ra[:,:i,2].argmin(axis=1)
             minscored.append(np.median(ra[np.arange(ra.shape[0]),minind,np.zeros(ra.shape[0],dtype=np.int)]))
-            print minrmsd[-1]
-            print minmcrmsd[-1]
+            print(minrmsd[-1])
+            print(minmcrmsd[-1])
         x=range(interval,mn,interval)
         phs=plt.plot(x,minrmsd)
         phs2=plt.plot(x,minmcrmsd)
@@ -935,8 +936,8 @@ class sprefine(object):
         os.makedirs(dspath)
         os.chdir(self.dir+self.rundir)
         rd={}
-        print self.nrpl
-        print self.nors
+        print(self.nrpl)
+        print(self.nors)
         for i in range(self.nors):
             if os.path.isfile(str(i+1)+'.pickle'):
                 inputdict=pickle.load(gzip.open(str(i+1)+'.pickle.gz'))
@@ -976,7 +977,7 @@ class sprefine(object):
                     gzip.open(os.path.join(sdspath,dpn),'w').write('\n'.join(basem.get_part(cc,l[2:])))
                     rmsddict[dn]=[r[1],r[0]]
                     scoredict[dn]=r[2]
-                print os.system('touch '+os.path.join(sdspath,'needcombinewithbase'))
+                print(os.system('touch '+os.path.join(sdspath,'needcombinewithbase')))
                 pickle.dump(rmsddict,open(os.path.join(sdspath,'rmsd.pickle'),'w'))
                 pickle.dump(scoredict,open(os.path.join(sdspath,'score.pickle'),'w'))
                 pickle.dump([('mcrmsd','f4')],open(os.path.join(sdspath,'extrapar.pickle'),'w'))

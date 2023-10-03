@@ -1,3 +1,4 @@
+from __future__ import print_function
 from sps import *
 import cProfile
 runenv.otherrun=False
@@ -109,13 +110,13 @@ if False:
     blocks=[]
     kk=0
     for apn in [36]:#57
-        print apn
+        print(apn)
         noc=np.load(runenv.libdir+'ap'+str(apn)+'.npy').max()+1
-        print noc
+        print(noc)
         scorers=[]
         searches=[]
         for i in range(noc):
-            print i
+            print(i)
             sbm=['cs1','ap'+str(apn)+'n',str(i)]
             reft={'type':'sf','features':sfeature,'sftype':slo,'par':slo,'parvalue':slo,'ratio':[1.0+0.00001*i],'bm':sbm}
         
@@ -351,9 +352,9 @@ if len(inimp)>0:
     bestpars=bm['allresult'][0]['repna']
     bm['model']['bmtype']['dslist']=['ppd4s']    
     so=scorer(model=bm['model'])
-    print so.assess_model()
+    print(so.assess_model())
     
-    print so.assess(bm['allresult'][0]['bestpar'])
+    print(so.assess(bm['allresult'][0]['bestpar']))
     #set the default values for nm
     nm=convert2old(model1)
     allsearches=nm['searches']
@@ -371,12 +372,12 @@ if len(inimp)>0:
     #pdb.set_trace()
 
     so1=scorer(model=nm)
-    print so1.assess_model()
+    print(so1.assess_model())
     opt=optimizer(scorer=so1)
-    print so1.assess_model()
+    print(so1.assess_model())
 
     opt.get_initial_value()    
-    print so1.assess(opt.initialvalue)
+    print(so1.assess(opt.initialvalue))
     
     spso=sps(modellist=[nm])
     spso.cv()#spl.eval_allpars()
@@ -387,14 +388,14 @@ if len(inimp)>0:
 if rrn==0:
     tm=convert2old(copy.deepcopy(model1))
     so=scorer(model=tm)
-    print so.assess_ideal()
-    print so.assess_model()
+    print(so.assess_ideal())
+    print(so.assess_model())
     opt=optimizer(scorer=so)
     opt.get_initial_value()
     pdb.set_trace()
     cProfile.run('opt.optimize()')
     optres=opt.optimize()
-    print so.assess(opt.initialvalue)
+    print(so.assess(opt.initialvalue))
     pdb.set_trace()
 elif rrn==1:
     spl=spss(model=model1)
@@ -420,14 +421,14 @@ elif rrn==4:
     bestpars=bm['allresult'][0]['repna']
     so=scorer(model=bm['model'])
     bm['model']['bmtype']['dslist']=['ppd4s']
-    print so.assess(bm['allresult'][0]['bestpar'])
+    print(so.assess(bm['allresult'][0]['bestpar']))
     
-    print so.assess_model()
+    print(so.assess_model())
         
     if 1:
         for iii in range(3):
             for block in blocks:
-                print block
+                print(block)
                 nm['searches']=[]
                 if 'str' in nm:
                     del nm['str']
@@ -448,6 +449,6 @@ elif rrn==4:
                             allsearches[i]['object'][allsearches[i]['key']][j]=bestmodel['searches'][k]['object'][allsearches[i]['key']][j]
                         #use previous run result as initial conditions
                         #allsearches[i]['InitialGenerator']=[bestmodel['searches'][k]['object'][allsearches[i]['key']]]
-                    except Exception,e:
-                        print e
+                    except Exception as e:
+                        print(e)
                         pdb.set_trace()

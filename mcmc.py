@@ -2,6 +2,7 @@
    SOAP Markov Chain Monte Carlo
 
 """
+from __future__ import print_function
 from env import *
 
 class MyMCMC(MCMC):
@@ -152,8 +153,8 @@ class MyMetropolis(Metropolis):
 
         # Verbose feedback
         if verbose > 0:
-            print '\t%s tuning:' % self._id
-            print '\t\tadaptive scale factor(old):', self.adaptive_scale_factor
+            print('\t%s tuning:' % self._id)
+            print('\t\tadaptive scale factor(old):', self.adaptive_scale_factor)
 
         # Flag for tuning state
         tuning = True
@@ -161,10 +162,10 @@ class MyMetropolis(Metropolis):
         # Calculate recent acceptance rate
         if not (self.accepted + self.rejected): return tuning
         acc_rate = self.accepted / (self.accepted + self.rejected)
-        print self.accepted
-        print self.rejected
+        print(self.accepted)
+        print(self.rejected)
 
-        print "Tunning with acc_rate_ratio "+str(runenv.acc_rate_ratio)
+        print("Tunning with acc_rate_ratio "+str(runenv.acc_rate_ratio))
         acc_rate=acc_rate*runenv.acc_rate_ratio
         # Switch statement
         if acc_rate<0.001:
@@ -200,10 +201,10 @@ class MyMetropolis(Metropolis):
         # More verbose feedback, if requested
         if verbose > 0:
             if hasattr(self, 'stochastic'):
-                print '\t\tvalue:', self.stochastic.value
-            print '\t\tacceptance rate:', acc_rate
-            print '\t\tadaptive scale factor:', self.adaptive_scale_factor
-            print
+                print('\t\tvalue:', self.stochastic.value)
+            print('\t\tacceptance rate:', acc_rate)
+            print('\t\tadaptive scale factor:', self.adaptive_scale_factor)
+            print()
         return tuning
 
     def propose(self):
@@ -220,7 +221,7 @@ class MyMetropolis(Metropolis):
                     if np.all(value>0):
                         break
                 pvalue[self.parindex[i]:self.parindex[i+1]]=value
-                #print value
+                #print(value)
             elif self.proposemethod[i] == "splineparn":
                 while True:
                     sv=self.stochastic.value[self.parindex[i]:self.parindex[i+1]]
@@ -232,8 +233,8 @@ class MyMetropolis(Metropolis):
                     parvalue=value.cumsum()+self.proposepars[i][0]
                     if parvalue[-1]<self.proposepars[i][1]:
                         break
-                #print value
-                #print parvalue
+                #print(value)
+                #print(parvalue)
                 pvalue[self.parindex[i]+1:self.parindex[i+1]]=parvalue
                 pvalue[self.parindex[i]]=self.proposepars[i][0]
         self.stochastic.value=pvalue
@@ -271,7 +272,7 @@ class MxMetropolis(MyMetropolis): #discrete anchor points
         self.parindex=parindex
         self.proposemethod=proposemethod
         self.proposepars=proposepars
-        print self.proposepars
+        print(self.proposepars)
         self.proposevalue=np.zeros(self.stochastic.value.shape)
         for i in range(len(self.parindex)-1):
             if self.proposemethod[i] == "splineparn":
@@ -309,32 +310,32 @@ class MxMetropolis(MyMetropolis): #discrete anchor points
         """
         runenv.stepblockind=self.blockind
         pvalue=np.copy(self.proposevalue)
-        #print self.proposal_sd
+        #print(self.proposal_sd)
         for i in range(len(self.proposemethod)):
             if self.proposemethod[i] == "pnormal":
-                #print "pnormal"
-                #print self.stochastic.value[self.parindex[i]:self.parindex[i+1]]
-                #print self.proposal_sd[self.parindex[i]:self.parindex[i+1]]
+                #print("pnormal")
+                #print(self.stochastic.value[self.parindex[i]:self.parindex[i+1]])
+                #print(self.proposal_sd[self.parindex[i]:self.parindex[i+1]])
                 value=np.random.normal(list(self.stochastic.value[self.parindex[i]:self.parindex[i+1]]), list(self.adaptive_scale_factor * self.proposal_sd[self.parindex[i]:self.parindex[i+1]]))
-                #print value
+                #print(value)
                 while np.any(value<0):
                     boolfilter=(value<0)
                     partvalue=np.random.normal(self.stochastic.value[self.parindex[i]:self.parindex[i+1]][boolfilter], self.adaptive_scale_factor * self.proposal_sd[self.parindex[i]:self.parindex[i+1]][boolfilter])
                     value[boolfilter]=partvalue
-                    #print value
+                    #print(value)
                 pvalue[self.parindex[i]:self.parindex[i+1]]=value
-                #print value
+                #print(value)
             elif self.proposemethod[i] == "normal":
-                #print "pnormal"
-                #print self.stochastic.value[self.parindex[i]:self.parindex[i+1]]
-                #print self.proposal_sd[self.parindex[i]:self.parindex[i+1]]
+                #print("pnormal")
+                #print(self.stochastic.value[self.parindex[i]:self.parindex[i+1]])
+                #print(self.proposal_sd[self.parindex[i]:self.parindex[i+1]])
                 value=np.random.normal(list(self.stochastic.value[self.parindex[i]:self.parindex[i+1]]), list(self.adaptive_scale_factor * self.proposal_sd[self.parindex[i]:self.parindex[i+1]]))
                 pvalue[self.parindex[i]:self.parindex[i+1]]=value
-                #print value
+                #print(value)
             elif self.proposemethod[i] == "splineparn":
-                #print "splineparn"
-                #print self.stochastic.value[self.parindex[i]:self.parindex[i+1]]
-                #print self.proposepars[i][-1]
+                #print("splineparn")
+                #print(self.stochastic.value[self.parindex[i]:self.parindex[i+1]])
+                #print(self.proposepars[i][-1])
                 binsize=self.proposepars[i][4]
                 k=0
                 success=False
@@ -345,7 +346,7 @@ class MxMetropolis(MyMetropolis): #discrete anchor points
                     svr[:-1]=svr[1:]-svr[:-1]
                     svr=svr-binsize
                     value=np.random.multivariate_normal(svr[:-1],self.proposepars[i][-1]*(self.adaptive_scale_factor**2))
-                    #print value
+                    #print(value)
                     if np.any(value<=0):
                         continue
                     value=value+binsize
@@ -353,14 +354,14 @@ class MxMetropolis(MyMetropolis): #discrete anchor points
                     if parvalue[-1]<(self.proposepars[i][1]-binsize):
                         success=True
                         break
-                #print value
-                #print parvalue
+                #print(value)
+                #print(parvalue)
                 if success:
                     parvalue=np.round((parvalue-self.proposepars[i][0])/binsize)*binsize+self.proposepars[i][0]
                     pvalue[self.parindex[i]:self.parindex[i+1]]=parvalue
                 else:
                     pvalue[self.parindex[i]:self.parindex[i+1]]=self.stochastic.value[self.parindex[i]:self.parindex[i+1]]
-                #print parvalue
+                #print(parvalue)
                 #pvalue[self.parindex[i]]=self.proposepars[i][0]
         self.stochastic.value=pvalue
 
@@ -386,7 +387,7 @@ class MzMetropolis(MxMetropolis): #discrete anchor points and lower limit on the
         pvalue=np.copy(self.proposevalue)
         for i in range(len(self.proposemethod)):
             if self.adaptive_scale_factor<self.scale_factor_min[i]:
-                print "using minscalefactor"
+                print("using minscalefactor")
                 scalefactor=self.scale_factor_min[i]
             else:
                 scalefactor=self.adaptive_scale_factor
@@ -396,7 +397,7 @@ class MzMetropolis(MxMetropolis): #discrete anchor points and lower limit on the
                     if np.all(value>0):
                         break
                 pvalue[self.parindex[i]:self.parindex[i+1]]=value
-                #print value
+                #print(value)
             elif self.proposemethod[i] == "splineparn":
                 binsize=self.proposepars[i][4]
                 while True:
@@ -411,10 +412,10 @@ class MzMetropolis(MxMetropolis): #discrete anchor points and lower limit on the
                     parvalue=value.cumsum()+self.proposepars[i][0]
                     if parvalue[-1]<(self.proposepars[i][1]-binsize):
                         break
-                #print value
-                #print parvalue
+                #print(value)
+                #print(parvalue)
                 parvalue=np.round((parvalue-self.proposepars[i][0])/binsize)*binsize+self.proposepars[i][0]
-                #print parvalue
+                #print(parvalue)
                 pvalue[self.parindex[i]+1:self.parindex[i+1]]=parvalue
                 pvalue[self.parindex[i]]=self.proposepars[i][0]
         self.stochastic.value=pvalue

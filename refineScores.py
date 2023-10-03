@@ -3,6 +3,7 @@
 
 """
 
+from __future__ import print_function
 from env import *
 import shutil
 
@@ -66,7 +67,7 @@ class sprefinescore(object):
         self.score=np.zeros(len(self.codelist),dtype=[('codeposn','i2'),('nativetotalscore','f4'),('nativescscore','f4')
                                               ,('nativespscore','f4'),('decoytotalscore','f4'),('decoyscscore','f4')
                                               ,('decoyspscore','f4'),('rmsd','f4')])
-        print self.score
+        print(self.score)
         for i in range(0,len(self.codelist)):
             code=self.codelist[i]
             if os.path.isfile(os.path.join(self.scorepath,
@@ -118,7 +119,7 @@ class sprefinescore(object):
             samplits=20000
             self.mdrefine(code,templ=temps,samplits=samplits)
         if genrn==2:
-            print 0
+            print(0)
 
     def mdrefine(self,code,templ=[],samplits=0, step=0):
         log.verbose()
@@ -138,7 +139,7 @@ class sprefinescore(object):
         mdl=automodel.automodel(env, alnfile=code+'.pir', knowns=code, sequence=code+'.refine.ini')
         mdl.clear_topology()
         mdl.generate_topology(aln[code+'decoys'],patch_default=True)
-        print "generating topology finished"
+        print("generating topology finished")
         mdl.patch_ss_templates(aln)
         mdl.transfer_xyz(aln, cluster_cut=-1.0)
         mdl.build(initialize_xyz=False, build_method='INTERNAL_COORDINATES')
@@ -175,11 +176,11 @@ class sprefinescore(object):
         md = optimizers.molecular_dynamics(cap_atom_shift=0.39, md_time_step=2.0,md_return='FINAL')
         init_vel = True
         # First run for equilibration, the second for sampling:
-        print 'starting refinement'
+        print('starting refinement')
         k=0
         for (its, equil, temps) in ((equil_its, equil_equil, equil_temps),(sampl_its, sampl_equil, sampl_temps)):
             for temp in temps:
-                print temp
+                print(temp)
                 md.optimize(atmsel, max_iterations=its, equilibrate=equil,temperature=temp, init_velocities=init_vel,
                             actions=[optimizers.actions.write_structure(100, 'md'+str(k)+'.%05d.pdb',last=True)])
                 init_vel=False

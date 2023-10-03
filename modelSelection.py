@@ -2,6 +2,7 @@
    SOAP Model Selection module
 
 """
+from __future__ import print_function
 from env import *
 from crossValidate import *
 import filelock
@@ -14,7 +15,7 @@ debug=True
 
 
 def cvplot(cl):
-    print 'plotting started'
+    print('plotting started')
     os.chdir(cl)
     if not os.path.isfile('figinput.pickle'):
         return 0
@@ -22,7 +23,7 @@ def cvplot(cl):
     cvcluster.plot()
     for g in glob.glob(os.path.join(cl, 'figinput*')):
         os.unlink(g)
-    print 'ploting finished'
+    print('ploting finished')
     del cvcluster
     gc.collect()
     return 0
@@ -191,7 +192,7 @@ class sps(object):
 
     def assess_basescore(self):
         for scorer in self.scorerlist:
-            print scorer.assess_basescore()
+            print(scorer.assess_basescore())
 
     def write_optimal_potential(self,type='lib'):
         for i in range(0,len(self.scorerlist)):
@@ -201,11 +202,11 @@ class sps(object):
 
     def show_summary(self):
         for cv in self.cvlist:
-            print cv.statsstr
+            print(cv.statsstr)
         for cv in self.cvlist:
-            print cv.bestmodelresult
+            print(cv.bestmodelresult)
         for cv in self.cvlist:
-            print cv.resultstr
+            print(cv.resultstr)
 
     def plot(self,cl=[]):
         clusterslist=[]
@@ -386,8 +387,8 @@ class spss(object):
         self.resultdict={}
         self.evalPotFunc=evalPotFunc
         if len(path)>0:
-            print path+'/spss.pickle'
-            print 'skipping'
+            print(path+'/spss.pickle')
+            print('skipping')
             fh=open(path+'/spss.pickle')
             a=pickle.load(fh)
             fh.close()
@@ -525,7 +526,7 @@ class spss(object):
         [nml,mkl,mil]=self.get_model_list(dsearch)
         #evaluate the list of models
         #if len(nml)==0:
-        #    print "no model to evaluate skip this round"
+        #    print("no model to evaluate skip this round")
         #    return 0
         pickedindex=self.eval_modellist(nml,mkl,mil,'SinglePar\n')
         self.update_dsearches(pickedindex,dsearch)
@@ -548,7 +549,7 @@ class spss(object):
         del spso
         gc.collect()
         #if debug and objgraph.count('scorer')>0:
-            #print 'some scorer object is still in memory'
+            #print('some scorer object is still in memory')
             #pdb.set_trace()
         return pickedindex
 
@@ -556,7 +557,7 @@ class spss(object):
     def show_current_result(self,spso,mkl):
         for cv,mk in zip(spso.cvlist,mkl):
             try:
-                print cv.resultstr+' '+str(mk)
+                print(cv.resultstr+' '+str(mk))
             except:
                 pass
 
@@ -633,7 +634,7 @@ class spss(object):
             j=min(j, len(pickedindex)-1)
             self.set_model(dsearch,pickedindex[j])
         except:
-            print "in spss.update_dsearches"
+            print("in spss.update_dsearches")
             pdb.set_trace()
         dsearch['valueset']=nvl
         self.write2log(self.get_valuesets())
@@ -685,9 +686,9 @@ class spss(object):
             logfile=open(self.logdir+'log','a+')
             logstr=logstr.encode('utf-8')
             logfile.write(logstr+'\n')
-            print logstr
+            print(logstr)
             logfile.close()
-            #print os.system('cp '+self.logdir+'log '+self.logdir2)
+            #print(os.system('cp '+self.logdir+'log '+self.logdir2))
             print("lock released")
 
     def get_valuesets(self):
@@ -716,14 +717,14 @@ class spss(object):
                         self.logdir)
             open(os.path.join(self.logdir, 'BMF-'+bbd), 'w') # touch
             shutil.copy(os.path.join(sys.path[1], sys.argv[0]), self.logdir)
-            #print os.system('cp '+self.logdir+'log '+self.logdir2)# keep the log in dropbox
-            #print os.system('cp '+self.logdir+'*py '+self.logdir2)# keep the log in dropbox
-            #print "Waiting for pool to finish"
+            #print(os.system('cp '+self.logdir+'log '+self.logdir2)# keep the log in dropbox)
+            #print(os.system('cp '+self.logdir+'*py '+self.logdir2)# keep the log in dropbox)
+            #print("Waiting for pool to finish")
             #p.close()
-            #print "Pool close"
+            #print("Pool close")
             #p.join()
-            #print "Pool finished"
-            print "The pool will just be ignored......(can't get it to work properly), now plotting the best one"
+            #print("Pool finished")
+            print("The pool will just be ignored......(can't get it to work properly), now plotting the best one")
             cvplot(self.baselogdir+bbd)
             os.chdir(self.logdir)
             for key in self.resultdict:
@@ -731,9 +732,9 @@ class spss(object):
                 for g in glob.glob(os.path.join(self.baselogdir, 'runs',
                                                 bd, 'figinput*')):
                     os.unlink(g)
-            #print os.system('cp '+self.baselogdir+bbd+'/*eps '+self.logdir2)
+            #print(os.system('cp '+self.baselogdir+bbd+'/*eps '+self.logdir2))
             shutil.move(self.logdir, self.logdir[:-1]+'-'+bd[5:])
-            #print os.system('mv '+self.logdir2+' '+self.logdir2[:-1]+'-'+bd[5:])
+            #print(os.system('mv '+self.logdir2+' '+self.logdir2[:-1]+'-'+bd[5:]))
             self.logdir=self.logdir[:-1]+'-'+bd[5:]+'/'
             #self.logdir2=self.logdir2[:-1]+'-'+bd[5:]+'/'
             with filelock.FileLock("spsslog.shelve", timeout=100,
@@ -749,7 +750,7 @@ class spss(object):
             pass
 
     def write_best_pot(self):
-        print "only works for the case with single pot, single reference state"
+        print("only works for the case with single pot, single reference state")
         fh=open(self.logdir+'bestmodel.pickle')
         bm=pickle.load(fh)
         fh.close()
@@ -759,8 +760,8 @@ class spss(object):
         so=scorer(model=bm)
         mre=so.assess_basescore()
         ssppath=so.write_potential(type=type)
-        print mre
-        print ssppath+'.opt.'+type
+        print(mre)
+        print(ssppath+'.opt.'+type)
 
     def dump(self):
         os.chdir(self.logdir)
@@ -784,7 +785,7 @@ class spss(object):
         ml3=[[],[],[]]#model, key,index
         self.get_all_models(ml3,0)
         for key in self.resultdict:
-            print self.resultdict[key][1]+', '+str(key)
+            print(self.resultdict[key][1]+', '+str(key))
 
 def pickle2shelf(prefix):
     fh=open(prefix+'.pickle')
@@ -812,10 +813,10 @@ def get_ppdock_plotdata(path2logdir,scoretype='model',bm=[],mindex=-1,bmset='',s
     #so=cvo.scorerlist[-1][mindex]
     #pdb.set_trace()
     so=scorer(model=bm)
-    #print so.assess_model(slevel='top1000_rlrank__'+accuracy)
-    print so.assess_model(slevel='top1000_rlrank__'+accuracy)
-    #print so.assess_model()
-    print so.assess_basescore()
+    #print(so.assess_model(slevel='top1000_rlrank__'+accuracy))
+    print(so.assess_model(slevel='top1000_rlrank__'+accuracy))
+    #print(so.assess_model())
+    print(so.assess_basescore())
     tnr=range(0,30)
     ra=np.zeros(30)
     idealperc=so.assess_ideal(slevel='top1000__nonempty_'+accuracy)
@@ -862,7 +863,7 @@ def get_bestm_result(path2logdir,scoretype='model',bm=[],mindex=-1,dslist=''
         bm['cvk']=0
         spso=sps(modellist=[bm])
         spso.cv()
-        print spso.cvlist[0].logpath
+        print(spso.cvlist[0].logpath)
         return spso.cvlist[0].logpath
     #cvo=k2cvcluster(model=bm,initialize=True)
     #cvo.prepare_cross_validation_sample()
@@ -876,7 +877,7 @@ def get_bestm_result(path2logdir,scoretype='model',bm=[],mindex=-1,dslist=''
     except:
         so=scorer(model=bm)
     #idealperc=so.assess_ideal(slevel='top100_rmsd10_irmsd4')
-    print so.assess_model()
+    print(so.assess_model())
     ra=np.zeros(len(ctl))
     for p,pi in zip(ctl,range(len(ctl))):
         if scoretype=='sascore':
@@ -895,7 +896,7 @@ def get_bestm_result(path2logdir,scoretype='model',bm=[],mindex=-1,dslist=''
     return ra
 
 def get_best_model(path2logdir):
-    print "only works for the case with single pot, single reference state"
+    print("only works for the case with single pot, single reference state")
     #fh=open(os.path.join(path2logdir,'bestmodel.pickle'))
     #bm=pickle.load(fh)
     #fh.close()
@@ -904,7 +905,7 @@ def get_best_model(path2logdir):
     fh.close()
     so=scorer(model=bm['model'])
     bestpars=bm['originalresult'][0][0]['bestpar']
-    print so.assess_model()
+    print(so.assess_model())
     return so.model
 
 def plot_ppdock_result(figpath,fl,lt):
@@ -959,7 +960,7 @@ def generate_uniformbins(pd):
     if pd['distribute']=='lownumberpriority':
         par=par+[bins[i] for i in inds][:-1]
     else:
-        print traceback.print_exec()
+        print(traceback.print_exec())
         raise Exception('not implemented')
     return par
 
@@ -997,10 +998,10 @@ def convert2old(nm):
         if len(scorer[search['key']])==0:
             nm['searches'].pop(k)
             continue
-        print scorer
+        print(scorer)
         #if scorer['parvalue']==None:
         #    pdb.set_trace()
-        #print search['key']=='parvalue' and search['object']['sftype']=='bins'
+        #print(search['key']=='parvalue' and search['object']['sftype']=='bins')
         if (search['key']=='parvalue') and ('parvalue' in scorer) and isinstance(scorer['parvalue'],dict):
             npl=[]
             sopar=scorer['parvalue']
@@ -1043,12 +1044,12 @@ def convert2old(nm):
                 search['pos']=range(0,len(scorer['parvalue']))
             elif search['key']=='par':
                 search['pos']=range(0,len(scorer['par']))
-        except Exception,e:
+        except Exception as e:
             traceback.print_exc()
-            #print scorer
-            #print search
+            #print(scorer)
+            #print(search)
             pdb.set_trace()
-    print 'converting model'
+    print('converting model')
     if ('bm' in nm['bmtype']) and isinstance(nm['bmtype']['bm'],list):
         npl=[]
         for item in nm['bmtype']['bm']:
@@ -1136,5 +1137,5 @@ def convert2old(nm):
                 elif isinstance(search['key'],list) and 'parvalue' in search['key']:
                     ind=search['key'].index('parvalue')
                     search['pos'][ind]=range(0,len(scorer['parvalue']))
-    print nm
+    print(nm)
     return nm

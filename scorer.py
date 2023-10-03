@@ -2,6 +2,7 @@
    SOAP Scorer, caculating a score of a statistical potential(with model and parameter) for benchmark
 
 """
+from __future__ import print_function
 from env import *
 from rankScores import *
 from benchmark import dsscorestats
@@ -103,7 +104,7 @@ class scorer(object):
                             keep=True
                             break
                     if not keep:
-                        #print spos
+                        #print(spos)
                         safilter[spos[0]:spos[1]]=False
             elif filter['criteria']=='nocode':
                 cl=filter['codelist']
@@ -111,7 +112,7 @@ class scorer(object):
                 for spos,code in zip(self.dsss.ds.indexlist,self.dsss.ds.codelist):
                     if code in cl:
                         safilter[spos[0]:spos[1]]=False
-                        print code
+                        print(code)
             else:
                 raise Exception('filter not recoginzed'+str(filter))
         #pdb.set_trace()
@@ -195,10 +196,10 @@ class scorer(object):
                     if len(self.basescore)>0:
                         try:
                         #if 1:
-                            #print 'adding '+str(k)+'\n'+str(scorer)
+                            #print('adding '+str(k)+'\n'+str(scorer))
                             self.basescore+=scorer['ratio'][0]*self.get_dsscore(scorer)
                             k=k+1
-                        except Exception,e:
+                        except Exception as e:
                             traceback.print_exc()
                             pdb.set_trace()
                     else:
@@ -378,7 +379,7 @@ class scorer(object):
                     self.score+=scorer.get_score(indexlist=self.dsss.ds.indexlist,sfv=rrf[sp:ep])
                     sp=ep
             res=self.dsss.analyze_score(slevel=self.bmtype['criteria'],score=self.score,report=report)
-            print res
+            print(res)
             return res
 
     def assess_model(self,report='single',slevel=''):
@@ -394,16 +395,16 @@ class scorer(object):
 
             try:
                 self.get_model_dsscore()
-            except OutOfRange,e:
+            except OutOfRange as e:
                 return 999.999999
-            except NanInScore, e:
+            except NanInScore as e:
                 return 998.999999
-            #except Exception,e:
+            #except Exception as e:
             #    raise e
             if not slevel:
                 slevel=self.bmtype['criteria']
             res=self.dsss.analyze_score(slevel=slevel,score=self.score,report=report)
-            #print "assessing model result: "+str(self.dsss.ds.indexlist)+'  '+str(res)
+            #print("assessing model result: "+str(self.dsss.ds.indexlist)+'  '+str(res))
             self.result=res
             return res
         elif self.bmtype['type']=='sprefine':
@@ -418,13 +419,13 @@ class scorer(object):
         Assess the model based on the given values.
         """
         if values==[]:
-            print "parameter values are needed for scorer.assess"
+            print("parameter values are needed for scorer.assess")
             return 0
         if len(pos)==0:
             try:
                 self.parvalues[...]=values
-            except Exception,e:
-                print e
+            except Exception as e:
+                print(e)
                 pdb.set_trace()
         else:
             if not self.parvalues.flags['WRITEABLE']:
@@ -449,7 +450,7 @@ class scorer(object):
 
     def assess_block(self,values=[],blockind=0,report='single',slevel=''):
         if values==[]:
-            print "parameter values are needed for scorer.assess_block"
+            print("parameter values are needed for scorer.assess_block")
             return 0
         try:
             self.parvalues[self.searchblocklist[blockind][-1][0]:self.searchblocklist[blockind][-1][1]]=values
@@ -472,7 +473,7 @@ class scorer(object):
 
     def assign_values2model(self):
         if self.blockind>=0:
-            print "block# "+str(self.blockind)
+            print("block# "+str(self.blockind))
             il=self.searchblocklist[self.blockind][0]
         else:
             il=range(len(self.searchlists))
@@ -559,7 +560,7 @@ class scorer(object):
             if atompairclustering:
                 reflist.append(ref)
             ratiolist.append(spmodel['ratio'])
-            print ref
+            print(ref)
             ssp=scaledsp(model=spmodel)
             if atompairclustering:
                 ssp.add_ref(reflist,affix,filetype,apca=apca,ratio=ratiolist,permute=permute)
@@ -571,7 +572,7 @@ class scorer(object):
         for i, sfmodel in refdict.items():
             sfo=sf(**sfmodel)
             sfo.write_potential(affix,self.model['bmtype']['bm'],ratio=sfmodel['ratio'])
-        print pathlist
+        print(pathlist)
         return pathlist
 
     def get_sample(self, perc=0):
@@ -597,7 +598,7 @@ class scorer(object):
             if not slevel:
                 slevel=self.bmtype['criteria']
             res=self.dsss.analyze_score(slevel=slevel,score=self.dsss.ds.sa['score'],report=report)
-            print res
+            print(res)
             return res
 
     def randomize_score(self):
@@ -613,7 +614,7 @@ class scorer(object):
             for i in range(0,100):
                 self.randomize_score()
                 res=res+self.dsss.analyze_score(slevel=slevel,score=self.basescore,report=report)
-            print res/100.0
+            print(res/100.0)
             return res/100.0
 
     def assess_ideal(self,report='single',slevel=''):
@@ -628,7 +629,7 @@ class scorer(object):
             self.dsss.getidealvalue=True
             res=self.dsss.analyze_score(slevel=slevel,score=self.dsss.ds.sa['score'],report=report)
             self.dsss.getidealvalue=False
-            print res
+            print(res)
             return res
 
     def assess_worst(self,report='single',slevel=''):
@@ -643,7 +644,7 @@ class scorer(object):
             self.dsss.getworstvalue=True
             res=self.dsss.analyze_score(slevel=slevel,score=self.dsss.ds.sa['score'],report=report)
             self.dsss.getworstvalue=False
-            print res
+            print(res)
             return res
 
     def calc_structurelistscore(self,structurepath,structurelist):
@@ -653,7 +654,7 @@ class scorer(object):
         self.apcscore=[]
         score=np.zeros(len(structurelist))
         if self.bmtype['combine']=='scoresum':
-            print os.getcwd()
+            print(os.getcwd())
             pir(path=os.path.join('pdbs0')).make_pir_fromlist(structurelist)
             for scorer in self.model['scorers']:
                 score+=self.calc_structurescore_singlescorer(scorer,structurepath)

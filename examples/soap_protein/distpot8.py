@@ -1,3 +1,4 @@
+from __future__ import print_function
 from sps import *
 import os
 import profile
@@ -136,9 +137,9 @@ model1={'scorers':[scaledsp1,ref1],'bmtype':bmtype,'searches':[search1,search2],
 #dsearch1,dsearch2,dsearch6,dsearch7
 
 #so=scorer(model=convert2old(model1))
-#print so.assess_ideal()
-#print so.assess_worst()
-#print so.assess_sascore(slevel='top1_rmsdbbif_mean_')  
+#print(so.assess_ideal())
+#print(so.assess_worst())
+#print(so.assess_sascore(slevel='top1_rmsdbbif_mean_'))
 #pdb.set_trace()
 
 #opt=optimizer(scorer=so)

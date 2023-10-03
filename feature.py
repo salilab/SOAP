@@ -3,6 +3,7 @@
 
 """
 
+from __future__ import print_function
 import mdt
 import mdt.features
 from env import *
@@ -302,7 +303,7 @@ class feature(object):
             if tl[0]==tl[1] and dl[0]==dl[1]:
                 return True
             else:
-                print "attention: feature "+self.features+" is not symmetric"
+                print("attention: feature "+self.features+" is not symmetric")
                 return False
 
     def get_featuretypepos(self):

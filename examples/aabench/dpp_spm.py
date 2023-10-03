@@ -1,3 +1,4 @@
+from __future__ import print_function
 from SOAP import *
 import os
 import profile
@@ -61,13 +62,13 @@ bmtype={'type':'dsscore','dslist':['aabench'],'criteria':'top1000_rlrank__rmsd10
 blocks=[]
 kk=0
 for apn in [36]:#57
-    print apn
+    print(apn)
     noc=np.load(runenv.libdir+'ap'+str(apn)+'.npy').max()+1
-    print noc
+    print(noc)
     scorers=[]
     searches=[]
     for i in range(noc):
-        print i
+        print(i)
         sbm=['cs1','ap'+str(apn)+'n',str(i)]
         ref1={'type':'sf','features':sfeature,'sftype':slo,'par':slo,'parvalue':slo,'ratio':[1.0+0.00001*i],'bm':sbm}
     
@@ -226,7 +227,7 @@ elif 1:
             #if k<16:
             #    continue
             #k+=1
-            print block
+            print(block)
             nm['searches']=[]
             if 'str' in nm:
                 del nm['str']
@@ -247,6 +248,6 @@ elif 1:
                         allsearches[i]['object'][allsearches[i]['key']][j]=bestmodel['searches'][k]['object'][allsearches[i]['key']][j]
                     #use previous run result as initial conditions
                     #allsearches[i]['InitialGenerator']=[bestmodel['searches'][k]['object'][allsearches[i]['key']]]
-                except Exception,e:
-                    print e
+                except Exception as e:
+                    print(e)
                     pdb.set_trace()

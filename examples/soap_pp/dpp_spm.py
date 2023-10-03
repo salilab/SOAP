@@ -1,3 +1,4 @@
+from __future__ import print_function
 from sps import *
 import os
 import profile
@@ -61,13 +62,13 @@ bmtype={'type':'dsscore','dslist':['ppd4s'],'criteria':'top1000_rlrank__rmsd10OR
 blocks=[]
 kk=0
 for apn in [36]:#57
-    print apn
+    print(apn)
     noc=np.load(runenv.libdir+'ap'+str(apn)+'.npy').max()+1
-    print noc
+    print(noc)
     scorers=[]
     searches=[]
     for i in range(noc):
-        print i
+        print(i)
         sbm=['cs1','ap'+str(apn)+'n',str(i)]
         ref1={'type':'sf','features':sfeature,'sftype':slo,'par':slo,'parvalue':slo,'ratio':[1.0+0.00001*i],'bm':sbm}
     
@@ -183,7 +184,7 @@ fd='/bell3/gqdong/statpot/results/ppd4s/top1000_rlrank__rmsd10ORirmsd4FIRST/runs
 
 #bm=get_best_model(fd)
 #so=scorer(model=bm)
-#print so.assess_model()
+#print(so.assess_model())
 #pdb.set_trace()
 
 
@@ -230,7 +231,7 @@ if 1:
             #if k<16:
             #    continue
             #k+=1
-            print block
+            print(block)
             nm['searches']=[]
             if 'str' in nm:
                 del nm['str']
@@ -251,6 +252,6 @@ if 1:
                         allsearches[i]['object'][allsearches[i]['key']][j]=bestmodel['searches'][k]['object'][allsearches[i]['key']][j]
                     #use previous run result as initial conditions
                     #allsearches[i]['InitialGenerator']=[bestmodel['searches'][k]['object'][allsearches[i]['key']]]
-                except Exception,e:
-                    print e
+                except Exception as e:
+                    print(e)
                     pdb.set_trace()

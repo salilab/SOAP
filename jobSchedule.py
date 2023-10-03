@@ -3,6 +3,7 @@
 
 """
 
+from __future__ import print_function
 from env import *
 
 
@@ -61,7 +62,7 @@ class task(object):
         if self.rsn==-9999:
             while os.path.isfile(runenv.basedir+'rsnlock'):
                 time.sleep(1)
-            print os.system('touch '+runenv.basedir+'rsnlock')
+            print(os.system('touch '+runenv.basedir+'rsnlock'))
             rsnf=open(runenv.basedir+'rsn','r')
             rsn=int(rsnf.read())
             rsnf.close()
@@ -69,7 +70,7 @@ class task(object):
             rsn=rsn+1
             rsnf.write(str(rsn))
             rsnf.close()
-            print os.system('rm -f '+runenv.basedir+'rsnlock')
+            print(os.system('rm -f '+runenv.basedir+'rsnlock'))
             self.rsn=rsn
 
     def get_tasksn(self):
@@ -97,34 +98,34 @@ class task(object):
         afl=os.listdir('./')
         runname=[f for f in afl if f.endswith('.sh.gz') and f.startswith('r')][0]
         self.runname=runname[:-3]
-        print os.system('gunzip '+runname)
+        print(os.system('gunzip '+runname))
         self.rsn=int(self.runname[1:-3])
         self.get_runf()
-        print os.system('gzip '+self.runname)
+        print(os.system('gzip '+self.runname))
         self.recheck_runstatus()
         self.afterprocessing.nors=self.numofruns
 
     def start_task_cluster(self):
         self.started=True
         if os.path.isfile(self.targetfile):
-            print 'Already executed by some other instances :)'
+            print('Already executed by some other instances :)')
             return 1
         elif os.path.isdir(self.dir):
             if runenv.otherrun or (self.dir in runenv.currentrundirlist):
-                print self.dir+' exist, meaning some other guys are generating what you want, just be patient and wait:)'
+                print(self.dir+' exist, meaning some other guys are generating what you want, just be patient and wait:)')
                 self.waitinglist=[self.targetfile]
                 self.justwait=1
                 return 0
             else:
-                print "reloading existing runs"
+                print("reloading existing runs")
                 self.reload_existingruns()
                 runenv.currentrundirlist.append(self.dir)
                 return 0
         self.waitinglist=self.preparing.prepare_task_input()
         runenv.currentrundirlist.append(self.dir)
         if isinstance(self.waitinglist,list) and len(self.waitinglist)>0:
-            print 'waiting for others to calc this:'
-            print self.waitinglist
+            print('waiting for others to calc this:')
+            print(self.waitinglist)
             self.justwait=2
             return 0
         self.get_tasksn()
@@ -147,9 +148,9 @@ class task(object):
 
     def submit_task(self):
         try:
-            print os.system('ssh '+runenv.jobserver+' \' rm -rf '+self.rdirname+' ;mkdir '+self.rdirname+'; mkdir '+self.rdirname+'/output''\'')
+            print(os.system('ssh '+runenv.jobserver+' \' rm -rf '+self.rdirname+' ;mkdir '+self.rdirname+'; mkdir '+self.rdirname+'/output''\''))
             os.chdir(self.dir)
-            print os.system('gzip -r -1 *')
+            print(os.system('gzip -r -1 *'))
             rc1=1
             while rc1:
                 fl=os.listdir('./')
@@ -161,11 +162,11 @@ class task(object):
                        stdout=subprocess.PIPE)
                     result = ssh.communicate()#ssh.stdout.readlines()
                     if not hf in result[0]:
-                        print os.system('scp '+hf+' '+runenv.jobserver+':\''+runenv.jobserverhdf5path+'\'')
-                    print os.system('mv '+hf+' ../temp')
+                        print(os.system('scp '+hf+' '+runenv.jobserver+':\''+runenv.jobserverhdf5path+'\''))
+                    print(os.system('mv '+hf+' ../temp'))
                     rc1=os.system('scp -r * '+runenv.jobserver+':\'~/'+self.rdirname+'/\'')
-                    print os.system('mv ../temp'+' ./'+hf)
-                    print os.system('ssh '+runenv.jobserver+' \' ln -s '+runenv.jobserverhdf5path+hf+' ~/'+self.rdirname+'/'+hf+'\'')
+                    print(os.system('mv ../temp'+' ./'+hf))
+                    print(os.system('ssh '+runenv.jobserver+' \' ln -s '+runenv.jobserverhdf5path+hf+' ~/'+self.rdirname+'/'+hf+'\''))
                 else:
                     rc1=os.system('scp -r * '+runenv.jobserver+':\'~/'+self.rdirname+'/\'')
 
@@ -178,7 +179,7 @@ class task(object):
                 self.runstatusdict[jn]={'errorcodelist':[],'starttime':0}
             if runtimetest:
                 self.runtime=np.ones(self.numofruns,dtype=[('runtime','i4'),('cn','f4'),('r2n','f4'),('host','a10')])
-        except Exception,e:
+        except Exception as e:
             traceback.print_exc()
             time.sleep(60)
 
@@ -193,11 +194,11 @@ class task(object):
             runmdt2.flush()
             os.chdir(self.dir)
             rc1=os.system('scp '+self.runname[:-3]+jn+'.sh'+' '+runenv.jobserver+':\'~/'+self.rdirname+'/\'')
-            print os.system('rm -f '+self.runname[:-3]+jn+'.sh')
+            print(os.system('rm -f '+self.runname[:-3]+jn+'.sh'))
             #rc2=os.system('scp -r '+self.inputlist[int(jn)-1]+' '+runenv.jobserver+':~/'+self.rdirname+'/')
             rc3=os.system('ssh '+runenv.jobserver+' '+'\'qsub -p 0 '+self.queues+' ./'+self.rdirname+'/'+self.runname[:-3]+jn+'.sh\'')
             if rc3:
-                print rc3
+                print(rc3)
                 raise NetworkError('Can not restart runs, possibly due to network problems')
             self.runstatusdict[int(jn)-1]['starttime']=0
             self.rtrys=self.rtrys+1
@@ -215,10 +216,10 @@ class task(object):
                 self.runstatusdict[jn]['errorcodelist'].append(self.check_runlog(jn))
             self.check_failed_runs(jnl)
             if len(jnl)>0.5*(self.numofruns-self.waitingrn):
-                print "50% of the runs failed with error codes (): "+str(jnl)
+                print("50% of the runs failed with error codes (): "+str(jnl))
                 raise Exception('50% of the runs failed with error codes')
                 self.errorjnl=jnl
-            print "starting runs"
+            print("starting runs")
             self.start_sr(jnl)
             #repeated error for a single run should be noticed...
 
@@ -236,7 +237,7 @@ class task(object):
             else:
                 ct=False
         if self.serverdiskfull:
-            print "Disk quota exceeded, please clean disk before continue!!!!!!!!!!!!!!"
+            print("Disk quota exceeded, please clean disk before continue!!!!!!!!!!!!!!")
             pdb.set_trace()
             return 0
         if cn>max(20,0.1*self.numofruns):
@@ -246,13 +247,13 @@ class task(object):
 
     def check_runlog(self,jn):
         jn=str(jn+1)
-        print 'checking run number '+jn
+        print('checking run number '+jn)
         proc1=subprocess.Popen('ssh '+runenv.jobserver+' '+'\'cd '+self.logpath+'; ls -c\'',shell=True,stdout=subprocess.PIPE)
         fc=proc1.communicate()[0]
         fl=fc.split('\n')
         fl2=[item for item in fl if item.endswith('.'+jn)]
         if len(fl2)==0:
-            print 'no output log'
+            print('no output log')
             return 'No output log'
         else:
             f=fl2[0]
@@ -260,40 +261,40 @@ class task(object):
         fc=proc1.communicate()[0]
         self.serverdiskfull=False
         if re.search('fork failure',fc) or re.search('Dynamic memory allocation failed',fc):
-            print "memory problem with the run"
+            print("memory problem with the run")
             ecode="memory problem with the run"
         elif re.search('Bugs',fc):
-            print "Bugs"
+            print("Bugs")
             ecode='Bugs'
             pdb.set_trace()
         elif re.search('EOFError',fc):
             #rer=re.search('\\n.*\\nEOFError.*\\n')
-            print "EOFError when reading "+fc
+            print("EOFError when reading "+fc)
             ecode='EOFError'
         elif re.search('No space left on device',fc):
-            print "The node or server has no space left"
+            print("The node or server has no space left")
             ecode='No space'
         elif re.search('Killed',fc):
-            print "Killed?????"
+            print("Killed?????")
             ecode='Killed'
         elif re.search('Segmentation fault',fc):
-            print "Segmentation fault - code problem"
+            print("Segmentation fault - code problem")
             ecode='Segmentation fault'
         elif re.search('Error',fc):
-            print "general Error"
+            print("general Error")
             ecode='Errors'
         elif re.search('Aborted',fc):
-            print "Aborted"
+            print("Aborted")
             ecode='Aborted'
         elif re.search('MemoryError',fc):
-            print "MemoryError"
+            print("MemoryError")
             ecode='MemoryError'
         elif re.search('Disk quota exceeded',fc):
-            print "Disk quota exceeded, please clean disk before continue!!!!!!!!!!!!!!"
+            print("Disk quota exceeded, please clean disk before continue!!!!!!!!!!!!!!")
             ecode='Disk quota exceeded'
             self.serverdiskfull=True
         else:
-            print "Unknown problem"
+            print("Unknown problem")
             ecode='Unknown'
         return ecode
         #_mdt.MDTError: unable to open file - no hdf5 file or file corrupt
@@ -325,7 +326,7 @@ class task(object):
             return 0
         mt=10
         if os.system('scp -r '+runenv.jobserver+':\"'+filelist+'\" '+self.dir):
-            print 'file copy failure'
+            print('file copy failure')
             efl,nefl=check_remote_file_exist(runenv.jobserver,rd,rfl)
             if len(nefl)>0:
                 ndjl=[]
@@ -349,18 +350,18 @@ class task(object):
         if tr:
             tr=os.system('for i in *.tar.gz; do tar -xvzf $i; done')
             if not tr:
-                print os.system('rm -f *.tar.gz')
+                print(os.system('rm -f *.tar.gz'))
             else:
                 raise Exception('can not untar file ')
         else:
-            print os.system('rm -f *.tar.gz')
+            print(os.system('rm -f *.tar.gz'))
         logfilelist=[]
         for (fjn, fjf) in djl:
             if self.runstatus[int(fjn)-1]>0:
                 self.runstatus[int(fjn)-1]=0
                 logfilelist.append('*.'+fjn)
-        print os.system('ssh '+runenv.jobserver+' '+'\'cd '+os.path.join(self.logpath)+'; rm -f '+' '.join(logfilelist)+'\'')
-        print os.system('ssh '+runenv.jobserver+' '+'\'cd '+self.rdirname+'; rm -f '+filelist+'\'')
+        print(os.system('ssh '+runenv.jobserver+' '+'\'cd '+os.path.join(self.logpath)+'; rm -f '+' '.join(logfilelist)+'\''))
+        print(os.system('ssh '+runenv.jobserver+' '+'\'cd '+self.rdirname+'; rm -f '+filelist+'\''))
 
     def get_runtimestats(self):
         #if not (runtimetest and os.path.isfile(self.dir+'pdbs1')):
@@ -372,7 +373,7 @@ class task(object):
             if runstatus.startswith('r'):
                 continue
             rl=runstatus.split('.')
-            print rl
+            print(rl)
             if len(rl)<3:
                 continue
             fjn=rl[0]
@@ -391,25 +392,25 @@ class task(object):
         if self.justwait==1:
             self.finished=True
             return 1
-        print 'run finished:)'
+        print('run finished:)')
         #try:
         #    self.get_runtimestats()
-        #except Exception,e:
+        #except Exception as e:
         #    traceback.print_exc()
-        print os.system('ssh '+runenv.jobserver+' \'rm -rf '+self.rdirname+' \'')
+        print(os.system('ssh '+runenv.jobserver+' \'rm -rf '+self.rdirname+' \''))
         if not self.logpath in [runenv.serverUserPath+'output',runenv.serverUserPath+'output/']:
-            print os.system('ssh '+runenv.jobserver+' \'rm -rf '+self.logpath+' \'')
+            print(os.system('ssh '+runenv.jobserver+' \'rm -rf '+self.logpath+' \''))
         #if runtimetest:
         #    np.save("../runtime"+str(self.rsn),self.runtime)
         if self.afterprocessing:
             #try:
             rv=self.afterprocessing.afterprocessing()
-            #except Exception, e:
-            #    print "error while processing the result of this run "
+            #except Exception as e:
+            #    print("error while processing the result of this run ")
             #    traceback.print_exc()
-            #    print "Please use the break point to look for whatever it wrong and continue without affecting other runs"
+            #    print("Please use the break point to look for whatever it wrong and continue without affecting other runs")
             #    pdb.set_trace()
-            #    print "saving the failed object..."
+            #    print("saving the failed object...")
             #    fh=open('run_failed_bugs.pickle','wb')
             #    cPickle.dump(self.afterprocessing,fh)
             #    fh.close()
@@ -441,25 +442,25 @@ class task(object):
             if self.finished:
                 return 1
             if not self.started:
-                print "##########monitoring:########## "+self.rdirname
+                print("##########monitoring:########## "+self.rdirname)
                 return self.start_task_cluster()
-            print "##########monitoring:########## "+self.rdirname
+            print("##########monitoring:########## "+self.rdirname)
             if self.justwait:
-                #print '############ Waiting for others to finish '
+                #print('############ Waiting for others to finish ')
                 nwl=[]
                 for f in self.waitinglist:
                     if not os.path.isfile(f):
                         nwl.append(f)
-                        #print 'WAITING FOR:  '+f
+                        #print('WAITING FOR:  '+f)
                 self.waitinglist=nwl
                 if len(nwl)==0:
                     return self.process_result()
                 else:
-                    print 'waiting for others'
+                    print('waiting for others')
                     return 0
             if self.unnoticederror:
                 self.process_keyboard_interrupt(self.error)
-                print 'continue looping'
+                print('continue looping')
                 return 0
             os.chdir(self.dir)
             proc1=subprocess.Popen('ssh '+runenv.jobserver+' '+'\' qstat | grep '+self.runname[:-3]+'\'',shell=True,stdout=subprocess.PIPE)
@@ -470,8 +471,8 @@ class task(object):
             jobstatlist=proc2.communicate()[0]
             if proc1.returncode==255:
                 raise NetworkError('Network problem')
-            print "obtaining runstats from server finished"
-            print "***Don't interrupt***"
+            print("obtaining runstats from server finished")
+            print("***Don't interrupt***")
             self.runstatusstr=runstatus
             self.runstatus[self.runstatus>0]=2 #set status to failed
             if runstatus:
@@ -482,26 +483,26 @@ class task(object):
             self.copy_result(djl)
             self.check_start_failed_runs(np.nonzero(self.runstatus==2)[0])
             self.k=self.k+1
-            print "*********************"
-            print 'Num of finished runs: '+str(self.finishedrn)+'/'+str(self.numofruns)+' active:'+str(self.activern) +' @iter#'+str(self.k)
+            print("*********************")
+            print('Num of finished runs: '+str(self.finishedrn)+'/'+str(self.numofruns)+' active:'+str(self.activern) +' @iter#'+str(self.k))
             if (self.runstatus==0).sum()==self.numofruns:
                 return self.process_result()
             elif self.rtrys >= 2*self.numofruns:
                 raise Exception('jobfailed because of too many trys, check input files or scripts for errors')
-        except NetworkError, e:
+        except NetworkError as e:
             traceback.print_exc()
             time.sleep(60)
-        except Bugs, e:
+        except Bugs as e:
             traceback.print_exc()
             #pdb.set_trace()
             #self.qdel_jobs()
             self.process_keyboard_interrupt(e)
-        except KeyboardInterrupt,e:
+        except KeyboardInterrupt as e:
             self.process_keyboard_interrupt(e)
-        except Exception, e:
-            print e
+        except Exception as e:
+            print(e)
             traceback.print_exc()
-            print self.dir
+            print(self.dir)
             self.process_keyboard_interrupt(e)
         return 0
 
@@ -573,9 +574,9 @@ class task(object):
                 if self.crashjobdict[key]>5:
                     autl.append(key)
                     del self.crashjobdict[key]
-            print 'The following node crashed >5: '+str(autl)
+            print('The following node crashed >5: '+str(autl))
             if len(autl)>0:
-                print os.system('ssh '+runenv.jobserver+' '+'\' qdel -f '+', '.join(autl)+' \'')
+                print(os.system('ssh '+runenv.jobserver+' '+'\' qdel -f '+', '.join(autl)+' \''))
         except:
             return
 
@@ -615,7 +616,7 @@ class task(object):
                     elif rstatus.startswith('d'):
                         self.runstatus[trn]=2
                     else:
-                        print 'can not decide the status of the run'
+                        print('can not decide the status of the run')
                         pdb.set_trace()
 
     def qdel_jobs(self,delete=False, qw=False):
@@ -624,26 +625,26 @@ class task(object):
         runnums=set(runnums.split('\n'))
         for runnum in runnums:
             if qw and len(runnum)>5:
-                print os.system('ssh '+runenv.jobserver+' '+'qdel -f '+runnum+' &')
+                print(os.system('ssh '+runenv.jobserver+' '+'qdel -f '+runnum+' &'))
             elif len(runnum)>5:
-                print os.system('ssh '+runenv.jobserver+' '+'qdel -f '+runnum+' &')
+                print(os.system('ssh '+runenv.jobserver+' '+'qdel -f '+runnum+' &'))
         if delete:
-            print os.system('ssh '+runenv.jobserver+' \'rm -rf '+self.rdirname+' \'')
-            print os.system('rm -rf '+self.dir)
+            print(os.system('ssh '+runenv.jobserver+' \'rm -rf '+self.rdirname+' \''))
+            print(os.system('rm -rf '+self.dir))
 
     def process_keyboard_interrupt(self,e, pos='task-monitor'):
-        print '@@@@@@@@ '+pos
-        print ""
+        print('@@@@@@@@ '+pos)
+        print("")
         self.error=e
         TIMEOUT = 120 # number of seconds your want for timeout
         def interrupted(signum, frame):
-            print "waiting more than 120s, continue looping......"
+            print("waiting more than 120s, continue looping......")
             raise Exception('timeout')
         signal.signal(signal.SIGALRM, interrupted)
         #def input():
         signal.alarm(TIMEOUT)
         try:
-            print 'You have 120s to interrupt the code to handle the error, otherwise code will continue looping \n 0-quit and delete;\n 1-quit this job;\n 2-re-raise;\n 3-quit whole script and delete;\n 4-enter debug mode;\n 5-continue\n 6-restart runs with updated SOAP code\n 7-re-parepare and restart job \n 8-ignore erros \n '
+            print('You have 120s to interrupt the code to handle the error, otherwise code will continue looping \n 0-quit and delete;\n 1-quit this job;\n 2-re-raise;\n 3-quit whole script and delete;\n 4-enter debug mode;\n 5-continue\n 6-restart runs with updated SOAP code\n 7-re-parepare and restart job \n 8-ignore erros \n ')
             s = raw_input()
         except:
             return 0
@@ -693,20 +694,20 @@ class task(object):
             time.sleep(0.1)
             pid=os.fork()
             if pid == 0:
-                print 'running child#'+str(i)
+                print('running child#'+str(i))
                 for item in listoflist[i]:
                     try:
-                        print 'child#'+str(i)+'start running'
+                        print('child#'+str(i)+'start running')
                         command(item)
-                    except Exception,e:
-                        print e
+                    except Exception as e:
+                        print(e)
                 sys.exit()
                 break
             elif pid > 0:
                 pids.append(pid)
                 if i==(len(listoflist)-1):
                     for j in range(0,len(pids)):
-                        print 'waiting '+str(j)
+                        print('waiting '+str(j))
                         os.wait()
                 else:
                     continue
@@ -733,7 +734,7 @@ class task(object):
             time.sleep(0.1)
             pid=os.fork()
             if pid == 0:
-                print 'running child#'+str(i)
+                print('running child#'+str(i))
                 k=-1
                 for item in listoflist[i]:
                     #try:
@@ -742,28 +743,28 @@ class task(object):
                         p=pipelistoflist[i][k]
                         os.close(p[0])
                         w=os.fdopen(p[1],'w')
-                        print 'child#'+str(i)+'start running'
+                        print('child#'+str(i)+'start running')
                         result=command(item)
-                        #print 'resultresultresultresult'
-                        #print result
+                        #print('resultresultresultresult')
+                        #print(result)
                         w.write(cPickle.dumps(result))
                         w.close()
-                    #except Exception,e:
-                    #    print e
+                    #except Exception as e:
+                    #    print(e)
                 sys.exit()
                 break
             elif pid > 0:
                 pids.append(pid)
                 if i==(len(listoflist)-1):
                     for j in range(0,len(pids)):
-                        print 'waiting '+str(j)
+                        print('waiting '+str(j))
                         os.wait()
                     for p in pipelist:
                         os.close(p[1])
                         r=os.fdopen(p[0])
                         rc=r.read()
-                        print p
-                        print 'result'+rc
+                        print(p)
+                        print('result'+rc)
                         rl.append(cPickle.loads(rc))
                         r.close()
                     return rl
@@ -863,11 +864,11 @@ class tasklist(task):
                 continue
             try:
                 self.resultlist[k]=self.tasklist[k].monitor()
-            except Bugs,e:
+            except Bugs as e:
                 self.resultlist[k]=987654321
                 self.bugs=True
                 self.buginfo=e
-            except FatalError,e:
+            except FatalError as e:
                 raise e
             except:
                 try:
@@ -882,12 +883,12 @@ class tasklist(task):
         if 0 in self.resultlist:
             return 0
         else:
-            print "All task finished or failed"
+            print("All task finished or failed")
             if self.bugs:
-                print "bugs during the run "+str(self.buginfo)
+                print("bugs during the run "+str(self.buginfo))
                 pdb.set_trace()
             if self.afterprocessing:
-                print "processing tasklist result"
+                print("processing tasklist result")
                 return self.afterprocessing(self.resultlist, self.tasklist,self.other)
             else:
                 return self.resultlist
@@ -925,35 +926,35 @@ class tasklist(task):
                             continue
                         try:
                             self.resultlist[k]=self.tasklist[k].monitor()
-                        except Bugs,e:
+                        except Bugs as e:
                             self.bugs=True
                             self.buginfo=e
                             self.resultlist[k]=987654321
-                        #except Exception,e:
+                        #except Exception as e:
                         #    pdb.set_trace()
                         if self.resultlist[k]!=0:
                             #del self.tasklist[k]
                             self.tasklist[k]==0
                     if 0 in self.resultlist:
-                        print 'waiting'
+                        print('waiting')
                         time.sleep(60)
                     self.delete_runs_on_crashed_nodes()
-                except KeyboardInterrupt,e:
+                except KeyboardInterrupt as e:
                     task.process_keyboard_interrupt(self,e,pos='tasklist-monitorend')
-            print "All all task finished or failed"
+            print("All all task finished or failed")
             if self.bugs:
-                print "bugs during the run "+str(self.buginfo)
+                print("bugs during the run "+str(self.buginfo))
                 raw_input('Input anything to enter debug mode(others finished): ')
                 pdb.set_trace()
             if self.afterprocessing:
-                print "processing this group of tasks"
+                print("processing this group of tasks")
                 return self.afterprocessing(self.resultlist,self.tasklist,self.other)
             else:
                 return self.resultlist
-        except FatalError,e:
+        except FatalError as e:
             self.qdel_jobs(delete=True)
             sys.exit(str(e))
-        except KeyboardInterrupt,e:
+        except KeyboardInterrupt as e:
             task.process_keyboard_interrupt(self,e,pos='tasklist-monitorend')
 
     def qdel_jobs(self,delete=False):
@@ -977,19 +978,19 @@ def report_job_runstatus(runpath, runsuccess, runnumber, outputname,inputname='r
             fl=os.listdir('./')
             nfl=[f for f in fl if f.startswith(fjf)]
             if len(nfl)==0:
-                print 'Bugs in code, output file does not exist '
-                print fl
+                print('Bugs in code, output file does not exist ')
+                print(fl)
                 runsuccess=False
                 #if temppath!=runpath:
-                #    print os.system('rm -rff '+temppath)
+                #    print(os.system('rm -rff '+temppath))
             else:
                 tr=os.system('tar cvzf '+fjf+'.tar.gz '+fjf+'* --remove-files')
                 if tr:
-                    print os.system('rm -f '+fjf+'.tar.gz ')
+                    print(os.system('rm -f '+fjf+'.tar.gz '))
                     tr=os.system('tar cvzf '+fjf+'.tar.gz '+fjf+'*  --remove-files')
                 if tr:
-                    print os.system('rm -f '+fjf+'*')
-                    print 'FatalError: can not tar the result file, disk  full?'
+                    print(os.system('rm -f '+fjf+'*'))
+                    print('FatalError: can not tar the result file, disk  full?')
                     runsuccess=False
                 else:
                     if temppath!=runpath:
@@ -998,16 +999,16 @@ def report_job_runstatus(runpath, runsuccess, runnumber, outputname,inputname='r
                             cr=os.system('mv '+fjf+'.tar.gz '+runpath)
                         if cr:
                             cr=os.system('mv '+fjf+'.tar.gz'+runpath)
-                        #print os.system('rm -rff '+temppath)
+                        #print(os.system('rm -rff '+temppath))
                         if cr:
-                            print os.system('rm -f '+runpath+fjf+'.tar.gz')
-                            print 'FatalError: can not copy the result file, netapp disk quota full?'
-                            print "FatalError: exiting..."
+                            print(os.system('rm -f '+runpath+fjf+'.tar.gz'))
+                            print('FatalError: can not copy the result file, netapp disk quota full?')
+                            print("FatalError: exiting...")
                             runsuccess=False
         if runsuccess:
-            print os.system('touch '+runpath+'jobfinished.'+str(runnumber)+'.'+fjf+'.tar.gz')
+            print(os.system('touch '+runpath+'jobfinished.'+str(runnumber)+'.'+fjf+'.tar.gz'))
         else:
-            print os.system('touch '+runpath+'jobfailed.'+str(runnumber)+'.runme.py')
+            print(os.system('touch '+runpath+'jobfailed.'+str(runnumber)+'.runme.py'))
     else:
         if not runsuccess:
             raise Exception('Run failed '+str(runnumber))
@@ -1031,7 +1032,7 @@ def generate_job_submit_script(freememory,spname,runtime,nors,parallel=0,mem_tot
     if "#" in spname:
         nspname=spname.replace('#','')
         submdtf=submdtf.replace('undefinedrundir/output','output/'+nspname)
-        print os.system('ssh '+runenv.jobserver+' mkdir '+runenv.serverUserPath+'output/'+nspname)
+        print(os.system('ssh '+runenv.jobserver+' mkdir '+runenv.serverUserPath+'output/'+nspname))
     submdtf=submdtf.replace('undefinedrundir',spname)
     submdtf=submdtf.replace('timeundefined',runtime)
     submdtf=submdtf.replace('#$ -p 0',"#$ -p "+str(runenv.runpriority))

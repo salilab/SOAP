@@ -3,6 +3,7 @@
 
 """
 
+from __future__ import print_function
 from feature import *
 from env import *
 import shutil
@@ -159,7 +160,7 @@ class rawsp(object):
                 if np.abs(r1[0])>0.0001:
                     spl.append([r1[0],r2[0],r2[2]]) #target
                     logstr=str(r1[0])+'*'+str(r2[1])+' + '
-            print logstr
+            print(logstr)
             return spl
         else:
             return []
@@ -182,7 +183,7 @@ class rawsp(object):
         self.runpath=runenv.basedir
         features=self.features
         pdbfile='pdbs'+str(runnumber)
-        print 'running pdb: '+pdbfile
+        print('running pdb: '+pdbfile)
         env = environ()
         #log.minimal()
         io=env.io
@@ -195,7 +196,7 @@ class rawsp(object):
         mlib=mdt.Library(env)
         mlib.bond_classes.read('${LIB}/bndgrp.lib')
         featurelist=feature(self.features,mlib).get_featurelist()
-        #print featurelist
+        #print(featurelist)
         m=mdt.Table(mlib,features=featurelist,shape=[-1]*len(featurelist))
         fl=len(featurelist)
         a=alignment(env)
@@ -223,7 +224,7 @@ class rawsp(object):
             lscale=float(rer.group(3))
         while a.read_one(f, allow_alternates=True):
             k=k+1
-            print k
+            print(k)
             fd,naln=self.get_pdbfile(pdbfdir,[],a[0].code,env,a,scratchdir)
             try:
                 if self.opdb:
@@ -245,9 +246,9 @@ class rawsp(object):
                     toaln=aln
                 else:
                     toaln=a
-                print toaln[0].code
+                print(toaln[0].code)
                 m.add_alignment_witherr(toaln,chain_span_range=(-csmax,-csmin,csmin,csmax),residue_span_range=(-kcut1,-kcut,kcut,kcut1),bond_span_range=(bs,bsm),errorscale=errsv,disulfide=ssp)
-            except Exception,e:
+            except Exception as e:
                 traceback.print_exc()
                 if re.search('fork failure',str(e)):
                     raise Exception('fork failure, quiting')
@@ -271,8 +272,8 @@ class rawsp(object):
                     runsuccess=False
         else:
             runsuccess=False
-            print m.sum()
-            print 'mdt sum to 0, code problem'
+            print(m.sum())
+            print('mdt sum to 0, code problem')
         report_job_runstatus(self.runpath, runsuccess, runnumber, '.result',inputname='runme.py',temppath=temppath)
 
     def calc_sp_cluster(self):
@@ -285,7 +286,7 @@ class rawsp(object):
             ngm=self.genmethod[:-len(rer.group(2))]
             nsp=rawsp(pdbset=self.pdbset,features=self.features,genmethod=ngm,tlib=self.tlib,decoy=self.decoy,routine=self.routine)
             return nsp.get_task()
-        print 'getting task '+self.spname
+        print('getting task '+self.spname)
         if self.routine=='calc_sp_all':
             self.targetfile=self.sppath+'.hdf5'
             self.filetype='.hdf5'
@@ -303,7 +304,7 @@ class rawsp(object):
                 for pset in pdbsets:
                     nspo=rawsp(pset,self.features,self.genmethod,self.tlib,self.decoy,self.routine)
                     tl.append(nspo.get_task())
-                print "running break down sps"
+                print("running break down sps")
                 return tasklist(tasklist=tl,afterprocessing=dummy)
             self.nors=1000
         if not tc:
@@ -313,7 +314,7 @@ class rawsp(object):
             return 0
 
     def afterprocessing(self):
-        print "run finished -> processing result"
+        print("run finished -> processing result")
         if self.justwait and len(self.waittarget)==0:
             pass
         elif self.justwait and len(self.waittarget)>0: # the sp need to be combined with others
@@ -342,7 +343,7 @@ class rawsp(object):
                             os.mkdir(sdir)
                         np.save(scorepath,allarray[:,i,...].squeeze())
                 shutil.move('all.npy', os.path.join('..', self.spname+'.npy'))
-            print os.system('rm -r *')
+            print(os.system('rm -r *'))
             os.chdir('..')
         shutil.rmtree(os.path.join(self.dir, self.prd))
         return 1
@@ -360,7 +361,7 @@ class rawsp(object):
                         sparray=np.zeros(self.fo.fdlist)
                 sparray=sparray+target[0]*sa
             except:
-                print traceback.print_exc()
+                print(traceback.print_exc())
                 pdb.set_trace()
         self.save_npy(sparray)
 
@@ -419,23 +420,23 @@ class rawsp(object):
                         try:
                             na=na+eval('mdta['+','.join(nai)+']')#there must be a simple way that does not need permuation.
                         except:
-                            print "line 1071 in sp"
+                            print("line 1071 in sp")
                             pdb.set_trace()
                     mdta=na
         except:
-            print traceback.print_exc()
+            print(traceback.print_exc())
             pdb.set_trace()
         if subsetlist[1]!=range(len(subsetlist[1])):
             na=np.transpose(na,subsetlist[1])
         return na
 
     def load2npy(self,f):
-        print "loading "+f
+        print("loading "+f)
         if self.routine=='calc_sp_all':
             f=h5py.File(f,'r')
             mdtb=f['mdt']
             ms=mdtb.shape
-            print ms
+            print(ms)
             mdta=np.zeros(np.array(list(ms)))
             mdta[...]=mdtb[...]
             f.close()
@@ -454,12 +455,12 @@ class rawsp(object):
             sj.run_task_local(self.calc_sp_all)
             self.sp_mean()
             #self.sp_stderr()
-            print os.system('mv sum.hdf5 ../'+self.spname+'.hdf5')
-            #print os.system('mv stderr.hdf5 ../'+self.spname+'.stderr.hdf5')
+            print(os.system('mv sum.hdf5 ../'+self.spname+'.hdf5'))
+            #print(os.system('mv stderr.hdf5 ../'+self.spname+'.stderr.hdf5'))
         elif routine=='calc_sp_i':
             sj.run_task_local(self.calc_sp_i)
             self.cat_spi()
-            print os.system('mv all.npy ../'+self.spname+'.npy')
+            print(os.system('mv all.npy ../'+self.spname+'.npy'))
 
     def sp_sum(self,wdir=None):
         if wdir:
@@ -479,22 +480,22 @@ class rawsp(object):
                     fname=name
                 else:
                     continue
-                print 'Adding '+name
+                print('Adding '+name)
                 k=k+1
                 if k==1:
                     m1.read_hdf5(fname)
                 else:
                     m2.read_hdf5(fname)
                     m1+=m2
-                print 'Adding '+name+'Finished'
-            except Exception, e:
+                print('Adding '+name+'Finished')
+            except Exception as e:
                 pdb.set_trace()
                 traceback.print_exc()
                 return 1
         m1.write_hdf5('sum.hdf5',gzip=True)
         m1=[]
         m2=[]
-        print "Combining finished"
+        print("Combining finished")
         return 0
 
     def should_wait(self):
@@ -506,10 +507,10 @@ class rawsp(object):
             wl=[item[1]+self.filetype for item in self.waittarget]
             for item in self.waittarget:
                 item[1]=item[1]+self.filetype
-            print "waiting for other runs to finish to combine to our sp"
-            print wl
+            print("waiting for other runs to finish to combine to our sp")
+            print(wl)
             self.mkdir()
-            print os.system('rm -r '+self.dir+self.prd)
+            print(os.system('rm -r '+self.dir+self.prd))
             os.mkdir(self.dir+self.prd)
             return wl
         else:
@@ -521,7 +522,7 @@ class rawsp(object):
             return wl
         nors=self.nors
         routine=self.routine
-        print "prepare task input for generating"+self.spname
+        print("prepare task input for generating"+self.spname)
         os.chdir(self.dir)
         #os.system('rm -r '+self.prd)
         freememory=feature(self.features).get_runmem()
@@ -612,16 +613,16 @@ class rawsp(object):
         while aln.read_one(f):
             sr=0;
             alncode=aln[0].code
-            print alncode
+            print(alncode)
             codelist=alncode.split('.')
             if len(codelist)>1:#decoys
-                print runenv.ddbdir+codelist[0]+'/'+codelist[1]+'/'
+                print(runenv.ddbdir+codelist[0]+'/'+codelist[1]+'/')
                 fd,naln=self.get_pdbfile(runenv.ddbdir+codelist[0]+'/'+codelist[1]+'/',codelist,alncode,env,aln,tmpdir)
                 io.atom_files_directory=[fd]+io.atom_files_directory
             else:#pdbs
                 io.atom_files_directory=runenv.pdbdir+io.atom_files_directory
                 #fd,naln=self.get_pdbfile(runenv.pdbdir,[],alncode,env,aln,tmpdir)
-            print k
+            print(k)
             m.add_alignment_witherr(naln,chain_span_range=(-csmax,-csmin,csmin,csmax),residue_span_range=(-kcut1,-kcut,kcut,kcut1),bond_span_range=(bs,bsm),errorscale=errsv,io=io,disulfide=ssp)#,startpos=0,endpos=0,scale=0,refyes=False,refmdt='',io=io)
             if len(m.shape)>1 and (np.array(m.shape)>1).sum()>1:
                 raise Bugs('Currently the code does not support 2-d rawsp-i')
@@ -639,7 +640,7 @@ class rawsp(object):
             fl=len(featurelist)
             #m=m.reshape(featurelist,[0 for i in range(0,fl)], [-1 for i in range(0,fl)])
             aln=alignment(env)
-        #print os.system('rm -rf '+tmpdir)
+        #print(os.system('rm -rf '+tmpdir))
         return refdista
 
     def calc_sp_individual1D_fromlist(self, dnlist):
@@ -668,13 +669,13 @@ class rawsp(object):
             aln=alignment(env)
             codelist=dnlist[k].split('.')
             if len(codelist)>1:
-                print runenv.ddbdir+codelist[0]+'/'+codelist[1]+'/'
+                print(runenv.ddbdir+codelist[0]+'/'+codelist[1]+'/')
                 fd,naln=self.get_pdbfile(runenv.ddbdir+codelist[0]+'/'+codelist[1]+'/',codelist,dnlist[k],env,aln)
                 env.io.atom_files_directory=[fd]+env.io.atom_files_directory
             else:
                 fd,naln=self.get_pdbfile(runenv.ddbdir+codelist[0]+'/'+codelist[1]+'/',[],alncode,env,aln,tmpdir)
             aln.append_model(mdl,align_codes=dnlist[k],atom_files=dnlist[k])
-            print k
+            print(k)
             #if k> 100:
             #    return refdista
             m.add_alignment_witherr(aln,chain_span_range=(-csmax,-csmin,csmin,csmax),residue_span_range=(-kcut1,-kcut,kcut,kcut1),bond_span_range=(bs,bsm),errorscale=errsv,disulfide=ssp)
@@ -785,16 +786,16 @@ class rawsp(object):
         while aln.read_one(f):
             sr=0;
             alncode=aln[0].code
-            print alncode
+            print(alncode)
             codelist=alncode.split('.')
             if len(codelist)>1:
-                print runenv.ddbdir+codelist[0]+'/'+codelist[1]+'/'
+                print(runenv.ddbdir+codelist[0]+'/'+codelist[1]+'/')
                 fd,naln=self.get_pdbfile(runenv.ddbdir+codelist[0]+'/'+codelist[1]+'/',codelist,alncode,env,aln,tmpdir)
                 io.atom_files_directory=[fd]+io.atom_files_directory
             else:
                 naln=aln
                 io.atom_files_directory=runenv.pdbdir+io.atom_files_directory
-            print k
+            print(k)
             m.add_alignment_witherr(naln,chain_span_range=(-csmax,-csmin,csmin,csmax),residue_span_range=(-kcut1,-kcut,kcut,kcut1),bond_span_range=(bs,bsm),errorscale=errsv,io=io,disulfide=ssp)#,startpos=0,endpos=0,scale=0,refyes=False,refmdt='',io=io)
             #process the result from this single table
             #sma=np.squeeze(np.copy(ma))
@@ -822,7 +823,7 @@ class rawsp(object):
                 ra[k,:]=(np.dot(self.svdu.T,sma.reshape([m1s,m2s]))*self.svdv).sum(axis=1)
             k=k+1
             m.clear()
-        #print os.system('rm -rf '+tmpdir)
+        #print(os.system('rm -rf '+tmpdir))
         return ra
 
     def cat_spi(self,name='result'):
@@ -849,7 +850,7 @@ class rawsp(object):
         ##!!!!!!!!!!!!!!!will calculate the stderr here
         if wdir:
             os.chdir(wdir)
-        print "Calculating Standard deviation"
+        print("Calculating Standard deviation")
         filelist=[]
         files=os.listdir('./')
         for filename in files:
@@ -872,7 +873,7 @@ class rawsp(object):
         else:
             ssp=scaledsp('nbsum',self)
         for filename in filelist:
-            print 'calcting error for '+filename
+            print('calcting error for '+filename)
             ssp.scalesp(ssppath=filename[:-5])
         for filename in filelist:
             #try:
@@ -881,7 +882,7 @@ class rawsp(object):
             ft.close()
             ft=[]
             #except:
-            #    print 'error in sp_stderr2 1'
+            #    print('error in sp_stderr2 1')
             #    pdb.set_trace()
         mdtmean[...]=mdtmean[...]/len(filelist)
         mdtstd=f2['mdt']
@@ -893,20 +894,20 @@ class rawsp(object):
             ft.close()
             ft=[]
             #except:
-            #    print 'error in sp_stderr2 2'
+            #    print('error in sp_stderr2 2')
             #    pdb.set_trace()
         mdtstd[...]=mdtstd[...]/len(filelist)**2
         f.flush()
         f.close()
         f2.flush()
         f2.close()
-        print "Calculating Standard error square Finished"
+        print("Calculating Standard error square Finished")
 
     def load_i(self):
         idist=np.load(self.sppath+'.npy')
         ms=idist.shape
         if 0 and  self.bl<ms[self.bp+1]: #outdated
-            print "reshaping the original stats array"
+            print("reshaping the original stats array")
             if len(ms)==2:
                 idist=np.copy(idist[:,:-1])
             elif len(ms)==3:
@@ -944,7 +945,7 @@ class rawsp(object):
                     newshape=tuple([nalen]+list(nspa.shape[1:]))
                 else:
                     newshape=(nalen)
-                print newshape
+                print(newshape)
                 na=np.empty(newshape,dtype=np.float32)
                 k=0
                 for nspa in al:
@@ -961,7 +962,7 @@ class rawsp(object):
         code=alncode
         if isinstance(pdbdir, list) and len(pdbdir)==1:
             pdbdir=pdbdir[0]
-        print "unziping "+code
+        print("unziping "+code)
         if isinstance(pdbdir, list):
             return [pdbdir,aln]
         if os.path.isfile(pdbdir+'needattachtobase'):
@@ -1008,7 +1009,7 @@ class rawsp(object):
                 env.libs.topology.read(file='$(LIB)/top_heav.lib')
                 env.libs.parameters.read(file='$(LIB)/par.lib')
                 self.currentdsname=codelist[0]+'.'+codelist[1]
-                #print self.currentdsname
+                #print(self.currentdsname)
                 self.basemodel=model(env,file=pdbdir+self.currentdsname+'.base.pdb')
                 taln=alignment(env)
                 taln.append_model(self.basemodel,align_codes='original')
@@ -1032,24 +1033,24 @@ class rawsp(object):
                 if os.path.isfile(os.path.join(tmpdir,code+'.pdb')) or os.path.isfile(os.path.join(tmpdir,'pdb'+code+'.pdb')) or os.path.isfile(os.path.join(tmpdir,'pdb'+code[:4]+'.pdb')):
                     return [tmpdir,aln]
                 elif os.path.isfile(os.path.join(spdbdir,code+'.pdb.gz')):
-                    print os.system('gzip -d -c  '+os.path.join(spdbdir,code+'.pdb.gz')+' > '+os.path.join(tmpdir,code+'.pdb'))
+                    print(os.system('gzip -d -c  '+os.path.join(spdbdir,code+'.pdb.gz')+' > '+os.path.join(tmpdir,code+'.pdb')))
                     return [tmpdir,aln]
                 elif os.path.isfile(os.path.join(spdbdir,'pdb'+code+'.pdb.gz')):
-                    print os.system('gzip -d -c  '+os.path.join(spdbdir,'pdb'+code+'.pdb.gz')+' > '+os.path.join(tmpdir,'pdb'+code+'.pdb'))
+                    print(os.system('gzip -d -c  '+os.path.join(spdbdir,'pdb'+code+'.pdb.gz')+' > '+os.path.join(tmpdir,'pdb'+code+'.pdb')))
                     return [tmpdir,aln]
                 elif os.path.isfile(os.path.join(spdbdir,'pdb'+code[:4]+'.pdb.gz')):
-                    print os.system('gzip -d -c  '+os.path.join(spdbdir,'pdb'+code[:4]+'.pdb.gz')+' > '+os.path.join(tmpdir,'pdb'+code[:4]+'.pdb'))
+                    print(os.system('gzip -d -c  '+os.path.join(spdbdir,'pdb'+code[:4]+'.pdb.gz')+' > '+os.path.join(tmpdir,'pdb'+code[:4]+'.pdb')))
                     return [tmpdir,aln]
         #elif os.path.isfile(os.path.join(tmpdir,code+'.pdb')) or os.path.isfile(os.path.join(tmpdir,'pdb'+code+'.pdb')) or os.path.isfile(os.path.join(tmpdir,'pdb'+code[:4]+'.pdb')):
         #    return [tmpdir,aln]
         #elif os.path.isfile(os.path.join(pdbdir,code+'.pdb.gz')):
-        #    print os.system('gzip -d -c  '+os.path.join(pdbdir,code+'.pdb.gz')+' > '+os.path.join(tmpdir,code+'.pdb'))
+        #    print(os.system('gzip -d -c  '+os.path.join(pdbdir,code+'.pdb.gz')+' > '+os.path.join(tmpdir,code+'.pdb')))
         #    return [tmpdir,aln]
         #elif os.path.isfile(os.path.join(pdbdir,'pdb'+code+'.pdb.gz')):
-        #    print os.system('gzip -d -c  '+os.path.join(pdbdir,'pdb'+code+'.pdb.gz')+' > '+os.path.join(tmpdir,'pdb'+code+'.pdb'))
+        #    print(os.system('gzip -d -c  '+os.path.join(pdbdir,'pdb'+code+'.pdb.gz')+' > '+os.path.join(tmpdir,'pdb'+code+'.pdb')))
         #    return [tmpdir,aln]
         #elif os.path.isfile(os.path.join(pdbdir,'pdb'+code[:4]+'.pdb.gz')):
-        #    print os.system('gzip -d -c  '+os.path.join(pdbdir,'pdb'+code[:4]+'.pdb.gz')+' > '+os.path.join(tmpdir,'pdb'+code[:4]+'.pdb'))
+        #    print(os.system('gzip -d -c  '+os.path.join(pdbdir,'pdb'+code[:4]+'.pdb.gz')+' > '+os.path.join(tmpdir,'pdb'+code[:4]+'.pdb')))
         #    return [tmpdir,aln]
         else:
             return [pdbdir,aln]
@@ -1061,7 +1062,7 @@ class rawsp(object):
         ms=f['mdt'].shape
         f.close()
         if self.bl<ms[self.bp]:
-            print "reshaping original mdt"
+            print("reshaping original mdt")
             env = environ()
             log.minimal()
             mlib=mdt.Library(env)
@@ -1128,7 +1129,7 @@ class rawsp(object):
             dvdim=dvdim*ms[i]
         ma=np.reshape(ma,(dvdim,-1))
         for i in range(0,dvdim):
-            print i
+            print(i)
             ma[i]=gps.ksmoothing_single_withscale(ma[i],sd)
         ma=np.reshape(ma,ms)
         if self.permute:
@@ -1148,7 +1149,7 @@ class rawsp(object):
             dvdim=dvdim*ms[i]
         ma=np.reshape(ma,(dvdim,-1))
         for i in range(0,dvdim):
-            print i
+            print(i)
             ma[i]=gps.gpsmoothing_single(ma[i],sd,kwl)
         ma=np.reshape(ma,ms)
         if self.permute:
@@ -1211,7 +1212,7 @@ class rawsp(object):
                         return err
                     bw=self.fo.fdlist[0]/self.fo.frlist[0]
                     optres=scipy.optimize.fmin_powell(errfunc,ma[0::bw])
-                    print optres
+                    print(optres)
                     scale=np.abs(optres)
                     us=scipy.interpolate.InterpolatedUnivariateSpline(range(0,int(self.fo.frlist[0])),scale)
                     spd=us(self.bins[0])
@@ -1263,7 +1264,7 @@ class rawsp(object):
             la=np.load(dist+'-'+linkage+'.npy')
         noc=r*c
         type=dist+'-'+linkage+str(noc)+'-'+str(minmember)
-        print type
+        print(type)
         if not os.path.isfile(type+'.npy'):
             l1=scipy.cluster.hierarchy.fcluster(la,noc,'maxclust')
             nl=[]
@@ -1290,7 +1291,7 @@ class rawsp(object):
             plt.tick_params(labelsize=5)
             for i in range(noc):
                 plt.subplot(r,c,i+1)
-                print 'plotting '+type+str(i)
+                print('plotting '+type+str(i))
                 for j in range(ndim[1]):
                     for k in range(i,ndim[1]):
                         if apa[j,k]==i:
@@ -1301,8 +1302,8 @@ class rawsp(object):
                             plt.yticks([])
                             plt.title('max '+str(apa.max()))
             plt.tick_params(labelsize=5)
-            print apa.max()
-            print apa.min()
+            print(apa.max())
+            print(apa.min())
             plt.savefig(type+figtype)
             plt.clf()
         if len(libname)>0:
@@ -1457,7 +1458,7 @@ class scaledsp(rawsp):
             nal.append(np.load(str(i)+'.smoothed.npy'))
         nma=np.vstack(nal)
         self.scalesp(pm='savema',sma=nma)
-        print os.system('rm -r '+self.dir+self.sspname)
+        print(os.system('rm -r '+self.dir+self.sspname))
         return 1
 
     def scalesp(self,pm='',ssppath='',ifpos=None,nbpos=None, ref=None,sma=[]):
@@ -1473,7 +1474,7 @@ class scaledsp(rawsp):
         if os.path.isfile(ssppath+'.hdf5'):
             return 0
         if pm.startswith('pp'):
-            print os.system('cp '+self.sppath+'.hdf5 '+ssppath+'.hdf5')
+            print(os.system('cp '+self.sppath+'.hdf5 '+ssppath+'.hdf5'))
             f2=h5py.File(ssppath+'.hdf5','r+')
             mdtc=f2['mdt']
             mdtc[...]=mdtc[...]+float(pm[2:])
@@ -1481,7 +1482,7 @@ class scaledsp(rawsp):
             f2.close()
             return 1
         elif pm.startswith('exp'):
-            print os.system('cp '+self.sppath+'.hdf5 '+ssppath+'.hdf5')
+            print(os.system('cp '+self.sppath+'.hdf5 '+ssppath+'.hdf5'))
             f2=h5py.File(ssppath+'.hdf5','r+')
             mdtc=f2['mdt']
             mdtc[...]=np.exp(mdtc[...])
@@ -1541,7 +1542,7 @@ class scaledsp(rawsp):
         ma=np.reshape(ma,ms)
         if self.permute:
             ma=np.transpose(ma,self.rs2)
-        print os.system('cp '+self.sppath+'.hdf5 '+ssppath+'.hdf5')
+        print(os.system('cp '+self.sppath+'.hdf5 '+ssppath+'.hdf5'))
         f2=h5py.File(ssppath+'.hdf5','r+')
         mdtc=f2['mdt']
         mdtc[...]=ma[...]
@@ -1612,7 +1613,7 @@ class scaledsp(rawsp):
     def normalize_sinlge_dist(self,sd,sums,sume,nolog):
         sdsum=sd[sums:sume].mean()
         if sdsum==0:
-            print "Can not normalize array by sum because of zero:"+self.pm
+            print("Can not normalize array by sum because of zero:"+self.pm)
             return 0
         sd[...]=sd/(sdsum)
 
@@ -1625,7 +1626,7 @@ class scaledsp(rawsp):
         f=h5py.File(self.ssppath+'.hdf5','r')
         mdtb=f['mdt']
         ms=mdtb.shape
-        print ms
+        print(ms)
         mdta=np.zeros(np.array(list(ms)))
         mdta[...]=mdtb[...]
         f.close()
@@ -1705,7 +1706,7 @@ class scaledsp(rawsp):
         header='R'+''.join(headerstrlist)
         if path:
             potfile=open(path+'.lib','w')
-            print path+'.lib'
+            print(path+'.lib')
         else:
             potfile=open(self.ssppath+'.lib','w')
         if mdtarray!=[]:
@@ -1740,7 +1741,7 @@ class scaledsp(rawsp):
 
     def poscutoff(self,cutoff):
         refname='pc'+str(cutoff)
-        print os.system('cp '+self.ssppath+'.hdf5 '+self.ssppath+'.'+refname+'.hdf5')
+        print(os.system('cp '+self.ssppath+'.hdf5 '+self.ssppath+'.'+refname+'.hdf5'))
         f=h5py.File(self.ssppath+'.'+refname+'.hdf5','r+')
         mdtb=f['mdt']
         mdtb[:,:,cutoff:]=0
@@ -2058,7 +2059,7 @@ class gpsmoothing(object):
         pass
 
     def runtask_cluster(self,runnum):
-        print runnum
+        print(runnum)
         self.runpath=runenv.basedir
         fh=open('input.pickle')
         nso=pickle.load(fh)
@@ -2071,9 +2072,9 @@ class gpsmoothing(object):
         if not npaname.endswith('npy'):
             npaname=npaname+'.npy'
         ma=np.load(npaname)
-        print 'start smoothing'
+        print('start smoothing')
         self.smoothing_2d(ma,int(orn))
-        print 'finish smoothing'
+        print('finish smoothing')
         #save the resulting array
         np.save(orn+'.smoothed',ma)
 

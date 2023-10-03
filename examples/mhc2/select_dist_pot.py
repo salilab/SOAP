@@ -1,3 +1,4 @@
+from __future__ import print_function
 from SOAP import *
 
 #define recovery fucntions
@@ -111,9 +112,9 @@ model1={'scorers':[scaledsp1,ref1],'bmtype':bmtype,'searches':[search1,search2],
 #test the model on local host
 if 0:
                 so=scorer(model=convert2old(model1))
-                print so.assess_ideal()
-                print so.assess_worst()
-                print so.assess_sascore(slevel='top1_rmsdbbif_mean_')  
+                print(so.assess_ideal())
+                print(so.assess_worst())
+                print(so.assess_sascore(slevel='top1_rmsdbbif_mean_'))
                 pdb.set_trace()
 
 #model selection

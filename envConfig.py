@@ -10,10 +10,11 @@ You might need to run "module load modeller" to load modeller and MDT.
 **Rename this file to env.py after proper configuration**
 
 """
+from __future__ import print_function
 import sys
 import os
 hostname=os.getenv('HOSTNAME')
-print hostname
+print(hostname)
 from modeller import *
 import Queue
 import threading
@@ -136,12 +137,12 @@ class SOAPenv(object):
         logcPicklefile.close()
 
     def setup_threadpool(self):
-        print "###setup thread pool"
+        print("###setup thread pool")
         for i in range(self.numofthread):
             t = ThreadClass()
             t.setDaemon(True)
             t.start()
-        print '###setup thread pool finished'
+        print('###setup thread pool finished')
 
 runenv=SOAPenv()
 
@@ -156,9 +157,9 @@ class ThreadClass(threading.Thread):
             inputlist=self.queue.get()
             #st=time.time()
             inputlist[0](*inputlist[1])
-            #print "calculation time "+str(time.time()-st)
+            #print("calculation time "+str(time.time()-st))
             self.queue.task_done()
-        print "quit"
+        print("quit")
 
 sys.path.extend([])
 scriptname='universal_script.sh'
@@ -220,7 +221,7 @@ else:
             os.makedirs(scratchdir)
     else:
         import statvfs
-        print os.statvfs("/scratch")
+        print(os.statvfs("/scratch"))
         dfs=os.statvfs("/scratch")
         if (dfs[statvfs.F_BAVAIL]*dfs[statvfs.F_BSIZE])>100000000:
             scratchdir=runenv.serverScrathPath+os.getenv('JOB_ID')+'/'+os.getenv('SGE_TASK_ID')+'/'

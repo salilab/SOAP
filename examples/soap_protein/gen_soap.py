@@ -1,3 +1,4 @@
+from __future__ import print_function
 from sps import *
 import os
 import profile
@@ -7,7 +8,7 @@ import pdb
 
 logpath='/bell3/gqdong/statpot/results/DecoysRUS_baker1/top1_rmsd_mean_+10xNativeSelection+cc/runs/54251-nan,nan_nan+nan_nan+nan_3.276_0.000__nan+nan_nan+nan_0.000_0.000 /'
 
-print logpath
+print(logpath)
 bm=pickle.load(open(logpath+'cvmodel.pickle'))
 #bestpars=bm['allresult'][0]['repna']
 bestpar=bm['originalresult'][0][0]['bestpar']
@@ -19,13 +20,13 @@ bestpar=bm['originalresult'][0][0]['bestpar']
 so=scorer(model=bm['model'])
 
 
-print so.assess(bm['allresult'][0]['bestpar'],slevel='top1_rmsd_mean_')
-print so.assess_model()
-print so.assess_ideal(slevel='top1_rmsd_mean_')
+print(so.assess(bm['allresult'][0]['bestpar'],slevel='top1_rmsd_mean_'))
+print(so.assess_model())
+print(so.assess_ideal(slevel='top1_rmsd_mean_'))
 pdb.set_trace()
 so.write_potential(filetype='hdf5')
 
 
 so.calc_structurescore('/bell2/gqdong/rawdecoyfiles/tmp/')
-print so.score[0]
+print(so.score[0])
 pdb.set_trace()

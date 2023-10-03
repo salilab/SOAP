@@ -2,6 +2,7 @@
    SOAP benchmark module, calculating statistics on the scores.
 
 """
+from __future__ import print_function
 from env import *
 from decoys import DecoySets
 from rankScores import dsscore
@@ -77,8 +78,8 @@ class dsscorestats(object):
 
     def report_stats(self,report):
         csa=np.copy(self.statsarray)
-        #print csa
-        #print csa.mean()
+        #print(csa)
+        #print(csa.mean())
         rv=0
         #report a single number indicating the performance of the potential
         for i in range(self.numofc):
@@ -351,7 +352,7 @@ class dsscorestats(object):
                 lowestctn=bottleneck.argpartsort(score,ctn)
                 lsind=np.argsort(score[lowestctn[:ctn]])
                 sortind=lowestctn[:ctn][lsind]
-                #print rmsds[sortind]
+                #print(rmsds[sortind])
             for k,tpc in enumerate(topcd):
                 #set up filter:
                 if tpc['cf']:
@@ -366,10 +367,10 @@ class dsscorestats(object):
                     if tpc['cfd']['firstonly'] and len(bni)>0:
                         #if self.ds.codelist[i].endswith('1I2M'):
                         #    pdb.set_trace()
-                    #    print self.ds.codelist[i]+' '+str(bni[0])+' '+str(rmsds['rmsd'][sortind[bni[0]]])+' '+str(rmsds['irmsd'][sortind[bni[0]]])
+                    #    print(self.ds.codelist[i]+' '+str(bni[0])+' '+str(rmsds['rmsd'][sortind[bni[0]]])+' '+str(rmsds['irmsd'][sortind[bni[0]]]))
                         bni=bni[0:1]
                     #else:
-                    #    print self.ds.codelist[i]+' '+str(-1)+' '+str(0)+' '+str(0)
+                    #    print(self.ds.codelist[i]+' '+str(-1)+' '+str(0)+' '+str(0))
                 else:
                     bni=range(0,tn[k])# index list for the sortind
                 #calculate property
@@ -424,7 +425,7 @@ class dsscorestats(object):
                     statsarray[tpc['ctsn']]=len(pa)>0
                 else:
                     raise Exception('can not handle benchmark criteria cs '+str(tpc['cs']))
-        #print self.statsarray
+        #print(self.statsarray)
 
     def analyze_score_0(self):
     #calculate benchmark statistics based on scores

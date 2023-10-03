@@ -2,6 +2,7 @@
    SOAP utility module
 
 """
+from __future__ import print_function
 from env import *
 
 
@@ -55,13 +56,13 @@ def get_residues_atoms():
             k=k+1
             if resatoms:
                 atoms.append(resatoms)
-                print k
+                print(k)
                 resatomdict[cr]=resatoms
             resatoms=[item[1]]
             allatoms.append(item[1])
             resname3.append(item[0])
             cr=item[0]
-            print item[0]
+            print(item[0])
     atoms.append(resatoms)
     resatomdict[cr]=resatoms
     resname3.append('HSD')
@@ -97,7 +98,7 @@ def get_ph(code):
 
 def float2int(tbca):
     amax=tbca.max()
-    print 'array max '+str(amax)
+    print('array max '+str(amax))
     if amax<=255:
         na=tbca.astype(np.uint8)
     elif amax<=65535:
@@ -105,7 +106,7 @@ def float2int(tbca):
     elif amax<=4294967295:
         na=tbca.astype(np.uint32)
     else:
-        print 'the data is too large to be converted to int to save memory'
+        print('the data is too large to be converted to int to save memory')
         na=tbca
     return na
 
@@ -114,10 +115,10 @@ def metalions():
 
 def isfirstlowest(array1):
     al=len(array1)
-    print al
+    print(al)
     re=1
     c2=array1[0]
-    print c2
+    print(c2)
     code="""
          int i;
          for(i=0;i<al;i++){
@@ -201,12 +202,12 @@ class mypickle(object):
         fh=open(nameprefix+'.pickle','wb')
         pickle.dump(obj,fh)
         fh.close()
-        print "dump finished"
+        print("dump finished")
         self.get_array_size(nameprefix)
         return self.arraysize
 
     def dumpnparray(self,obj,nameprefix):
-        #print "checking object "+obj.__repr__
+        #print("checking object "+obj.__repr__)
         if isinstance(obj,list) or isinstance(obj,tuple):
             if len(obj)>3000:
                 return 0
@@ -244,7 +245,7 @@ class mypickle(object):
             cid=self.npyobjidlist.index(id(obj[key]))
         else:
             cid=len(self.npyobjidlist)
-            print 'saving numpy array to hdf5'+' '+str(key)+' shape '+str(obj[key].shape)
+            print('saving numpy array to hdf5'+' '+str(key)+' shape '+str(obj[key].shape))
             tf=h5py.File(nameprefix+str(cid),'w')
             self.arraysize=self.arraysize+obj[key].nbytes
             na=tf.create_dataset('na',data=obj[key],compression='lzf')
@@ -283,7 +284,7 @@ class mypickle(object):
             ind=self.npyobjnamelist.index(sao.name)
         else:
             self.npyobjnamelist.append(sao.name)
-            print "loading numpy array"+sao.name
+            print("loading numpy array"+sao.name)
             if sao.name.endswith('npy'):
                 na=np.load(sao.name)
             else:
@@ -315,17 +316,17 @@ class mypickle(object):
         return na
 
     def load(self,nameprefix):
-        print "loading pickle file"
+        print("loading pickle file")
         name=nameprefix if nameprefix.endswith('.pickle') else nameprefix+'.pickle'
         fh=open(name,'rb')
         obj=pickle.load(fh)
         fh.close()
-        print "finished loading pickle file"
+        print("finished loading pickle file")
         #fl=os.listdir('./')
         #fl=[item for item in fl if item.startswith(nameprefix) and item.endswith('npy')]
         #if len(fl)>0:
         self.loadnparray(obj)
-        print "load finished"
+        print("load finished")
         return obj
 
     def loadpickleonly(self,nameprefix):
@@ -575,8 +576,8 @@ def build_scorer(scorerpath='./'):
     for scorer in model['scorers']:
         if scorer['type']=='scaledsp':
             ssp=scaledsp(model=scorer)
-            print os.system('ln -s '+ssp.ssppath+'.hdf5 '+ssp.sspname+'.hdf5')
-    print os.system('cp ~/Dropbox/Code/calc_score.py ./')
+            print(os.system('ln -s '+ssp.ssppath+'.hdf5 '+ssp.sspname+'.hdf5'))
+    print(os.system('cp ~/Dropbox/Code/calc_score.py ./'))
 
 
 
@@ -596,7 +597,7 @@ def findsameobjectkeys(d,list2):
         for i in range(len(list2)):
             item2=list2[i]
             if d[key] is item2:
-                #print "same key " +str(key)+' value '+str(d[key])
+                #print("same key " +str(key)+' value '+str(d[key]))
                 kl.append(key)
                 il.append(i)
     return [kl,il]
@@ -633,7 +634,7 @@ def squeeze_indexlist(indexlist):
 
 def load_scorer(originalscorer,indexlen):
     """loading scorer, used for tranfering scoring across computers"""
-    print "loading scorer"
+    print("loading scorer")
     gc.collect()
     mp=mypickle()
     scorer=copy.deepcopy(originalscorer)
@@ -727,7 +728,7 @@ class Mymodel(model):
             chainlist[-1].append(k)
             chainlist[-1].append(residuelist)
             chainlist[-1][3][-1].append(k)
-        except Exception,e:
+        except Exception as e:
             traceback.print_exc()
             pdb.set_trace()
         self.chainlist=chainlist
@@ -786,17 +787,17 @@ class Mymodel(model):
 
     def copy_native(self,code,tdir):
         code=code.lower()
-        print os.system('cp '+runenv.opdbdir+code[1:3]+'/pdb'+code+'.ent.gz '+tdir)
-        print os.system('gunzip '+tdir+'pdb'+code+'.ent.gz ')
+        print(os.system('cp '+runenv.opdbdir+code[1:3]+'/pdb'+code+'.ent.gz '+tdir))
+        print(os.system('gunzip '+tdir+'pdb'+code+'.ent.gz '))
 
     def clash_contact(self,code):
         os.chdir('/bell2/gqdong/loopsp/tmp')
         if os.path.isdir('clashtemp'+code):
-            print os.system('rm -r clashtemp'+code)
+            print(os.system('rm -r clashtemp'+code))
         os.mkdir('clashtemp'+code)
         os.chdir('clashtemp'+code)
         self.copy_native(code,'./')
-        print os.system('cp ~/Dropbox/Code/crystal_contacts.py ./')
+        print(os.system('cp ~/Dropbox/Code/crystal_contacts.py ./'))
 
         ssh = subprocess.Popen(['chimera','--nogui', 'crystal_contacts.py'],
            shell=False,
@@ -830,7 +831,7 @@ class Mymodel(model):
         for item in allcontacts:
             contactlist.append([[item[0],item[3],item[2],item[1],item[4]],[item[5],item[8],item[7],item[6],item[9]],item[10],item[11]])
         os.chdir('..')
-        print os.system('rm -r clashtemp'+code)
+        print(os.system('rm -r clashtemp'+code))
         return clashlist,contactlist
 
     def select(self,loops):
@@ -863,7 +864,7 @@ class Mymodel(model):
         rl=[]
         for item in clashlist:
             if item in loopres:
-                print 'clash with '+','.join(item)+'  '
+                print('clash with '+','.join(item)+'  ')
                 rl.append('clash with '+','.join(item)+'  ')
         return rl
 
@@ -902,7 +903,7 @@ class MemoryMonitor(object):
                                         )
 
         self.mm = self.process.communicate()[0].split('\n')[0].split()[5]
-        print self.mm
+        print(self.mm)
         return int(self.mm)
 
     def monitor(self,name,fn='mlog'):
@@ -933,9 +934,9 @@ def load_log(path):
                     #ld[l.split()[0]].append(l)
     logs.sort(key=itemgetter(0),reverse=True)
     #for key in ld:
-    #    print key
+    #    print(key)
     #    for v in ld[key]:
-    #        print v
+    #        print(v)
     for l in logs:
-        print '    '.join(l)
+        print('    '.join(l))
     return None

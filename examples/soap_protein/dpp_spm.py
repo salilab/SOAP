@@ -1,3 +1,4 @@
+from __future__ import print_function
 from sps import *
 import os
 import profile
@@ -44,13 +45,13 @@ bmtype={'type':'dsscore','dslist':['DecoysRUS','casp58','baker1'],'criteria':'3x
 blocks=[]
 kk=0
 for apn in [36]:#57
-    print apn
+    print(apn)
     noc=np.load(runenv.libdir+'ap'+str(apn)+'.npy').max()+1
-    print noc
+    print(noc)
     scorers=[]
     searches=[]
     for i in range(noc):
-        print i
+        print(i)
         sbm=['bs10dsp','ap'+str(apn)+'n',str(i)]
         ref1={'type':'sf','features':sfeature,'sftype':slo,'par':slo,'parvalue':slo,'ratio':[1.0+0.00001*i],'bm':sbm}
     
@@ -184,10 +185,10 @@ model1={'scorers':scorerlist,'bmtype':bmtype,'searches':searchlist,#'thread':4,
 
 if 0:
     so=scorer(model=convert2old(model1))
-    print so.assess_model()
+    print(so.assess_model())
     opt=optimizer(scorer=so)
     opt.get_initial_value()    
-    print so.assess(opt.initialvalue)
+    print(so.assess(opt.initialvalue))
     opt.optimize()
     pdb.set_trace()
     spso=sps(modellist=[convert2old(model1)])
@@ -197,11 +198,11 @@ if 0:
 
 elif 0:
     so=scorer(model=convert2old(model1))
-    print so.assess_model()
+    print(so.assess_model())
     opt=optimizer(scorer=so)
     opt.get_initial_value()    
     optres=opt.optimize()
-    print so.assess(opt.initialvalue)
+    print(so.assess(opt.initialvalue))
     spso=sps(modellist=[convert2old(model1)])
     pdb.set_trace()
     spso.cv()#spl.eval_allpars()

@@ -1,3 +1,4 @@
+from __future__ import print_function
 from sps import *
 import os
 import profile
@@ -18,10 +19,10 @@ bm['model']['searches']=[]
 so=scorer(model=bm['model'])
 #bm['model']['scorers'][1:2]+
 
-#print so.assess(bm['allresult'][0]['bestpar'])
-print so.assess_model(slevel='top10__nonempty_rmsd10ORirmsd4FIRST')
+#print(so.assess(bm['allresult'][0]['bestpar']))
+print(so.assess_model(slevel='top10__nonempty_rmsd10ORirmsd4FIRST'))
 #pdb.set_trace()
 so.write_potential(filetype='hdf5')
 so.calc_structurescore('/bell2/gqdong/rawdecoyfiles/ppd/temp/')
-#print so.score[0]
+#print(so.score[0])
 pdb.set_trace()

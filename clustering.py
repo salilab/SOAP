@@ -2,6 +2,7 @@
    SOAP clustering module, for clustering recovery functions.
 
 """
+from __future__ import print_function
 import numpy as np
 import scipy.cluster
 
@@ -31,7 +32,7 @@ class singlecluster(object):
             return []
 
     def get_pars_in_range(self,min2,max2):
-        print "not working"
+        print("not working")
         pdb.set_trace()
         ai=[]
         for i in range(0,len(self.pars)):
@@ -72,7 +73,7 @@ class singlecluster(object):
         return self.pars[parindex]
 
     def get_bestpar_close_to(self,value):
-        print "accessing middle of the cluster"
+        print("accessing middle of the cluster")
         if self.allclusters.optscorer.assess_rrf(np.log(self.middle))==self.bestresult:
             return value
         else:
@@ -175,7 +176,7 @@ class optclustering(object):
 
     def analyze(self):
         if len(set(self.results))==1:
-            print "!!!!!!!!!!Search returns the same results for all the values tried!!!!!!!!!!!"
+            print("!!!!!!!!!!Search returns the same results for all the values tried!!!!!!!!!!!")
             self.pickedpar=np.log(self.pars.mean(axis=0))
             self.bestmodelresult=self.optscorer.assess_rrf(self.pickedpar,report='full')
             self.testresult=self.testscorer.assess_rrf(self.pickedpar)
@@ -186,7 +187,7 @@ class optclustering(object):
         self.clustering_bestpars()
         self.pick_best_cluster(self.clusters)
         self.get_pickedpar()
-        print 'Best result '+str(self.bestresult)
+        print('Best result '+str(self.bestresult))
         self.optscorer.assess_rrf(self.pickedpar)
         if self.hasscorer:
             self.testresult=self.testscorer.assess_rrf(self.pickedpar)
@@ -415,7 +416,7 @@ class cvclustering(object):
         i=0
         for optcluster in self.optclusterlist:
             i=i+1
-            print  "Analyzing cluster #"+str(i)
+            print("Analyzing cluster #"+str(i))
             optcluster.analyze()
 
     def find_overlap(self):
@@ -423,12 +424,12 @@ class cvclustering(object):
         for optcluster in self.optclusterlist:
             region=optcluster.clustering(region)
             if region==[]:
-                print "No overlap regions"
+                print("No overlap regions")
                 break
         return region
 
     def plot(self):
-        print "ploting...... (can take a while)"
+        print("ploting...... (can take a while)")
         ph=self.plot_all_bestpars()
         ph.savefig(self.figpath+'all_bestpars.eps')
         ph2,ph3=self.optclusterlist[-1].plot()
@@ -469,7 +470,7 @@ class cvclustering(object):
         fh.close()
 
 def get_representative_pars(pars, cutoffdistance=0.001, maxcluster=0):
-    #print "orinial number: "+str(len(pars))
+    #print("orinial number: "+str(len(pars)))
     if pars.shape[0]<10:
         return range(len(pars))
     pars=np.round(pars,4)
@@ -486,7 +487,7 @@ def get_representative_pars(pars, cutoffdistance=0.001, maxcluster=0):
     for i in range(1,noc+1):
         rl=np.nonzero(ca==i)[0]
         rac.append(rl[0])
-    #print "representative par number: "+str(len(rac))+' at distance '+str(cutoffdistance)
+    #print("representative par number: "+str(len(rac))+' at distance '+str(cutoffdistance))
     return rac
 
 def get_representative_pars_maxlength(pars, cutoffdistance=0.001, maxlength=5000,maxcluster=5000):
@@ -499,12 +500,12 @@ def get_representative_pars_maxlength(pars, cutoffdistance=0.001, maxlength=5000
     pars=np.random.permutation(pars)
     nal=[]
     apl=range(0,parshape[0],prn)+[parshape[0]]
-    print "total orinial number: "+str(parshape[0])
+    print("total orinial number: "+str(parshape[0]))
     for i in range(0,numofrun):
         spars=pars[apl[i]:apl[i+1]]
         nal.append(spars[get_representative_pars(spars[:,:-1],cutoffdistance,maxcluster=int(takepercentage*(apl[i+1]-apl[i])))])
     na=np.vstack(nal)
-    print "total representative par number: "+str(len(na))+' at distance '+str(cutoffdistance)+' max '+str(maxcluster)
+    print("total representative par number: "+str(len(na))+' at distance '+str(cutoffdistance)+' max '+str(maxcluster))
     return na
 
 def get_representative_pars_maxcluster(pars, cutoffdistance=0.001, maxlength=5000,maxcluster=5000):
@@ -532,7 +533,7 @@ def get_representative_pars_forall(na,distanceratio=0,maxcluster=5000,cutoffdist
         spars=pars[fm]
         pr=result[fm]
         sparindex=parindex[fm]
-        print "reducing for performance pars "+str(res)
+        print("reducing for performance pars "+str(res))
         na=get_representative_pars_maxcluster(spars,cutoffdistance=(cutoffdistance+(1-res)*distanceratio),maxcluster=maxcluster)
         pl.append(np.hstack((na,ar.min()+res*(ar.max()-ar.min())*np.ones([na.shape[0],1]))))
     return np.vstack(pl)

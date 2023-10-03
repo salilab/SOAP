@@ -3,6 +3,7 @@
 
 """
 
+from __future__ import print_function
 from scorer import *
 from sampling import *
 import filelock
@@ -69,7 +70,7 @@ class k2cv(object):
                 try:
                     tperc=tperc+item[0][1]
                     perc=perc+item[1]
-                except Exception,e:
+                except Exception as e:
                     traceback.print_exc()
                     pdb.set_trace()
             tperc=tperc/len(result)
@@ -163,7 +164,7 @@ class k2cv(object):
             optarraylist.append(np.vstack(item))
         self.optarraylist=optarraylist
         self.optstats=na
-        print self.optstats
+        print(self.optstats)
         self.statsstr='('+str(self.optstats[-1].min())+' '+str(self.optstats[-1].max())+') '+str(self.optstats[-1].mean())+u"\u00B1"+str(self.optstats[-1].std())
 
     def get_scorer_list(self):
@@ -247,7 +248,7 @@ class k2cv(object):
         self.resultstr=u"{5:.5f},{6:.3f}, {0:2.3f}\u00B1{1:2.3f}, {2:2.3f}\u00B1{3:2.3f}, {4:2.3f}, {7:2.3f}__{8:2.3f}\u00B1{9:2.3f}, {10:2.3f}\u00B1{11:2.3f}, {12:2.3f}, {13:2.3f} ".format(
             self.optmean,self.optstd,self.testmean,self.teststd,self.finaloptresult,self.pdsum,self.rlpdmean,self.lasttestresult, self.finaloptmean,self.finaloptstd,self.finaltestmean,self.finalteststd,self.finalfinaloptresult,self.finalfinaltestresult)
         self.resultarray=np.array([self.optmean,self.optstd,self.testmean,self.teststd,self.finaloptresult,self.pdsum,self.lasttestresult, self.finaloptmean,self.finaloptstd,self.finaltestmean,self.finalteststd,self.finalfinaloptresult,self.finalfinaltestresult,self.rlpdmean])
-        print self.resultstr
+        print(self.resultstr)
 
     def save_optimization_results(self):
         bdir=runenv.basedir+'results/'
@@ -273,7 +274,7 @@ class k2cv(object):
                      'inputlist':self.inputlist,'allresult':self.rdlist,'originalresult':self.originalresult},fh)
         fh.close()
         #self.clusters.dump('cvcluster.pickle')
-        print os.system('cp '+sys.path[1]+'/'+sys.argv[0]+' ./')
+        print(os.system('cp '+sys.path[1]+'/'+sys.argv[0]+' ./'))
         if self.withlastone:
             self.bestmodel=self.spsfo.scorer.build_model(self.finaloptpar)
             fh=open('bestmodel.pickle','w')
@@ -415,7 +416,7 @@ class k2cv(object):
         if numofcount==0:
             conn.execute("insert into Counter values (1000000,2000000,3000000)")
         elif numofcount>1:
-            print "more than 1 line of count"
+            print("more than 1 line of count")
             pdb.set_trace()
 
         if self.spsfo==None:
@@ -435,11 +436,11 @@ class k2cv(object):
                         WHERE optmethod=?;""",(optList[0],))
         rows=conn.fetchall()
         if len(rows)>1:
-            print "duplicate in database"
+            print("duplicate in database")
             pdb.set_trace()
         elif len(rows)==1:
             if rows[0][1:]!=tuple(optList):
-                print "duplicate but not matching optmethod"
+                print("duplicate but not matching optmethod")
                 pdb.set_trace()
             optList.insert(0, rows[0][0])
         elif len(rows)==0:
@@ -473,11 +474,11 @@ class k2cv(object):
                             WHERE scorer=?""",(scoList[0],))
             rows=conn.fetchall()
             if len(rows)>1:
-                print "duplicate in database"
+                print("duplicate in database")
                 pdb.set_trace()
             elif len(rows)==1:
                 if rows[0][1:]!=tuple(scoList):
-                    print "duplicate but not matching scorer"
+                    print("duplicate but not matching scorer")
                     pdb.set_trace()
                 scoList.insert(0, rows[0][0])
             elif len(rows)==0:
@@ -507,13 +508,13 @@ class k2cv(object):
             for i in range(len(resList[-2][0])):
                 nl.append(resList[-2][0][i])
             resList[-2]=nl
-        print resList[-2]
+        print(resList[-2])
         conn.execute("""SELECT *
                         FROM Result
                         WHERE runnum=?""",(resList[-1],))
         rows=conn.fetchall()
         if len(rows)>1:
-            print "duplicate in database"
+            print("duplicate in database")
         elif len(rows)==1:
             for i in range(len(resList)):
                 try:
@@ -522,7 +523,7 @@ class k2cv(object):
                 except:
                     continue
             if rows[0][:-2]!=tuple(resList)[:-2] or rows[0][-1]!=tuple(resList)[-1] or (not np.allclose(rows[0][-2],resList[-2])):
-                print "duplicate but not matching result"
+                print("duplicate but not matching result")
                 pdb.set_trace()
         elif len(rows)==0:
             for sc in allScorers:
@@ -729,10 +730,10 @@ class k2cvcluster(k2cvlocal):
                     csptemp=self.get_parvalue_from_rf(so.initialvalues,om,repna[sp:ep,:-1],oso,sp=csp)
                     sp=sp+self.runsperscorer
             csp=csptemp
-        print "please check the initialvalue performance"
+        print("please check the initialvalue performance")
         self.spsfo.scorer.initialvalues=so.initialvalues
         self.spsfo.get_initial_value()
-        print self.spsfo.scorer.assess(self.spsfo.bestpar)
+        print(self.spsfo.scorer.assess(self.spsfo.bestpar))
 
     def get_parvalue_from_rf(self,newpar,originalmodel,originalpar,oso,sp=0):
         #originalpar is the list containing all the search pars, we need to somehow convert the original pars to the pars for the new model
@@ -741,7 +742,7 @@ class k2cvcluster(k2cvlocal):
         #the scorers from the original model and current model are matched 1 by 1.
         ospi=0 # original model  position
         for spi in range(sp,len(self.spsfo.scorer.model['scorers'])): #current model posiiotn
-            print spi
+            print(spi)
             #if spi==(len(self.spsfo.scorer.model['scorers'])-2):
             #    pdb.set_trace()
             if len(self.spsfo.scorer.scorersearchlist[spi])==0:
@@ -766,7 +767,7 @@ class k2cvcluster(k2cvlocal):
                     for si2 in oso.scorersearchlist[ospi]:
                         if originalmodel['searches'][si2]['key']=='ratio':
                             if np.any(newpar[:,self.spsfo.scorer.searchlistspos[si]]!=-9999):
-                                print "resetting the values twice"
+                                print("resetting the values twice")
                             for j in range(parshape[0]):
                                 newpar[j,self.spsfo.scorer.searchlistspos[si]]=originalpar[j,oso.searchlistspos[si2]]
                             setvalues=True
@@ -777,7 +778,7 @@ class k2cvcluster(k2cvlocal):
                             setbins=True
                             bins=[]
                             if np.any(newpar[:,self.spsfo.scorer.searchlistspos[si]:self.spsfo.scorer.searchlistspos[si+1]]!=-9999):
-                                print "resetting the values twice"
+                                print("resetting the values twice")
                                 pdb.set_trace()
                             for j in range(parshape[0]):
                                 newpar[j,self.spsfo.scorer.searchlistspos[si]:self.spsfo.scorer.searchlistspos[si+1]]=originalpar[j,oso.searchlistspos[si2]:oso.searchlistspos[si2+1]]
@@ -786,7 +787,7 @@ class k2cvcluster(k2cvlocal):
                     if setbins==False and len(originalmodel['scorers'][ospi]['par'])==len(self.model['scorers'][spi]['par']):
                         bins=[]
                         if np.any(newpar[:,self.spsfo.scorer.searchlistspos[si]:self.spsfo.scorer.searchlistspos[si+1]]!=-9999):
-                            print "resetting the values twice"
+                            print("resetting the values twice")
                             pdb.set_trace()
                         for j in range(parshape[0]):
                             newpar[j,self.spsfo.scorer.searchlistspos[si]:self.spsfo.scorer.searchlistspos[si+1]]=originalmodel['scorers'][ospi]['par']
@@ -798,7 +799,7 @@ class k2cvcluster(k2cvlocal):
                     for si2 in oso.scorersearchlist[ospi]:
                         if originalmodel['searches'][si2]['key']=='parvalue':
                             if np.any(newpar[:,self.spsfo.scorer.searchlistspos[si]:self.spsfo.scorer.searchlistspos[si+1]]!=-9999):
-                                print "resetting the values twice"
+                                print("resetting the values twice")
                                 pdb.set_trace()
                             for j in range(parshape[0]):
                                 oso.parvalues=originalpar[j,:]
@@ -820,8 +821,8 @@ class k2cvcluster(k2cvlocal):
                 break
             #pdb.set_trace()
         if np.any(newpar==-9999):
-            print 'Some Initial values are undefined '
-        print spi
+            print('Some Initial values are undefined ')
+        print(spi)
         spi+=1
         return spi
 
@@ -927,8 +928,8 @@ class k2cvcluster(k2cvlocal):
                 res.append(self.spsfo.runtask_local(i,self.testscorer))
                 if self.spsfo.quit:
                     break
-            print os.system('touch Finished'+str(self.spsfo.scorerid)+'#'+str(self.spsfo.jobid)+'#'+str(int(time.time()-self.spsfo.starttime)))
-            print os.system('touch '+self.runpath+self.inputcode+'.pickle')
+            print(os.system('touch Finished'+str(self.spsfo.scorerid)+'#'+str(self.spsfo.jobid)+'#'+str(int(time.time()-self.spsfo.starttime))))
+            print(os.system('touch '+self.runpath+self.inputcode+'.pickle'))
             fh=open(self.runpath+self.inputcode+'.pickle','w')
             pickle.dump(res,fh)
             fh.close()
@@ -937,35 +938,35 @@ class k2cvcluster(k2cvlocal):
                 self.wait_analyze_single_try(inputindex)
                 #oc.dump(self.inputcode+'.optimizer.pickle')
                 for i in self.runnumlist[inputindex]:
-                    print 'removing '+str(i)
-                    print os.system('rm '+str(i)+'.pickle')
+                    print('removing '+str(i))
+                    print(os.system('rm '+str(i)+'.pickle'))
             else:
                 fh=open(self.inputcode+'.optimizer.pickle','wb')
                 pickle.dump('Empty',fh)
                 fh.close()
             runsuccess=True
-        except Exception,e:
-            print e
-            print "FatalError : can not write the pickle file"
+        except Exception as e:
+            print(e)
+            print("FatalError : can not write the pickle file")
             traceback.print_exc()
             runsuccess=False
         report_job_runstatus(self.runpath, runsuccess, inputcode, '.optimizer',inputname='runme.py')
         return 0
 
     def wait_analyze_single_try(self,inputindex):
-        print 'waiting for other runs to finish '
+        print('waiting for other runs to finish ')
         #rn=self.check_status_single_try(inputindex)
         #while rn>0:
         #    time.sleep(10)
         #    rn=self.check_status_single_try(inputindex)
-        #    print os.system('touch '+self.runpath+str(inputindex)+'-waiting-'+str(rn))
+        #    print(os.system('touch '+self.runpath+str(inputindex)+'-waiting-'+str(rn)))
         rn=self.check_status_single_try(inputindex,type='jobfinished')
         while rn>1: #change to rn>1
             time.sleep(30)
             rn=self.check_status_single_try(inputindex,type='jobfinished')
-            print 'waiting for others to finish'
-            #print os.system('touch '+self.runpath+str(inputindex)+'-waitingjob-'+str(rn))
-        #print os.system('rm '+self.runpath+str(inputindex)+'-waiting*')
+            print('waiting for others to finish')
+            #print(os.system('touch '+self.runpath+str(inputindex)+'-waitingjob-'+str(rn)))
+        #print(os.system('rm '+self.runpath+str(inputindex)+'-waiting*'))
         return self.analyze_results_for_single_try(inputindex)
 
     def check_status_single_try(self,inputindex,type='pickle'):
@@ -981,8 +982,8 @@ class k2cvcluster(k2cvlocal):
                 k=k+1
             else:
                 pass
-                #print os.system('touch '+str(inputindex)+'-waitingnum-'+str(i))
-        print "Finished run num ("+type+") :"+str(k)
+                #print(os.system('touch '+str(inputindex)+'-waitingnum-'+str(i)))
+        print("Finished run num ("+type+") :"+str(k))
         return len(self.runnumlist[inputindex])-k
 
     def analyze_results_for_single_try(self,inputindex):
@@ -1151,14 +1152,14 @@ class k2cvcluster(k2cvlocal):
                 rdll.append(self.rdlist[srn*i:srn*(i+1)])
             self.originalresult=rdll
             for i in range(srn):
-                print "num"+str(i)
+                print("num"+str(i))
                 bestresult=-np.inf #choose the best train restult
-                print bestresult
+                print(bestresult)
                 bestrd=[]
                 for j in range(self.repeat):
                     if rdll[j][i]['bestresult']>bestresult:
                         bestresult=rdll[j][i]['bestresult']
-                        print bestresult
+                        print(bestresult)
                         bestrd=rdll[j][i]
                 nrdlist.append(bestrd)
             self.rdlist=nrdlist
@@ -1180,7 +1181,7 @@ class k2cvcluster(k2cvlocal):
         #self.clusters.optclusterlist[-1].optscorer=self.scorerlist[-1][0]
         self.analyze_clustering_results()
         cvresult=self.save_optimization_results()
-        print os.system('rm -r '+self.dir+self.rundir)
+        print(os.system('rm -r '+self.dir+self.rundir))
         #del self.clusters
         del self.task
         gc.collect()
@@ -1206,12 +1207,12 @@ class k2cvcluster(k2cvlocal):
                 fl=get_starting_jobs()
                 while len(fl)>0:
                     sleep(5)
-                    print "jobs are starting on  "+hcn
+                    print("jobs are starting on  "+hcn)
                 fm=get_system_freemem()
                 if fm/1000.0>(self.freememory+1.5):
                     return mypickle().loadpickleonly('input')
                 else:
-                    print "not enough free memory on node"
+                    print("not enough free memory on node")
                     sys.exit(0)
 
     def get_ppdock_plotdata(self):
@@ -1226,7 +1227,7 @@ class k2cvcluster(k2cvlocal):
                 so.loadfilter=None
                 par=self.rdlist[i]['bestpar']
                 tnr=range(0,30)
-                print so.assess(par)
+                print(so.assess(par))
                 for p in tnr:
                     tcp=int(10**(p/10.0))
                     ara[p,i,k]=so.assess(par,slevel='top'+str(tcp)+'__nonempty_rmsd10ORirmsd4FIRST')
@@ -1237,10 +1238,10 @@ class k2cvcluster(k2cvlocal):
         so=scorer(model=self.model)
         if not hasattr(self,'finaloptpar'):
             self.load_fromlogdir(self.logpath)
-        print so.assess(self.finaloptpar)
-        print so.assess_model()
+        print(so.assess(self.finaloptpar))
+        print(so.assess_model())
         rp=so.write_potential(filetype='lib')
-        print rp
+        print(rp)
         libpath=rp[0]+'.opt.lib'
-        print libpath
-        print os.system('scp '+libpath+' '+runenv.jobserver+':'+os.path.join(runenv.serverUserPath+'lib',self.rundir+'.lib'))
+        print(libpath)
+        print(os.system('scp '+libpath+' '+runenv.jobserver+':'+os.path.join(runenv.serverUserPath+'lib',self.rundir+'.lib')))

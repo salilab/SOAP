@@ -2,6 +2,7 @@
    A module for processing protein sequences in PIR format.
 """
 
+from __future__ import print_function
 from env import *
 
 class pir(object):
@@ -137,10 +138,10 @@ class pir(object):
                 aln.append_model(mdl,align_codes=f,atom_files=f)
                 aln.write(output,alignment_format='PIR')
                 ndnlist.append(f)
-            except Exception, error:
-                print os.listdir('./')
-                print error
-                print f
+            except Exception as error:
+                print(os.listdir('./'))
+                print(error)
+                print(f)
                 traceback.print_exc()
         return ndnlist
 
@@ -200,7 +201,7 @@ class pir(object):
             if pirhead.match(line):
                 sly=1;
                 numofr=0;
-                #print line
+                #print(line)
         return n
 
     def sep_pir(self, tardir, numoff,permin=100,residuepower=2):
@@ -208,7 +209,7 @@ class pir(object):
         bdir=tardir # input
         totalcodenum=self.count_pir()
         if totalcodenum<permin:
-            print os.system('cp '+pirfile+' '+tardir+'/pdbs1')
+            print(os.system('cp '+pirfile+' '+tardir+'/pdbs1'))
             return 0
         if float(totalcodenum)/numoff<permin:
             numoff=int(float(totalcodenum)/permin)
@@ -241,7 +242,7 @@ class pir(object):
                     out.flush()
                     out.close()
                     out=file('pdbs'+str(k),"w")
-                    #print 'seperating'+ str(k)
+                    #print('seperating'+ str(k))
                 sly=1
                 numofr=0;
                 tc=tc+1
@@ -250,7 +251,7 @@ class pir(object):
         out.close()
 
     def gen_pir(self, pirfiledirectory,pdbset):
-        print 'Generating pdb file'
+        print('Generating pdb file')
         env = environ()
         aln = alignment(env)
         pdbfile='pdb_'+pdbset+'.pir'
@@ -261,17 +262,17 @@ class pir(object):
         for filen in listoffiles:
             if re.match(filen[:-4],pdbfile):
                 if re.match('[0-9.]*A',pdbfile[len(filen)-3:-4]):
-                    print filen
+                    print(filen)
                     input = modfile.File(pirfiledirectory+filen, 'r')
                     output = modfile.File(pirfiledirectory+pdbfile, 'w')
                     while aln.read_one(input, alignment_format='PIR'):
-                        print "Read code %s" % aln[0].code
+                        print("Read code %s" % aln[0].code)
                         if aln[0].resolution < float(pdbfile[len(filen)-3:-5]):
                             aln.write(output, alignment_format='PIR')
                     input.close()
                     output.close()
                     return pdbfile
-        print 'The program do not know how to generate the pdbpir file. Please generate it manually.'
+        print('The program do not know how to generate the pdbpir file. Please generate it manually.')
         return 0
 
     def filter_pir(self,inputpirfile,outputpirfile,structuretype='structureX',structureresolution=99.0):
@@ -312,7 +313,7 @@ class pir(object):
                 out.write(line)
 
     def gen_pir_new(self,pirfiledirectory,pdbset):
-        print 'Generating pdb file ' + pdbset
+        print('Generating pdb file ' + pdbset)
         env = environ()
         aln = alignment(env)
         pdbfile='pdb_'+pdbset+'.pir'
@@ -325,10 +326,10 @@ class pir(object):
         elif pdbset[0]=='N':
             sttype='structureN'
         else:
-            print 'unsupported pdb database file type (example X_2.2A_60): '+pdbset
+            print('unsupported pdb database file type (example X_2.2A_60): '+pdbset)
         if re.search('[0-9.]*A',pdbset):
             stresolution=float(pdbset[2:5])
-            print stresolution
+            print(stresolution)
         else:
             stresolution=99.0
         if not re.search('_[0-9]*$',pdbset):
@@ -347,7 +348,7 @@ class pir(object):
         k=0
         for fn in list:
             k=k+1
-            print str(k)+' outof '+str(len(list))
+            print(str(k)+' outof '+str(len(list)))
             pirstring=pirstring+self.pirdict[fn]
         out=open(targetpath,'w')
         out.write(pirstring)
@@ -377,14 +378,14 @@ class pir(object):
         for key in self.pirdict:
             if len(key)<4:
                 continue
-            print key
+            print(key)
             mdl=model(env)
             mdl.read(file=key[0:4])
             if mdl.rfactor>rfactor or mdl.resolution>xray or mdl.rfactor==-1 or mdl.resolution==-1:
                 continue
             ph=get_ph(key[0:4])
             if ph<phrange[0] or ph>phrange[1]:
-                print 'ph not in range '+str(ph)
+                print('ph not in range '+str(ph))
                 continue
             pirstring=pirstring+self.pirdict[key]
         out=open(tp,'w')
@@ -402,7 +403,7 @@ class pir(object):
             mdl=model(env)
             mdl.read(code[0:4])
             mdl.write('pdb'+code[0:4]+'.ent')
-            print os.system('scp pdb'+code[0:4]+'.ent '+runenv.jobserver+':~/pdb/')
+            print(os.system('scp pdb'+code[0:4]+'.ent '+runenv.jobserver+':~/pdb/'))
 
     def duplicate_check(self):
         codelist=self.get_codelist()
