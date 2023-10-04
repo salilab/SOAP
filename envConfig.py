@@ -125,19 +125,16 @@ class SOAPenv(object):
         self.spdsscoreTasks={}
 
     def log(self,sdict):#obsolete
-        logstrfile=open(self.basedir+'score.summary','a')
-        logstrfile.write(sdict['string']+'\n')
-        logstrfile.close()
+        with open(self.basedir+'score.summary','a') as logstrfile:
+            logstrfile.write(sdict['string']+'\n')
         if os.path.isfile(self.basedir+'score.summary.pickle'):
-            logcPicklefile=open(self.basedir+'score.summary.pickle','rb')
-            loglist=cPickle.load(logcPicklefile)
+            with open(self.basedir+'score.summary.pickle','rb') as logcPicklefile:
+                loglist=cPickle.load(logcPicklefile)
             loglist.append(sdict)
-            logcPicklefile.close()
         else:
             loglist=[]+[sdict]
-        logcPicklefile=open(self.basedir+'score.summary.pickle','wb')
-        cPickle.dump(loglist,logcPicklefile)
-        logcPicklefile.close()
+        with open(self.basedir+'score.summary.pickle','wb') as logcPicklefile:
+            cPickle.dump(loglist,logcPicklefile)
 
     def setup_threadpool(self):
         print("###setup thread pool")

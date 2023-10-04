@@ -221,9 +221,8 @@ class sps(object):
         plt.show()
 
     def loadlog(self):
-        fh=open(runenv.basedir+'log.pickle','rb')
-        self.resultdict=pickle.load(fh)
-        fh.close()
+        with open(runenv.basedir+'log.pickle','rb') as fh:
+            self.resultdict=pickle.load(fh)
 
     def get_cvrundir(self):
         rdl=[]
@@ -389,9 +388,8 @@ class spss(object):
         if len(path)>0:
             print(path+'/spss.pickle')
             print('skipping')
-            fh=open(path+'/spss.pickle', 'rb')
-            a=pickle.load(fh)
-            fh.close()
+            with open(path+'/spss.pickle', 'rb') as fh:
+                a=pickle.load(fh)
             for key in self.__dict__.keys():
                 self.__dict__[key]=a.__dict__[key]
             self.logdir=a.logdir
@@ -683,11 +681,10 @@ class spss(object):
         os.chdir(self.logdir)
         with filelock.FileLock("log.shelve", timeout=100, delay=2) as lock:
             print("Lock acquired.")
-            logfile=open(self.logdir+'log','a+')
-            logstr=logstr.encode('utf-8')
-            logfile.write(logstr+'\n')
-            print(logstr)
-            logfile.close()
+            with open(self.logdir+'log','a+') as logfile:
+                logstr=logstr.encode('utf-8')
+                logfile.write(logstr+'\n')
+                print(logstr)
             #print(os.system('cp '+self.logdir+'log '+self.logdir2))
             print("lock released")
 
@@ -751,9 +748,8 @@ class spss(object):
 
     def write_best_pot(self):
         print("only works for the case with single pot, single reference state")
-        fh=open(self.logdir+'bestmodel.pickle', 'rb')
-        bm=pickle.load(fh)
-        fh.close()
+        with open(self.logdir+'bestmodel.pickle', 'rb') as fh:
+            bm=pickle.load(fh)
         #pdb.set_trace()
         #bm['scorers'][1]['sftype']='logbins'
         bm['scorers'][0]['refs']=[bm['scorers'][1]]
@@ -765,9 +761,8 @@ class spss(object):
 
     def dump(self):
         os.chdir(self.logdir)
-        fh=open('spss.pickle','wb')
-        pickle.dump(self,fh)
-        fh.close()
+        with open('spss.pickle','wb') as fh:
+            pickle.dump(self,fh)
 
     def get_all_models(self,ml3, dsearchindex):
         dsearch=self.dsearches[dsearchindex]
@@ -788,9 +783,8 @@ class spss(object):
             print(self.resultdict[key][1]+', '+str(key))
 
 def pickle2shelf(prefix):
-    fh=open(prefix+'.pickle', 'rb')
-    a=pickle.load(fh)
-    fh.close()
+    with open(prefix+'.pickle', 'rb') as fh:
+        a=pickle.load(fh)
     os.unlink(prefix+'.pickle')
     nd=shelve.open(prefix+'.shelve')
     for key in a:
@@ -900,9 +894,8 @@ def get_best_model(path2logdir):
     #fh=open(os.path.join(path2logdir,'bestmodel.pickle'))
     #bm=pickle.load(fh)
     #fh.close()
-    fh=open(os.path.join(path2logdir,'cvmodel.pickle'), 'rb')
-    bm=pickle.load(fh)
-    fh.close()
+    with open(os.path.join(path2logdir,'cvmodel.pickle'), 'rb') as fh:
+        bm=pickle.load(fh)
     so=scorer(model=bm['model'])
     bestpars=bm['originalresult'][0][0]['bestpar']
     print(so.assess_model())

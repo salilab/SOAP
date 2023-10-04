@@ -518,9 +518,8 @@ class sprefine(object):
         self.input=input[:-7]
         print(input)
         print(input[:-7])
-        fh=open(input,'rb')
-        loopdict=cPickle.load(fh)
-        fh.close()
+        with open(input,'rb') as fh:
+            loopdict=cPickle.load(fh)
         self.model_loops_list(loopdict)
         fl=os.listdir('./')
         fl=[item for item in fl if item[-3:]=='pdb']
@@ -675,19 +674,17 @@ class sprefine(object):
         nrpl=max(1,numofruns/k)
         nrpn=self.nofloops/nrpl
         for i in range(0,k*nrpl):
-            fh=open(str(i+1)+'.pickle','wb')
             cd=dictlist[i/nrpl]
             if nrpl>1:
                 cd['runenv']=[(i%k)*nrpn,(i%k+1)*nrpn]
-            pickle.dump(cd,fh)
-            fh.close()
+            with open(str(i+1)+'.pickle','wb') as fh:
+                pickle.dump(cd,fh)
         self.nrpl=nrpl
         self.nors=k*nrpl
         nors=k*nrpl
         #write the input list for different runs
-        inputlist=open('inputlist','w')
-        inputlist.write(','.join([str(i)+'.pickle' for i in range(1,nors+1)]))
-        inputlist.close()
+        with open('inputlist','w') as inputlist:
+            inputlist.write(','.join([str(i)+'.pickle' for i in range(1,nors+1)]))
         makemdt=open('runme.py','w')#nonbond_spline=0.1,contact_shell=12.0,deviations=50
         makemdt.write('from SOAP.loop import *\nimport sys \n \nspopt=sprefine(sys.argv[1],"'+self.bm+'","'+self.criteria+'",'+str(self.nonbond_spline)+','+str(self.contact_shell)+','+str(self.deviations)+')\nspopt.runpath=\''+self.runpath+'\'\nspopt.refpot[1]="'+self.refpot[1]+'"\n\nspopt.assess_method="'+self.assess_method+'"\n\nspopt.saveStructure='+str(self.saveStructure)+'\n\nspopt.trace='+str(self.trace)+'\n\nspopt.initialize_dslist()'+'\n'+'\nspopt.assess_cluster_node()\n')
         makemdt.flush()
@@ -752,9 +749,8 @@ class sprefine(object):
         print(self.nors)
         for i in range(self.nors):
             if os.path.isfile(str(i+1)+'.pickle'):
-                fh=open(str(i+1)+'.pickle','rb')
-                res=pickle.load(fh)
-                fh.close()
+                with open(str(i+1)+'.pickle','rb') as fh:
+                    res=pickle.load(fh)
                 if not res.keys()[0] in rd:
                     rd[res.keys()[0]]=[]
                 #if self.assess_method=='SOAP':
@@ -942,9 +938,8 @@ class sprefine(object):
             if os.path.isfile(str(i+1)+'.pickle'):
                 inputdict=pickle.load(gzip.open(str(i+1)+'.pickle.gz', 'rb'))
                 del inputdict['runenv']
-                fh=open(str(i+1)+'.pickle','rb')
-                res=pickle.load(fh)
-                fh.close()
+                with open(str(i+1)+'.pickle','rb') as fh:
+                    res=pickle.load(fh)
                 l=inputdict.values()[0][0]
                 code=inputdict.keys()[0]
                 dsname=code+str(l[1])+('A' if l[0]=='' else l[0])+str(l[2])

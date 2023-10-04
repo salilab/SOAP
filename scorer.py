@@ -661,9 +661,8 @@ class scorer(object):
         else:
             raise Exception('this type of model is not supported yet.')
         scorestr=[f+', '+str(ss) for f,ss in zip(structurelist,list(score))]
-        fh=open('score','w')
-        fh.write('\n'.join(scorestr))
-        fh.close()
+        with open('score','w') as fh:
+            fh.write('\n'.join(scorestr))
         return score
 
     def calc_structurescore(self,structurepath):

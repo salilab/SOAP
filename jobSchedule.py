@@ -46,9 +46,8 @@ class task(object):
         self.waitinglist=[]
 
     def get_runf(self):
-        rfh=open(self.dir+self.runname)
-        rfs=rfh.read()
-        rfh.close()
+        with open(self.dir+self.runname) as rfh:
+            rfs=rfh.read()
         rer=re.search('1-([0-9]+)',rfs)
         self.rfs=rfs
         self.numofruns=int(rer.group(1))
@@ -63,13 +62,11 @@ class task(object):
             while os.path.isfile(runenv.basedir+'rsnlock'):
                 time.sleep(1)
             print(os.system('touch '+runenv.basedir+'rsnlock'))
-            rsnf=open(runenv.basedir+'rsn','r')
-            rsn=int(rsnf.read())
-            rsnf.close()
-            rsnf=open(runenv.basedir+'rsn','w')
+            with open(runenv.basedir+'rsn','r') as rsnf:
+                rsn=int(rsnf.read())
             rsn=rsn+1
-            rsnf.write(str(rsn))
-            rsnf.close()
+            with open(runenv.basedir+'rsn','w') as rsnf:
+                rsnf.write(str(rsn))
             print(os.system('rm -f '+runenv.basedir+'rsnlock'))
             self.rsn=rsn
 
@@ -530,9 +527,8 @@ class task(object):
         self.rdirname=str(rsn)
         self.numofruns=numofruns
         self.runname='r'+str(rsn)+'.sh'
-        rfh=open(self.dir+self.runname)
-        rfs=rfh.read()
-        rfh.close()
+        with open(self.dir+self.runname) as rfh:
+            rfs=rfh.read()
         self.rfs=rfs
         self.started=True
         self.unnoticederror=False

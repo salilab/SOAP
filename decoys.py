@@ -171,10 +171,9 @@ class Decoys4Single(object):
                     shutil.move(otherprotein, otherprotein[:-3]+atom+'.bad')
                     break
                 fs=fs+atomlines[index]+'\n'
-            fht=open(otherprotein,'w')
-            fht.write(fs)
-            fht.flush()
-            fht.close()
+            with open(otherprotein,'w') as fht:
+                fht.write(fs)
+                fht.flush()
 
     def align_seq(self,seqnamel,seqnuml,tseqnamel,tseqnuml):
         k=0
@@ -235,9 +234,8 @@ class Decoys4Single(object):
         if rmsdfl[0]=='rmsd.pickle':
             return self.load_rmsd(rmsdfl[0])
         rmsdf=rmsdfl[0]
-        rmsdfh=open(rmsdf)
-        rmsdfc=rmsdfh.read()
-        rmsdfh.close()
+        with open(rmsdf) as rmsdfh:
+            rmsdfc=rmsdfh.read()
         nativef=[elem for elem in flist if re.search(nativepattern,elem)][0]
         flist.remove(nativef)
         otherf=[elem for elem in flist if re.search('pdb$', elem)]
@@ -303,17 +301,15 @@ class Decoys4Single(object):
         self.build_sa(rmsdlist)
 
     def load_rmsd(self,rmsdf):
-        fh=open(rmsdf,'rb')
-        rmsddict=pickle.load(fh)
-        fh.close()
+        with open(rmsdf,'rb') as fh:
+            rmsddict=pickle.load(fh)
         rmsdlist=[]
         k=0
         dopescore=False
         if os.path.isfile('score.pickle'):
-            fh=open('score.pickle','rb')
             dopescore=True
-            dopedict=pickle.load(fh)
-            fh.close()
+            with open('score.pickle','rb') as fh:
+                dopedict=pickle.load(fh)
         if os.path.isfile('extrapar.pickle'):
             self.extrapar=pickle.load(open('extrapar.pickle', 'rb'))
         for key in rmsddict:
@@ -422,9 +418,8 @@ class Decoys4Single(object):
             dfc=fh.read()
             fh.close()
             fc=fc.replace('replacethis',dfc)
-            fh=open('nativepdb','w')
-            fh.write(fc)
-            fh.close()
+            with open('nativepdb','w') as fh:
+                fh.write(fc)
             nativefile='nativepdb'
         elif len(bf)>0 and os.path.isfile('needattachtobase'):
             nativeligand=[f for f in fl if self.dnlist[0] in f and (f.endswith('pdb.gz') or f.endswith('pdb'))][0]
@@ -453,22 +448,19 @@ class Decoys4Single(object):
         subprocess.check_call(['PatchDock/mainchain.pl',
                                self.code+'_l_u.pdb', 'B'])
         #combine the two files
-        fh=open(self.code+'_r_b.pdb','a')
-        fh.write('\n')
-        fh.close()
+        with open(self.code+'_r_b.pdb','a') as fh:
+            fh.write('\n')
         cat_files((self.code+'_r_u.pdb', self.code+'_l_u.pdb'),
                   open(self.dsname+'.'+self.code+'.base.pdb', 'w'))
         #generate pir file for the base structure
         self.make_basepir(self.dsname+'.'+self.code+'.base.pdb')
         basepir=open('base.pir').read()
         totalpir=basepir.replace('base',self.dsname+'.'+self.code+'.base')+'\n'
-        fh=open(self.code+'.pir','w')
-        fh.write(totalpir)
-        fh.close()
+        with open(self.code+'.pir','w') as fh:
+            fh.write(totalpir)
         #Read in the rmad, transformation matrix
-        fh=open('ma')
-        fc=fh.read()
-        fh.close()
+        with open('ma') as fh:
+            fc=fh.read()
         fcl=fc.split(',')
         va=[float(item) for item in fcl]
         rmsdlist=[[self.dsname+'.'+self.code+'.base',0]+va]
@@ -496,9 +488,8 @@ class Decoys4Single(object):
         subprocess.check_call(['PatchDock/mainchain.pl',
                                self.code.upper()+'_l_u.pdb', 'B'])
         #combine the two files
-        fh=open(self.code.upper()+'_r_u.pdb','a')
-        fh.write('\n')
-        fh.close()
+        with open(self.code.upper()+'_r_u.pdb','a') as fh:
+            fh.write('\n')
         cat_files((self.code.upper()+'_r_u.pdb', self.code.upper()+'_l_u.pdb'),
                   open(self.dsname+'.'+self.code+'.base.pdb', 'w'))
         #generate pir file for the base structure
@@ -551,9 +542,8 @@ class Decoys4Single(object):
         totalpir=''
         for k in range(0,len(self.dnlist)):
             totalpir=totalpir+basepir.replace('base',self.dnlist[k]).replace('tbrname',transmatrixlist[k])+'\n'
-        fh=open(self.code+'.pir','w')
-        fh.write(totalpir)
-        fh.close()
+        with open(self.code+'.pir','w') as fh:
+            fh.write(totalpir)
         #copy files to cluster
         tdir = os.path.join(runenv.serverUserPath, 'decoys', self.dsname,
                             self.code)
@@ -564,9 +554,8 @@ class Decoys4Single(object):
 
     def build_dockingdecoys_withtransformation(self):
         """Build decoys that need transformation, for pathdock only?"""
-        fh=open('firedockinput.pickle', 'rb')
-        sd=pickle.load(fh)
-        fh.close()
+        with open('firedockinput.pickle', 'rb') as fh:
+            sd=pickle.load(fh)
         print('building docking decoys')
         fl=os.listdir('./')
         #pf=[item for item in fl if re.search('_r_',item)][0]
@@ -621,9 +610,8 @@ class Decoys4Single(object):
         basepirlist=basepirlist[:2]+basepirlist[-1].split('tbrname')
         totalpir=''.join([basepirlist[0]+self.dnlist[k]+basepirlist[1]+self.dnlist[k]+basepirlist[2]+transmatrixlist[k]+basepirlist[3] for k in range(0,len(self.dnlist))])
         print("generating pir finished")
-        fh=open(self.code+'.pir','w')
-        fh.write(totalpir)
-        fh.close()
+        with open(self.code+'.pir','w') as fh:
+            fh.write(totalpir)
         tdir = os.path.join(runenv.serverUserPath, 'decoys', self.dsname,
                             self.code)
         subprocess.check_call(['ssh', runenv.jobserver, 'mkdir', '-p', tdir])
@@ -642,13 +630,11 @@ class Decoys4Single(object):
         sl=int(len(''.join(bpl[1:]))/50+0.5)
         basepir=''.join(['A' for i in range(0,sl)])
         print(basepir)
-        fh=open(self.code+'.pir','r')
-        fc=fh.read()
-        fh.close()
+        with open(self.code+'.pir','r') as fh:
+            fc=fh.read()
         fc=fc.replace('ACS',basepir)
-        fh=open(self.code+'.pir','w')
-        fh.write(fc)
-        fh.close()
+        with open(self.code+'.pir','w') as fh:
+            fh.write(fc)
         return fc
 
     def get_sorted_rmsdlist(self):
@@ -713,14 +699,12 @@ class Decoys4Single(object):
         return rms
 
     def save(self):
-        fh=open(self.path+'.pickle','wb')
-        cPickle.dump(self,fh)
-        fh.close()
+        with open(self.path+'.pickle','wb') as fh:
+            cPickle.dump(self,fh)
 
     def load(self):
-        fh=open(self.path+'.pickle','rb')
-        no=cPickle.load(fh)
-        fh.close()
+        with open(self.path+'.pickle','rb') as fh:
+            no=cPickle.load(fh)
         return no
 
     def replicate_pir(self):
@@ -728,9 +712,8 @@ class Decoys4Single(object):
         totalpir=''
         for dn in self.dnlist:
             totalpir=totalpir+basepir.replace('base',dn)+'\n'
-        fh=open(self.code+'.pir','w')
-        fh.write(totalpir)
-        fh.close()
+        with open(self.code+'.pir','w') as fh:
+            fh.write(totalpir)
 
     def get(self):
         if os.path.isfile(self.path+'.pickle'):
@@ -925,9 +908,8 @@ class DecoySet(object):
             sd=Decoys4Single(code,self.dsname,
                              os.path.join(self.sourcedir, code))
             sd.get()
-            fh=open(os.path.join(self.sourcedir, code, code+'.pickle'),'rb')
-            sd=cPickle.load(fh)
-            fh.close()
+            with open(os.path.join(self.sourcedir, code, code+'.pickle'),'rb') as fh:
+                sd=cPickle.load(fh)
             dnlist=dnlist+sd.dnlist
             sal.append(sd)
             pos.append(pos[-1]+len(sd.dnlist))
@@ -952,9 +934,8 @@ class DecoySet(object):
             mypickle().dump(self,self.dsname)
         except Exception as e:
             traceback.print_exc()
-            fh=open(self.dsname, 'rb')
-            pickle.dump(fh)
-            fh.close()
+            with open(self.dsname, 'rb') as fh:
+                pickle.dump(fh)
             pdb.set_trace()
             mypickle().dump(self,self.dsname)
 
@@ -1005,9 +986,8 @@ class DecoySet(object):
                 ld[code[0:4]].append([cc,cl,cs,cs+cl-1])
             else:
                 ld[code[0:4]]=[[cc,cl,cs,cs+cl-1]]
-            fh=open(dp,'wb')
-            pickle.dump(ld,fh)
-            fh.close()
+            with open(dp,'wb') as fh:
+                pickle.dump(ld,fh)
 
     def build_index_list(self):
         self.indexlist=[]
@@ -1118,9 +1098,8 @@ class DecoySets(DecoySet):
         self.gen_pir()
     #    pirfile=pir(self.pirpath)
     #    pirfile.get_pir_fromlist(nativelist,self.pirpath[:-3]+'native.pir')
-        nlfh=open(self.dir+'nativelist','w')
-        nlfh.write(','.join(nativelist))
-        nlfh.close()
+        with open(self.dir+'nativelist','w') as nlfh:
+            nlfh.write(','.join(nativelist))
         return nativelist
 
     def load_nativelist(self):

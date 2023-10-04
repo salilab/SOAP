@@ -360,9 +360,8 @@ class optclustering(object):
     def dump(self,path):
         self.optscorer=[]
         self.testscorer=[]
-        fh=open(path,'wb')
-        pickle.dump(self,fh)
-        fh.close()
+        with open(path,'wb') as fh:
+            pickle.dump(self,fh)
 
     def plot_for_andrej1(self,ssp):
         #get the top and bottom curve
@@ -465,9 +464,8 @@ class cvclustering(object):
             cl.optscorer=[]
             cl.testscorer=[]
         self.scorerlist=[]
-        fh=open(path,'wb')
-        pickle.dump(self,fh)
-        fh.close()
+        with open(path,'wb') as fh:
+            pickle.dump(self,fh)
 
 def get_representative_pars(pars, cutoffdistance=0.001, maxcluster=0):
     #print("orinial number: "+str(len(pars)))

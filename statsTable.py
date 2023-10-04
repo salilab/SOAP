@@ -549,9 +549,8 @@ class rawsp(object):
             pir('pdb_'+self.pdbset+'.pir').sep_pir('./',nors,residuepower=residuepower)
         nors=int(os.popen('ls | grep -c pdbs').read())
         self.nors=nors
-        inputlist=open('inputlist','w')
-        inputlist.write(','.join(['pdbs'+str(i) for i in range(1,nors+1)]))
-        inputlist.close()
+        with open('inputlist','w') as inputlist:
+            inputlist.write(','.join(['pdbs'+str(i) for i in range(1,nors+1)]))
         makemdt=open('runme.py','w')
         makemdt.write('keeptry=5\nwhile keeptry:\n    try:\n        from SOAP.statsTable import *\n        keeptry=0\n    except:\n        keeptry-=1\n'
                       +'import sys \n \nrsp=rawsp(\''+self.pdbset+'\',\''
@@ -969,16 +968,14 @@ class rawsp(object):
             basefile=pdbdir+codelist[1]+'.base.pdb'
             if not os.path.isfile(basefile):
                 basefile=pdbdir+codelist[0]+'.'+codelist[1]+'.base.pdb'
-            fh=open(basefile,'r')
-            fc=fh.read()
-            fh.close()
+            with open(basefile,'r') as fh:
+                fc=fh.read()
             fh=gzip.open(pdbdir+alncode+'.pdb.gz','r')
             dfc=fh.read()
             fh.close()
             fc=fc+'\n'+dfc
-            fh=open(os.path.join(tmpdir,alncode+'.pdb'),'w')
-            fh.write(fc)
-            fh.close()
+            with open(os.path.join(tmpdir,alncode+'.pdb'),'w') as fh:
+                fh.write(fc)
             return [tmpdir,aln]
         elif os.path.isfile(pdbdir+'needcombinewithbase'):
             basefile=pdbdir+codelist[1]+'.base.pdb'
@@ -997,9 +994,8 @@ class rawsp(object):
             dfc=fh.read()
             fh.close()
             fc=fc.replace('replacethis',dfc)
-            fh=open(os.path.join(tmpdir,alncode+'.pdb'),'w')
-            fh.write(fc)
-            fh.close()
+            with open(os.path.join(tmpdir,alncode+'.pdb'),'w') as fh:
+                fh.write(fc)
             return [tmpdir,aln]
         elif os.path.isfile(pdbdir+'needtransformation'):
             tranformationmatrix=aln[0].name
@@ -1429,9 +1425,8 @@ class scaledsp(rawsp):
         gps.lib=self.tlib
         gps.stretchdict,gps.priorkw=self.get_stretch_dictionary(self.pm)
         gps.sm=self.pm
-        fh=open('input.pickle','wb')
-        pickle.dump(gps,fh)
-        fh.close()
+        with open('input.pickle','wb') as fh:
+            pickle.dump(gps,fh)
         if self.pm.startswith('gps'):
             freememory=0.55+8*(ms[1]**2)/1000000000.0
             if freememory<1.9:
@@ -1440,9 +1435,8 @@ class scaledsp(rawsp):
             freememory=0.8
         nors=self.nors
         #write the input list for different runs, maybe not necessary
-        inputlist=open('inputlist','w')
-        inputlist.write(','.join(['runme.py' for i in range(1,nors+1)]))
-        inputlist.close()
+        with open('inputlist','w') as inputlist:
+            inputlist.write(','.join(['runme.py' for i in range(1,nors+1)]))
         makemdt=open('runme.py','w')
         makemdt.write('keeptry=5\nwhile keeptry:\n    try:\n        from SOAP.statsTable import *\n        keeptry=0\n    except:\n        keeptry-=1\n'
                       +'import sys \nso=gpsmoothing()\n'
@@ -2061,9 +2055,8 @@ class gpsmoothing(object):
     def runtask_cluster(self,runnum):
         print(runnum)
         self.runpath=runenv.basedir
-        fh=open('input.pickle', 'rb')
-        nso=pickle.load(fh)
-        fh.close()
+        with open('input.pickle', 'rb') as fh:
+            nso=pickle.load(fh)
         nso.smoothing_2d_npa(runnum)
         report_job_runstatus(self.runpath, True, runnum, '.smoothed',inputname='runme.py')
 
@@ -2104,9 +2097,8 @@ class atmsprop(object):
         raise exception('atom type not known')
 
     def read_libfile(self):
-        fh=open(runenv.basedir+'lib/'+self.libfile)
-        fhc=fh.read()
-        fh.close()
+        with open(runenv.basedir+'lib/'+self.libfile) as fh:
+            fhc=fh.read()
         if 'DBLGRP' in fhc:
             agl=[l[8:-1] for l in fhc.split('\n') if l.startswith('DBLGRP')]
         elif 'ATMGRP' in fhc:

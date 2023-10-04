@@ -34,9 +34,8 @@ def get_array_mem(na):
     return ams
 
 def get_residues_atoms():
-    fh=open(runenv.basedir+'lib/atmcls-mf.lib')
-    fhc=fh.read()
-    fh.close()
+    with open(runenv.basedir+'lib/atmcls-mf.lib') as fh:
+        fhc=fh.read()
     resname1=['A','R','N','D','C','Q','E','G','H','I','L','K','M','F','P','S','T','W','Y','V']
     resname3=[]
     resatomdict={}
@@ -72,9 +71,8 @@ def get_residues_atoms():
     return {'resname1':resname1,'resname3':resname3,'resatoms':atoms,'atomset':set(allatoms),'resatomdict':resatomdict}
 
 def get_sidechainatom_index():
-    fh=open(runenv.basedir+'lib/atmcls-mf.lib')
-    fhc=fh.read()
-    fh.close()
+    with open(runenv.basedir+'lib/atmcls-mf.lib') as fh:
+        fhc=fh.read()
     na=np.zeros(158)
     gl=fhc.split('ATMGRP')
     for i in range(158):
@@ -132,18 +130,16 @@ def isfirstlowest(array1):
     return re
 
 def filter_lib(atomtype='CA',ofp='atmcls-mf.lib',ffp='caatm.lib'):
-    fh=open(ofp)
-    fc=fh.read()
-    fh.close()
+    with open(ofp) as fh:
+        fc=fh.read()
     fcl=fc.split('ATMGRP')
     nfcl=[]
     for item in fcl:
         if item[3:5]=='CA':
             nfcl.append(item)
-    fh=open(ffp,'w')
-    nls='ATMGRP'+'ATMGRP'.join(nfcl)
-    fh.write(nls)
-    fh.close()
+    with open(ffp,'w') as fh:
+        nls='ATMGRP'+'ATMGRP'.join(nfcl)
+        fh.write(nls)
 
 def extendsum(array1,array2):
     ref=array1
@@ -154,9 +150,8 @@ def extendsum(array1,array2):
 def read_bndgrp(libpath=''):
     if not libpath:
         libpath='bndgrp.lib'
-    fh=open(libpath)
-    fhc=fh.read()
-    fh.close()
+    with open(libpath) as fh:
+        fhc=fh.read()
     bndgrps=re.findall('BOND \'([A-Z0-9]+)\' \'([A-Z0-9]+)\' \'([A-Z0-9]+)\'',fhc)
     return bndgrps
 
@@ -199,9 +194,8 @@ class mypickle(object):
     def dump(self,obj,nameprefix):
         self.arraysize=0
         self.dumpnparray(obj,nameprefix)
-        fh=open(nameprefix+'.pickle','wb')
-        pickle.dump(obj,fh)
-        fh.close()
+        with open(nameprefix+'.pickle','wb') as fh:
+            pickle.dump(obj,fh)
         print("dump finished")
         self.get_array_size(nameprefix)
         return self.arraysize
@@ -318,9 +312,8 @@ class mypickle(object):
     def load(self,nameprefix):
         print("loading pickle file")
         name=nameprefix if nameprefix.endswith('.pickle') else nameprefix+'.pickle'
-        fh=open(name,'rb')
-        obj=pickle.load(fh)
-        fh.close()
+        with open(name,'rb') as fh:
+            obj=pickle.load(fh)
         print("finished loading pickle file")
         #fl=os.listdir('./')
         #fl=[item for item in fl if item.startswith(nameprefix) and item.endswith('npy')]
@@ -330,9 +323,8 @@ class mypickle(object):
         return obj
 
     def loadpickleonly(self,nameprefix):
-        fh=open(nameprefix+'.pickle','rb')
-        obj=pickle.load(fh)
-        fh.close()
+        with open(nameprefix+'.pickle','rb') as fh:
+            obj=pickle.load(fh)
         return obj
 
     def get_array_size(self,nameprefix):
@@ -570,9 +562,8 @@ def any2str(anything):
 
 def build_scorer(scorerpath='./'):
     os.chdir(scorerpath)
-    fh=open(scorerpath+'bestmodel.pickle', 'rb')
-    model=pickle.load(fh)
-    fh.close()
+    with open(scorerpath+'bestmodel.pickle', 'rb') as fh:
+        model=pickle.load(fh)
     for scorer in model['scorers']:
         if scorer['type']=='scaledsp':
             ssp=scaledsp(model=scorer)
@@ -773,9 +764,8 @@ class Mymodel(Model):
         self.gen_atomlist()
 
     def save_model(self,filename):
-        fh=open(filename,'w')
-        fh.write('\n'.join(self.atomlines))
-        fh.close()
+        with open(filename,'w') as fh:
+            fh.write('\n'.join(self.atomlines))
 
     def get_residue_index(self,chainid,residuenum):
         for item in self.chainlist:
@@ -810,15 +800,12 @@ class Mymodel(Model):
             else:
                 break
         #
-        fh=open('selfclash','r')
-        scs=fh.read()
-        fh.close()
-        fh=open('otherclash','r')
-        ocs=fh.read()
-        fh.close()
-        fh=open('othercontact','r')
-        octs=fh.read()
-        fh.close()
+        with open('selfclash','r') as fh:
+            scs=fh.read()
+        with open('otherclash','r') as fh:
+            ocs=fh.read()
+        with open('othercontact','r') as fh:
+            octs=fh.read()
         clashlist=[]
         contactlist=[]
         rep=re.compile('#([0-9]+) ([A-Z]{3}) ([0-9]+)\.([A-Z]{1}) ([A-Z0-9\.\']+)\s* #([0-9]+) ([A-Z]{3}) ([0-9]+)\.([A-Z]{1}) ([A-Z0-9\.\']+)\s* ([0-9\-\.]+)\s* ([0-9\-\.]+)')
@@ -907,15 +894,14 @@ class MemoryMonitor(object):
         return int(self.mm)
 
     def monitor(self,name,fn='mlog'):
-        fh=open(fn,'a+')
-        mu=11
-        while mu>10:
-            mu=self.usage(name)
-            self.mul.append(mu)
-            fh.write(str(mu)+'\n')
-            time.sleep(5)
-            fh.flush()
-        fh.close()
+        with open(fn,'a+') as fh:
+            mu=11
+            while mu>10:
+                mu=self.usage(name)
+                self.mul.append(mu)
+                fh.write(str(mu)+'\n')
+                time.sleep(5)
+                fh.flush()
 
 def load_log(path):
     from collections import defaultdict

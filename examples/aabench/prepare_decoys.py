@@ -24,18 +24,16 @@ for f in fl:
 #pre-prepare the decoys
 
 def replace_end(lpdb):
-    fh=open(lpdb)
-    fc=fh.read()
-    nofe=fc.count('END')
-    fh.close()
+    with open(lpdb) as fh:
+        fc=fh.read()
+        nofe=fc.count('END')
     if nofe!=1:
         print("more than one END in model")
         pdb.set_trace()
     else:
         fc=fc.replace('END','TER')
-    fh=open(lpdb,'w')
-    fh.write(fc)
-    fh.close()
+    with open(lpdb,'w') as fh:
+        fh.write(fc)
 
 bd=preparedDecoyPath
 
@@ -115,9 +113,8 @@ for d in fl:
     #complete_pdbfile(rpdb)
     #complete_pdbfile(lpdb)
     sd['complextype']=ct
-    fh2=open('firedockinput.pickle','wb')
-    pickle.dump(sd,fh2)
-    fh2.close()
+    with open('firedockinput.pickle','wb') as fh2:
+        pickle.dump(sd,fh2)
     replace_end(lpdb)
     replace_end(rpdb)
     replace_end(sd['orpdbAB'])

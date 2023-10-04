@@ -409,9 +409,8 @@ class optimizer(object):
         #the individual nodes on the cluster will run this function, if other funtions needs to be run here, chage the code here.
         self.runtask_local(inputcode)
         res.append(self.optlist2array(self.scoredict.values()))
-        fh=open('optimizer'+self.inputcode+'.pickle','wb')
-        pickle.dump(res,fh)
-        fh.close()
+        with open('optimizer'+self.inputcode+'.pickle','wb') as fh:
+            pickle.dump(res,fh)
         return 0
 
     def runtask_local(self,inputcode=5,testscorer=[]):
@@ -519,10 +518,9 @@ class optimizer(object):
 
     def save_currentbest(self):
         os.system('rm -f ./'+str(self.scorerid)+'/'+'B'+str(self.optmind)+'est'+str(self.scorerid)+'#'+str(self.jobid)+'#*')
-        fh=open('./'+str(self.scorerid)+'/B'+str(self.optmind)+'est'+str(self.scorerid)+'#'+str(self.jobid)+'#'+str(self.bestresult)+'#'+str(self.likehoodstd)+'#.pickle','wb')
-        pickle.dump([self.currentpar,self.currentresult,self.bestpar,self.bestresult],fh)
-        fh.flush()
-        fh.close()
+        with open('./'+str(self.scorerid)+'/B'+str(self.optmind)+'est'+str(self.scorerid)+'#'+str(self.jobid)+'#'+str(self.bestresult)+'#'+str(self.likehoodstd)+'#.pickle','wb') as fh:
+            pickle.dump([self.currentpar,self.currentresult,self.bestpar,self.bestresult],fh)
+            fh.flush()
         print('B'+str(self.optmind)+'est'+str(self.scorerid)+'#'+str(self.jobid)+'#'+str(self.bestresult)+'#'+str(self.likehoodstd)+'#.pickle')
         print("saving result finished")
 
@@ -558,15 +556,13 @@ class optimizer(object):
             print('Global Bestresult '+bestf+'   '+str(bestresult))
             time.sleep(0.1)
             try:
-                fh=open('./'+str(self.scorerid)+'/'+bestf, 'rb')
-                bp=pickle.load(fh)
-                fh.close()
+                with open('./'+str(self.scorerid)+'/'+bestf, 'rb') as fh:
+                    bp=pickle.load(fh)
             except:
                 self.allfilelist=os.listdir('./'+str(self.scorerid)+'/')
                 bestf=[f for f in self.allfilelist if f.startswith(bestf.split('#')[0]+'#')][0]
-                fh=open('./'+str(self.scorerid)+'/'+bestf, 'rb')
-                bp=pickle.load(fh)
-                fh.close()
+                with open('./'+str(self.scorerid)+'/'+bestf, 'rb') as fh:
+                    bp=pickle.load(fh)
             self.globalbestresult=bp[-1]
             self.globalbestpar=bp[-2]
             print('Global Bestresult '+bestf+'   '+str(self.globalbestresult))
@@ -947,10 +943,9 @@ class optimizer(object):
                 rj[-1]=si
         #save exchange result
         for rl in self.globalresultlist:
-            fh=open('./'+str(self.scorerid)+'/'+rl[2].replace('B'+str(self.optmind)+'est','p'+str(self.optmind)+'t')+'#'+str(rl[3])+'.pickle','wb')
-            pickle.dump(rl[-1][:2],fh)
-            fh.flush()
-            fh.close()
+            with open('./'+str(self.scorerid)+'/'+rl[2].replace('B'+str(self.optmind)+'est','p'+str(self.optmind)+'t')+'#'+str(rl[3])+'.pickle','wb') as fh:
+                pickle.dump(rl[-1][:2],fh)
+                fh.flush()
         #replica exhange finished...
 
     def mcmc_tillconverge_withblocks_singlebysingle(self):

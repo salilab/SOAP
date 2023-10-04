@@ -533,14 +533,12 @@ class dsscorestats(object):
                 self.statsarray[i,ai]=(score<score[si]).sum()+1
 
     def save(self):
-        fh=open(self.dsscore.scorepath+'.stats.pickle','wb')
-        cPickle.dump(self,fh)
-        fh.close()
+        with open(self.dsscore.scorepath+'.stats.pickle','wb') as fh:
+            cPickle.dump(self,fh)
 
     def load(self):
-        fh=open(self.score.scorepath+'.stats.pickle','rb')
-        no=cPickle.load(fh)
-        fh.close()
+        with open(self.score.scorepath+'.stats.pickle','rb') as fh:
+            no=cPickle.load(fh)
         return no
 
     def log(self):

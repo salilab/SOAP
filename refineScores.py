@@ -38,9 +38,8 @@ class sprefinescore(object):
         os.chdir(os.path.join(self.dir, self.scorename))
         nors=len(self.codelist)
         #write the input list for different runs
-        inputlist=open('inputlist','w')
-        inputlist.write(','.join(['runme.py' for i in range(1,nors+1)]))
-        inputlist.close()
+        with open('inputlist','w') as inputlist:
+            inputlist.write(','.join(['runme.py' for i in range(1,nors+1)]))
         #copy scripts to this rundir
         #generate the lib file for modeller refinement
         self.ssp.write_lib_dist150()
@@ -308,9 +307,8 @@ library_schedule should now be a schedule object, not an integer as in
 older versions of Modeller""")
         sched = self.library_schedule.make_for_model(self)
         sched = sched * runenv.schedule_scale
-        fh = open(self.schfile, "w")
-        sched.write(fh)
-        fh.close()
+        with open(self.schfile, "w") as fh:
+            sched.write(fh)
 
     def single_model_pass(self, atmsel, num, sched):
         """Perform a single pass of model optimization"""

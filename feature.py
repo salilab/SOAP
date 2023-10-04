@@ -350,9 +350,8 @@ class atmsprop(object):
         raise exception('atom type not known')
 
     def read_libfile(self):
-        fh=open(runenv.basedir+'lib/'+self.libfile)
-        fhc=fh.read()
-        fh.close()
+        with open(runenv.basedir+'lib/'+self.libfile) as fh:
+            fhc=fh.read()
         if 'DBLGRP' in fhc:
             agl=[l[8:-1] for l in fhc.split('\n') if l.startswith('DBLGRP')]
         elif 'ATMGRP' in fhc:

@@ -269,31 +269,25 @@ class k2cv(object):
         #self.clusters.figpath=cdp
         self.logpath=cdp
         #mypickle().dump(self.clusters, 'figinput')
-        fh=open('cvmodel.pickle','wb')
-        pickle.dump({'model':self.spsfo.scorer.originalmodel, 'runtime':self.task.runduration,
-                     'inputlist':self.inputlist,'allresult':self.rdlist,'originalresult':self.originalresult},fh)
-        fh.close()
+        with open('cvmodel.pickle', 'wb') as fh:
+            pickle.dump({'model':self.spsfo.scorer.originalmodel, 'runtime':self.task.runduration,
+                         'inputlist':self.inputlist,'allresult':self.rdlist,'originalresult':self.originalresult},fh)
         #self.clusters.dump('cvcluster.pickle')
         print(os.system('cp '+sys.path[1]+'/'+sys.argv[0]+' ./'))
         if self.withlastone:
             self.bestmodel=self.spsfo.scorer.build_model(self.finaloptpar)
-            fh=open('bestmodel.pickle','wb')
-            pickle.dump(self.bestmodel,fh)
-            fh.close()
-            fh=open('bestmodel','w')
-            fh.write(any2str(self.bestmodel))
-            fh.close()
-            fh=open('bestmodelresult','w')
-            fh.write(str(self.bestmodelresult)+'\n'+str(self.rdlist[-1]['fulltestresult']))
-            fh.close()
+            with open('bestmodel.pickle', 'wb') as fh:
+                pickle.dump(self.bestmodel, fh)
+            with open('bestmodel','w') as fh:
+                fh.write(any2str(self.bestmodel))
+            with open('bestmodelresult', 'w') as fh:
+                fh.write(str(self.bestmodelresult)+'\n'+str(self.rdlist[-1]['fulltestresult']))
         else:
             self.bestmodel=self.spsfo.scorer.originalmodel
-            fh=open('bestmodel.pickle','wb')
-            pickle.dump(self.bestmodel,fh)
-            fh.close()
-            fh=open('bestmodel','w')
-            fh.write(any2str(self.bestmodel))
-            fh.close()
+            with open('bestmodel.pickle', 'wb') as fh:
+                pickle.dump(self.bestmodel, fh)
+            with open('bestmodel', 'w') as fh:
+                fh.write(any2str(self.bestmodel))
         self.write2logshelve()
         self.write2db()
         return self.resultstr
@@ -931,9 +925,8 @@ class k2cvcluster(k2cvlocal):
                     break
             print(os.system('touch Finished'+str(self.spsfo.scorerid)+'#'+str(self.spsfo.jobid)+'#'+str(int(time.time()-self.spsfo.starttime))))
             print(os.system('touch '+self.runpath+self.inputcode+'.pickle'))
-            fh=open(self.runpath+self.inputcode+'.pickle','wb')
-            pickle.dump(res,fh)
-            fh.close()
+            with open(self.runpath+self.inputcode+'.pickle', 'wb') as fh:
+                pickle.dump(res,fh)
         try:
             if self.runnumlist[inputindex][-1]==int(self.inputcode):#last one will collect all the jobs
                 self.wait_analyze_single_try(inputindex)
@@ -942,9 +935,8 @@ class k2cvcluster(k2cvlocal):
                     print('removing '+str(i))
                     print(os.system('rm '+str(i)+'.pickle'))
             else:
-                fh=open(self.inputcode+'.optimizer.pickle','wb')
-                pickle.dump('Empty',fh)
-                fh.close()
+                with open(self.inputcode+'.optimizer.pickle', 'wb') as fh:
+                    pickle.dump('Empty',fh)
             runsuccess=True
         except Exception as e:
             print(e)
@@ -996,9 +988,8 @@ class k2cvcluster(k2cvlocal):
             while tnt>0 and not success:
                 tnt=tnt-1
                 try:
-                    fh=open(self.runpath+str(i)+'.pickle', 'rb')
-                    ndl=pickle.load(fh)
-                    fh.close()
+                    with open(self.runpath+str(i)+'.pickle', 'rb') as fh:
+                        ndl=pickle.load(fh)
                     for nd in ndl:
                         dl.append(nd) #result dictionary list
                         brl.append(np.array(nd['trainresultlist']).max())
@@ -1067,9 +1058,8 @@ class k2cvcluster(k2cvlocal):
             'bestpar':bestpar, 'bestresult':resultlist[0],'testresult':testscorer.assess(bestpar),
             'fulltestresult':testscorer.assess(bestpar,report='full'), 'allna':allna
             ,'pd':pd/k,'rlpd':rlpd,'finalbestresult':finalbestresult,'finaltestresult':finaltestresult}
-        fh=open(self.inputcode+'.optimizer.pickle','wb')
-        pickle.dump(sd,fh)
-        fh.close()
+        with open(self.inputcode+'.optimizer.pickle','wb') as fh:
+            pickle.dump(sd,fh)
 
     def prepare_task_input(self):
         self.initialize_model()
@@ -1093,9 +1083,8 @@ class k2cvcluster(k2cvlocal):
         #    self.task.queues='-q lab.q'
         nors=self.nors
         #write the input list for different runs
-        inputlist=open('inputlist','w')
-        inputlist.write(','.join(['runme.py' for i in range(1,nors+1)]))
-        inputlist.close()
+        with open('inputlist','w') as inputlist:
+            inputlist.write(','.join(['runme.py' for i in range(1,nors+1)]))
         makemdt=open('runme.py','w')
         makemdt.write('keeptry=5\nwhile keeptry:\n    try:\n        from SOAP import *\n        keeptry=0\n    except:\n        keeptry-=1\n'
                       +'import sys \n \nspopt=k2cvcluster()\n'
@@ -1138,9 +1127,8 @@ class k2cvcluster(k2cvlocal):
         for i in range(self.optn):
             for inputn in self.runnumlist[i]:
                 if os.path.isfile(str(inputn)+'.optimizer.pickle'):
-                    fh=open(str(inputn)+'.optimizer.pickle','rb')
-                    res=pickle.load(fh)
-                    fh.close()
+                    with open(str(inputn)+'.optimizer.pickle','rb') as fh:
+                        res=pickle.load(fh)
                     if res=='Empty':
                         continue
                     else:
@@ -1190,9 +1178,8 @@ class k2cvcluster(k2cvlocal):
 
     def save(self):
         self.spsfo.arraysize=mypickle().dump([self.spsfo.scorer,self.scorerlist],'input')
-        fh=open('input.pickle','wb')
-        pickle.dump(self,fh)
-        fh.close()
+        with open('input.pickle','wb') as fh:
+            pickle.dump(self,fh)
         # the scorer object will be useless unlesed the savednumpy is loaded from numpy arrays.
 
     def load(self):

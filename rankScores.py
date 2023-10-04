@@ -41,9 +41,8 @@ class dsscore(object):
         #sio.savemat(self.scorepath+'.mat',{'score':self.score})
 
     def load(self):
-        fh=open(self.scorepath+'.pickle','rb')
-        no=cPickle.load(fh)
-        fh.close()
+        with open(self.scorepath+'.pickle','rb') as fh:
+            no=cPickle.load(fh)
         return no
 
     def get(self,nors=2000):
@@ -213,9 +212,8 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
         self.nors=nors
         self.runpath=runenv.serverUserPath+self.scorename+'/'
         #write the input list for different runs
-        inputlist=open('inputlist','w')
-        inputlist.write(','.join(['pdbs'+str(i) for i in range(1,nors+1)]))
-        inputlist.close()
+        with open('inputlist','w') as inputlist:
+            inputlist.write(','.join(['pdbs'+str(i) for i in range(1,nors+1)]))
         if os.path.isfile(self.ssppath+'.hdf5'):
             os.system('ln -s '+self.ssppath+'.hdf5 ./'+self.sspname+'.hdf5')
         makemdt=open('runme.py','w')
@@ -245,16 +243,14 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
         self.save()
 
     def calc_score_nmrfile(self,fn):
-        fh=open(fn)
-        fc=fh.read()
-        fh.close()
+        with open(fn) as fh:
+            fc=fh.read()
         os.mkdir(fn[:-4])
         os.chdir(fn[:-4])
         fl=fc.split('ENDMDL')
         for f,i in zip(fl[:-1],range(len(fl)-1)):
-            fh=open(str(i)+'.pdb','w')
-            fh.write(f)
-            fh.close()
+            with open(str(i)+'.pdb','w') as fh:
+                fh.write(f)
         self.calc_score_dir('./')
 
     def calc_score_dir(self,path):
@@ -520,9 +516,8 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
                 elif self.features =='rankscore':
                     print(os.system('/netapp/sali/haofan/imp/bin/imppy.sh python '+runenv.serverUserPath+'/gst/rankscore.py '+os.path.join(runenv.ddbdir,smll[0],smll[1],'base.pdb')+' '+sml))
                 #print(os.system('rm '+os.path.join(scratchdir,sml+'.pdb*')))
-                fh3=open(os.path.join(scratchdir,sml+'.score'))
-                fc=fh3.read()
-                fh3.close()
+                with open(os.path.join(scratchdir,sml+'.score')) as fh3:
+                    fc=fh3.read()
                 #rer=re.findall(' DFIRE-score :\s*([0-9\.\-\s]+)',fc)
                 #for item in rer:
                 try:
@@ -544,9 +539,8 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
                     print(os.system('gunzip '+os.path.join(scratchdir,sml+'.pdb.gz')))
                 print(os.system('/netapp/sali/haofan/score/rapdf/know -p /netapp/sali/haofan/score/rapdf/pmf1_dfire151_bin.dat -f '+os.path.join(scratchdir,sml+'.pdb')+' > '+os.path.join(scratchdir,sml+'.score')))
                 #print(os.system('rm '+os.path.join(scratchdir,sml+'.pdb*')))
-                fh3=open(os.path.join(scratchdir,sml+'.score'))
-                fc=fh3.read()
-                fh3.close()
+                with open(os.path.join(scratchdir,sml+'.score')) as fh3:
+                    fc=fh3.read()
                 #rer=re.findall(' DFIRE-score :\s*([0-9\.\-\s]+)',fc)
                 #for item in rer:
                 scorestr=scorestr+'>'+sml+' score: '+fc.split()[-1]+'\n'
@@ -568,9 +562,8 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
                 else:
                     print(os.system(runenv.serverUserPath+'/rosetta_source/bin/score.linuxgccrelease -database '+runenv.serverUserPath+'/rosetta_source/rosetta_database/ -s '+os.path.join(scratchdir,sml+'.pdb')+' -out:file:scorefile '+os.path.join(scratchdir,sml+'.score')))
                 #print(os.system('rm '+os.path.join(scratchdir,sml+'.pdb*')))
-                fh3=open(os.path.join(scratchdir,sml+'.score'))
-                fc=fh3.read()
-                fh3.close()
+                with open(os.path.join(scratchdir,sml+'.score')) as fh3:
+                    fc=fh3.read()
                 #rer=re.findall(' DFIRE-score :\s*([0-9\.\-\s]+)',fc)
                 #for item in rer:
                 if self.genmethod=='fpd':
@@ -594,9 +587,8 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
                 open(os.path.join(scratchdir,'ploop'),'w').write(ploop)
                 print(os.system('/netapp/home/ck/plop/plop '+os.path.join(scratchdir,'ploop')+' > '+os.path.join(scratchdir,sml+'.score')))
                 #print(os.system('rm '+os.path.join(scratchdir,sml+'.pdb*')))
-                fh3=open(os.path.join(scratchdir,sml+'.score'))
-                fc=fh3.read()
-                fh3.close()
+                with open(os.path.join(scratchdir,sml+'.score')) as fh3:
+                    fc=fh3.read()
                 #rer=re.findall(' DFIRE-score :\s*([0-9\.\-\s]+)',fc)
                 #for item in rer:
                 if re.search('TOTALE\s*([0-9.-]*)',fc):
@@ -685,9 +677,8 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
                 open(os.path.join(scratchdir,'ploop'),'w').write(ploop)
                 print(os.system('/netapp/home/ck/plop/plop '+os.path.join(scratchdir,'ploop')+' > '+os.path.join(scratchdir,sml+'.score')))
                 #print(os.system('rm '+os.path.join(scratchdir,sml+'.pdb*')))
-                fh3=open(os.path.join(scratchdir,sml+'.score'))
-                fc=fh3.read()
-                fh3.close()
+                with open(os.path.join(scratchdir,sml+'.score')) as fh3:
+                    fc=fh3.read()
                 #rer=re.findall(' DFIRE-score :\s*([0-9\.\-\s]+)',fc)
                 #for item in rer:
                 if re.search('TOTALE\s*([0-9.-]*)',fc):
@@ -747,22 +738,19 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
         scorestr=''
         for fd,sml in zip(fdl,tmml):
             print(os.system('rm *'))
-            fh2=open(fd+'firedockinput.pickle', 'rb')
-            fid=pickle.load(fh2)
-            fh2.close()
+            with open(fd+'firedockinput.pickle', 'rb') as fh2:
+                fid=pickle.load(fh2)
             print(os.system('cp '+os.path.join(fd,fid['rpdb'])+' ./'))
             print(os.system('cp '+os.path.join(fd,fid['lpdb'])+' ./'))
             if self.features=='firedock':
                 sml=[str(i)+' '+sml[i] for i in range(len(sml))]
                 inputfile='\n'.join(sml)
-                fh=open('transfile','w')
-                fh.write(inputfile)
-                fh.close()
+                with open('transfile','w') as fh:
+                    fh.write(inputfile)
                 print(os.system('/netapp/sali/dina/FiberDock1.1/buildFiberDockParams.pl '+fid['rpdb']+' '+fid['lpdb']+' U U '+fid['complextype']+' transfile out 0 50 0.8 0 glpk outp > /dev/null'))
                 print(os.system('/netapp/sali/dina/FiberDock1.1/FiberDock outp'))
-                fh3=open('out.ref')
-                fc=fh3.read()
-                fh3.close()
+                with open('out.ref') as fh3:
+                    fc=fh3.read()
                 rer=re.findall('\n(.*)\t\|([0-9\.\-\s]+)\|.*',fc)
                 for item in rer:
                     scorestr=scorestr+'>'+item[0].strip()+' score: '+item[1].strip()+'\n'
@@ -774,16 +762,14 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
                     print(os.system(runenv.serverUserPath+'bin/pdb_trans64 '+tm+' <'+fid['lpdb']+' >ltemp.pdb'))
                     print(os.system('cat '+fid['rpdb']+' ltemp.pdb > '+str(i)+'.pdb'))
                     fl=fl+str(i)+'.pdb\n'
-                fh=open('pdblist','w')
-                fh.write(fl)
-                fh.close()
+                with open('pdblist','w') as fh:
+                    fh.write(fl)
                 print(os.system(runenv.serverUserPath+'bin/zrank_linux_64bit/zrank pdblist >/dev/null'))
-                fh=open('pdblist.zr.out')
-                for line in fh:
-                    if len(line)>4:
-                        item=line.split()
-                        scorestr=scorestr+'>'+item[0].strip()+' score: '+item[1].strip()+'\n'
-                fh.close()
+                with open('pdblist.zr.out') as fh:
+                    for line in fh:
+                        if len(line)>4:
+                            item=line.split()
+                            scorestr=scorestr+'>'+item[0].strip()+' score: '+item[1].strip()+'\n'
             elif self.features=='rdock':
                 fl=''
                 for tm, i in zip(sml, range(len(sml))):
@@ -793,28 +779,25 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
                     else:
                         print(os.system('cat '+fid['rpdb']+' ltemp.pdb > '+str(i)+'.pdb'))
                     fl=fl+str(i)+'.pdb\n'
-                fh=open('pdblist','w')
-                fh.write(fl)
-                fh.close()
+                with open('pdblist','w') as fh:
+                    fh.write(fl)
                 print(os.system(runenv.serverUserPath+'rosetta_source/bin/score.linuxgccrelease -database '+runenv.serverUserPath+'rosetta_source/rosetta_database -s '+fid['lpdb']+' -score:weights docking'))
                 print(os.system(runenv.serverUserPath+'rosetta_source/bin/score.linuxgccrelease -database '+runenv.serverUserPath+'rosetta_source/rosetta_database -s '+fid['rpdb']+' -score:weights docking'))
-                fh=open('default.sc')
-                fh.readline()
-                sepscore=0
-                for line in fh:
-                    if len(line)>20:
-                        item=line.split()
-                        sepscore+=float(item[1].strip())
-                fh.close()
+                with open('default.sc') as fh:
+                    fh.readline()
+                    sepscore=0
+                    for line in fh:
+                        if len(line)>20:
+                            item=line.split()
+                            sepscore+=float(item[1].strip())
                 print(os.system('rm default.sc'))
                 print(os.system(runenv.serverUserPath+'rosetta_source/bin/score.linuxgccrelease -database '+runenv.serverUserPath+'rosetta_source/rosetta_database -in:file:l pdblist -score:weights docking >/dev/null'))
-                fh=open('default.sc')
-                fh.readline()
-                for line in fh:
-                    if len(line)>20:
-                        item=line.split()
-                        scorestr=scorestr+'>'+item[1].strip()+' score: '+str(float(item[1].strip())-sepscore)+'\n'
-                fh.close()
+                with open('default.sc') as fh:
+                    fh.readline()
+                    for line in fh:
+                        if len(line)>20:
+                            item=line.split()
+                            scorestr=scorestr+'>'+item[1].strip()+' score: '+str(float(item[1].strip())-sepscore)+'\n'
         print(os.system('rm -r '+rdir))
         os.chdir(wd)
         return scorestr

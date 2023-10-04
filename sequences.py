@@ -77,9 +77,8 @@ class pir(object):
         if pdbfile in listoffiles:
             return pdbfile
         pirstring=self.get_pir_from_pdbdict(pdbset)
-        fh=open(runenv.pdbpirdir+'pdb_'+pdbset+'.pir','w')
-        fh.write(pirstring)
-        fh.close()
+        with open(runenv.pdbpirdir+'pdb_'+pdbset+'.pir','w') as fh:
+            fh.write(pirstring)
         pir(path=runenv.pdbpirdir+'pdb_'+pdbset+'.pir').duplicate_check()
 
     def get_pir_from_pdbdict(self,pdbset):
@@ -363,9 +362,8 @@ class pir(object):
             pirstring=pirstring+self.pirdict[fn]
             if k>=n:
                 break
-        out=open(targetpath,'w')
-        out.write(pirstring)
-        out.close()
+        with open(targetpath,'w') as out:
+            out.write(pirstring)
 
     def filter_pir(self,xray=2,rfactor=0.25,phrange=[6.5,7.5],sid=60):
         tp=self.pirpath[:-4]+'_'+str(xray)+'_'+str(rfactor)+'_'+str(phrange[0])+'-'+str(phrange[1])+'.pir'

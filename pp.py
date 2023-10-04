@@ -57,9 +57,8 @@ class entirepdb(object):
         self.xslist=[]
         self.update=update
         if update:
-            fh=open('xslist.pickle', 'rb')
-            self.oxslist=cPickle.load(fh)
-            fh.close()
+            with open('xslist.pickle', 'rb') as fh:
+                self.oxslist=cPickle.load(fh)
         else:
             self.oxslist=[]
             self.nxslist=self.xslist
@@ -82,17 +81,15 @@ class entirepdb(object):
                 self.xslist.append(code)
         self.xslist=list(set(self.xslist))
         if self.update:
-            fh=open('xslist.pickle', 'rb')
-            self.oxslist=cPickle.load(fh)
-            fh.close()
+            with open('xslist.pickle', 'rb') as fh:
+                self.oxslist=cPickle.load(fh)
             self.nxslist=[item for item in self.xslist if not item in self.oxslist]
         else:
             self.nxslist=self.xslist
             self.oxslist=[]
         #pdb.set_trace()
-        fh=open('xslist.pickle','wb')
-        cPickle.dump(self.xslist,fh)
-        fh.close()
+        with open('xslist.pickle','wb') as fh:
+            cPickle.dump(self.xslist,fh)
 
     def copy_xray_structures(self,path=originaldir):
         os.chdir(path)
@@ -103,10 +100,9 @@ class entirepdb(object):
 
     def load_xslist(self):
         os.chdir(originaldir)
-        fh=open('xslist.pickle', 'rb')
-        self.xslist=cPickle.load(fh)
+        with open('xslist.pickle', 'rb') as fh:
+            self.xslist=cPickle.load(fh)
         self.nxslist=self.xslist
-        fh.close()
 
     def preprocess(self):
         import sp
@@ -156,15 +152,13 @@ class entirepdb(object):
 
     def save_dict(self):
         os.chdir('/bell2/gqdong/pdb/')
-        fh=open(self.pdbdictname,'w')
-        cPickle.dump(self.pdbdict,fh)
-        fh.close()
+        with open(self.pdbdictname,'w') as fh:
+            cPickle.dump(self.pdbdict,fh)
 
     def load_dict(self):
         os.chdir('/bell2/gqdong/pdb/')
-        fh=open(self.pdbdictname)
-        self.pdbdict=cPickle.load(fh)
-        fh.close()
+        with open(self.pdbdictname) as fh:
+            self.pdbdict=cPickle.load(fh)
 
     def get_seqlist(dsname):
         dsdir=decoysdir[dsname]
@@ -582,18 +576,16 @@ class loop(object): #loopchain,looplength,loopstart,loopend,looptype
                             looplist.append([loopchain,looplength,loopstart,loopend,looptype])
             loopdict[key]=looplist
         dslistname=''.join(dslist).strip()
-        fh=open('/bell3/gqdong/statpot/loop/'+dslistname+'loop.pickle','wb')
-        cPickle.dump(loopdict,fh)
-        fh.close()
+        with open('/bell3/gqdong/statpot/loop/'+dslistname+'loop.pickle','wb') as fh:
+            cPickle.dump(loopdict,fh)
 
     def filter_loops(self,pdbset='pdb_SX.pir',Xray=2.0,Rfactor=0.25,looplength=[4,25],nonstdres=False,
                      terminal=False,broken=False,occ=1,accessibilitycutoff=[5,60],phrange=[6.5,7.5], sid=60,
                      missingatoms=False,isotempfactorstd=2,minhetamdist=1,metaliondist=3.5,maxcacadist=3.7,dslist=[' ','T','S','B']):
         os.chdir('/bell3/gqdong/statpot/loop/')
         dslistname=''.join(dslist).strip()
-        fh=open('/bell3/gqdong/statpot/loop/SBTloop.pickle','rb')
-        loopdict=cPickle.load(fh)
-        fh.close()
+        with open('/bell3/gqdong/statpot/loop/SBTloop.pickle','rb') as fh:
+            loopdict=cPickle.load(fh)
         selectedloopdict={}
         env = Environ()
         log.minimal()
@@ -696,21 +688,18 @@ class loop(object): #loopchain,looplength,loopstart,loopend,looptype
                 numofloops=numofloops+len(selectedloops)
         print('num of selected loops: '+str(numofloops))
         print('numof structures: '+str(len(selectedloopdict)))
-        fh=open('/bell3/gqdong/statpot/acc','w')
-        fh.write(','.join(aacc))
-        fh.close()
-        fh=open('/bell3/gqdong/statpot/loop/selectedloop.pickle','wb')
-        cPickle.dump(selectedloopdict,fh)
-        fh.close()
+        with open('/bell3/gqdong/statpot/acc','w') as fh:
+            fh.write(','.join(aacc))
+        with open('/bell3/gqdong/statpot/loop/selectedloop.pickle','wb') as fh:
+            cPickle.dump(selectedloopdict,fh)
 
     def filter_bs(self,pdbset='pdb_SX.pir',Xray=2.0,Rfactor=0.25,looplength=[4,25],nonstdres=False,
                      terminal=False,broken=False,occ=1,accessibilitycutoff=[5,60],phrange=[6.5,7.5], sid=60,
                      missingatoms=False,isotempfactorstd=2,minhetamdist=1,metaliondist=3.5,maxcacadist=3.7,dslist=[' ','T','S','B']):
         os.chdir('/bell3/gqdong/statpot/loop/')
         dslistname=''.join(dslist).strip()
-        fh=open('/bell3/gqdong/statpot/loop/SBTloop.pickle','rb')
-        loopdict=cPickle.load(fh)
-        fh.close()
+        with open('/bell3/gqdong/statpot/loop/SBTloop.pickle','rb') as fh:
+            loopdict=cPickle.load(fh)
         selectedloopdict={}
         env = Environ()
         log.minimal()
@@ -813,12 +802,10 @@ class loop(object): #loopchain,looplength,loopstart,loopend,looptype
                 numofloops=numofloops+len(selectedloops)
         print('num of selected loops: '+str(numofloops))
         print('numof structures: '+str(len(selectedloopdict)))
-        fh=open('/bell3/gqdong/statpot/acc','w')
-        fh.write(','.join(aacc))
-        fh.close()
-        fh=open('/bell3/gqdong/statpot/loop/selectedloop.pickle','wb')
-        cPickle.dump(selectedloopdict,fh)
-        fh.close()
+        with open('/bell3/gqdong/statpot/acc','w') as fh:
+            fh.write(','.join(aacc))
+        with open('/bell3/gqdong/statpot/loop/selectedloop.pickle','wb') as fh:
+            cPickle.dump(selectedloopdict,fh)
 
 
 
@@ -910,9 +897,8 @@ class loop(object): #loopchain,looplength,loopstart,loopend,looptype
         return (biso.mean(), biso.std())
 
     def get_loop_subset(self,inputloop='selectedloop.pickle', outputloop='m5l4t20.pickle',length=range(4,21),maxn=20):
-        fh=open(inputloop, 'rb')
-        als=pickle.load(fh)
-        fh.close()
+        with open(inputloop, 'rb') as fh:
+            als=pickle.load(fh)
         nld={}
         length.reverse()
         for ll in length:
@@ -932,9 +918,8 @@ class loop(object): #loopchain,looplength,loopstart,loopend,looptype
                     if k>=maxn:
                         break
         pdb.set_trace()
-        fh=open(outputloop,'wb')
-        pickle.dump(nld,fh)
-        fh.close()
+        with open(outputloop,'wb') as fh:
+            pickle.dump(nld,fh)
 
 def list2pir(pdblist):
     pdb.set_trace()
@@ -953,9 +938,8 @@ class mymodel(Model):
         self.type='structureX'
 
     def read_tm_region(self,fp=''):
-        fh=open(fp)
-        fc=fh.read()
-        fh.close()
+        with open(fp) as fh:
+            fc=fh.read()
         rer=re.findall('TMH\s+[0-9]+\s+residue\s+([0-9]+)\s+([0-9]+)',fc)
         tmrl=[]
         for item in rer:
@@ -997,9 +981,8 @@ class mymodel(Model):
         aln=Alignment(env)
         aln.append_model(self,align_codes=code,atom_files=code)
         aln.write(code+'.s.pir')
-        fh=open(code+'.s.pir')
-        fc=fh.read()
-        fh.close()
+        with open(code+'.s.pir') as fh:
+            fc=fh.read()
         return replace_structure_type(fc,self.type)
 
     def get_structure_chain_sequence(self):
@@ -1014,9 +997,8 @@ class mymodel(Model):
             c.write('temp.pir', atom_file, align_code, format='PIR',
                 chop_nonstd_termini=False)
             cc.append(align_code[-1])
-            fh=open('temp.pir')
-            fc=fh.read()
-            fh.close()
+            with open('temp.pir') as fh:
+                fc=fh.read()
             cs.append(replace_structure_type(fc,self.type))
         return [cc,cs]
 
@@ -1114,9 +1096,8 @@ class SingleStructure(object):
         self.save_dict()
 
     def save_dict(self):
-        ph=open(self.code+'.pickle','wb')
-        cPickle.dump(self.pdict,ph)
-        ph.close()
+        with open(self.code+'.pickle','wb') as ph:
+            cPickle.dump(self.pdict,ph)
 
     def precalc_errorscale(self):
         os.chdir(originaldir)
@@ -1225,12 +1206,10 @@ class SingleStructure(object):
         print(os.system('rm -r '+file[:-4]))
 
     def load_molprobity(self):
-        f='pdb'+self.code+'.molprobity'
-        f=open(f)
-        fc=f.readline()
-        fc=f.readline()
-        fc=f.readline()
-        f.close()
+        with open('pdb'+self.code+'.molprobity') as f:
+            fc=f.readline()
+            fc=f.readline()
+            fc=f.readline()
         fd={}
         if fc[-1]=='\n':
             fc=fc[:-1]
@@ -1247,9 +1226,8 @@ class SingleStructure(object):
     def read_full_sequence(self):
         code=self.code
         bdir='/bell2/gqdong/S2C/'
-        mlf=open(bdir+code+'.sc')
-        mlfc=mlf.read()
-        mlf.close()
+        with open(bdir+code+'.sc') as mlf:
+            mlfc=mlf.read()
         sc=re.findall('(SEQCRD.*)\\n',mlfc)
         sc=sc[1:]
         sl={}
@@ -1403,9 +1381,8 @@ class SingleStructure(object):
         bdir='/bell2/gqdong/S2C/'
         nonhetdict=self.originalm.build_residue_nonhet_set()
         od=copy.deepcopy(nonhetdict)
-        mlf=open(bdir+code+'.sc')
-        mlfc=mlf.read()
-        mlf.close()
+        with open(bdir+code+'.sc') as mlf:
+            mlfc=mlf.read()
         sc=re.findall('(SEQCRD.*)\\n',mlfc)
         sc=sc[1:]
         sl={}
@@ -1502,9 +1479,8 @@ class SingleStructure(object):
         ns=ns[:-1]+'*\n\n'
         nss=nss[:-1]+'*\n\n'
         rs=[]
-        fh=open(code+'.ali','w')
-        fh.write(nss+ns)
-        fh.close()
+        with open(code+'.ali','w') as fh:
+            fh.write(nss+ns)
         self.missingresnum=mrc
         #pdb.set_trace()
 
@@ -1597,9 +1573,8 @@ def combine_models(modellist,fmn):
     print(os.system('cat '+mnl+' >'+fmn))
 
 def seperate_models(fp):
-    fh=open(fp)
-    fc=fh.read()
-    fh.close()
+    with open(fp) as fh:
+        fc=fh.read()
     nm=re.findall('MODEL',fc)
     if len(nm)<2:
         return []
@@ -1610,9 +1585,8 @@ def seperate_models(fp):
         if len(mf)<400:
             continue
         mn=fp+'.model'+str(k)
-        fh=open(mn,'w')
-        fh.write(mf)
-        fh.close()
+        with open(mn,'w') as fh:
+            fh.write(mf)
         mnl.append(mn)
         k=k+1
     return mnl
@@ -1730,9 +1704,8 @@ def precalc_errorscale(pdbdir):
         atomnrer=atomre.findall(pline)
         atomn=len(atomnrer)
         pdbdict[pnn]['atomnum']=atomn
-    out=file(pdbdir+'pdbdict2.pickle',"wb")
-    ccPickle.dump(pdbdict,out)
-    out.close()
+    with open(pdbdir+'pdbdict2.pickle',"wb") as out:
+        ccPickle.dump(pdbdict,out)
 
 def load_molprobity_dir(path):
     os.chdir(path)
@@ -1742,9 +1715,8 @@ def load_molprobity_dir(path):
     for f in fl:
         fd=load_molprobity_singlefile(f)
         pdbdict[fd['code']]=fd
-    out=file('pdbdict1.pickle',"wb")
-    ccPickle.dump(pdbdict,out)
-    out.close()
+    with open('pdbdict1.pickle',"wb") as out:
+        ccPickle.dump(pdbdict,out)
     return pdbdict
 
 def combine_dict2d(dict1,dict2):
@@ -1802,9 +1774,8 @@ def opm_mpl():
         mlfc=mlf.read()
         opt=re.findall('Related PDB Sum entries</b></td>\\r\\n.*\\r\\n',mlfc)
         mpl=mpl+re.findall('>([0-9a-z]{4})</a>',opt[0])
-    fh=open(basedir+'pdbpir/mpl','w')
-    fh.write(' '.join(mpl))
-    fh.close()
+    with open(basedir+'pdbpir/mpl','w') as fh:
+        fh.write(' '.join(mpl))
     return mpl
 
 def opm_tmcl():
@@ -1841,9 +1812,9 @@ def opm_tmpl():
     mlf=urllib.urlopen('http://opm.phar.umich.edu/classes.php?type=1')
     mlfc=mlf.read()
     mpl=re.findall('Text\[\d*\]=\[\"([0-9a-z]{4})',mlfc)
-    fh=open(basedir+'pdbpir/tmpl','w') # this file contains the codes of unique transmembrane proteins defined by OPM
-    fh.write(' '.join(mpl))
-    fh.close()
+    # this file contains the codes of unique transmembrane proteins defined by OPM
+    with open(basedir+'pdbpir/tmpl','w') as fh:
+        fh.write(' '.join(mpl))
     sfn=open(basedir+'pdbpir/tmplts','w') # this file contains the tilt angles and the transmembrane segments of unique transmembrane proteins defined by OPM
     for pn in mpl:
         time.sleep(1)
@@ -1857,9 +1828,9 @@ def opm_tmpl():
         for mpltsi in mplts:
             sfn.write(' '.join(mpltsi)+';\n')
     sfn.close()
-    fh=open(basedir+'pdbpir/tmpla','w') #this file contains the codes of all transmembrane proteins from OPM
-    fh.write(' '.join(mpl))
-    fh.close()
+    # this file contains the codes of all transmembrane proteins from OPM
+    with open(basedir+'pdbpir/tmpla','w') as fh:
+        fh.write(' '.join(mpl))
     return mpl
 
 def gen_pir(pdbfiles):
