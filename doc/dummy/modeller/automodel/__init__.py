@@ -1,1 +1,1 @@
-class loopmodel(object): pass
+class LoopModel(object): pass

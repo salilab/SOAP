@@ -113,7 +113,7 @@ class SOAPenv(object):
             self.libdir=os.path.join(self.serverInstallPath, 'lib')
         self.hostn=0
         self.runpriority=0
-        self.env=environ()
+        self.env=Environ()
         log.none()
         self.mcmc_temperature_ratios1=[3,3,2.5,2.5,2,2,1.5,1.5,1,1]
         self.acc_rate_ratio=1.0

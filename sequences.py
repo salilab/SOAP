@@ -100,10 +100,10 @@ class pir(object):
 
     def make_pir_single_forautomodel(self):
         code=self.pirpath
-        e=environ()
+        e=Environ()
         e.io.atom_files_directory=runenv.pdbdir
-        aln=alignment(e)
-        mdl=model(e)
+        aln=Alignment(e)
+        mdl=Model(e)
         mdl.read(file=code)
         aln.append_model(mdl,align_codes=code,atom_files=code)
         aln.append_model(mdl,align_codes=code+'decoys')
@@ -111,7 +111,7 @@ class pir(object):
 
     def make_pir_fromlist(self,filelist):
         code=self.pirpath
-        e=environ()
+        e=Environ()
         e.io.atom_files_directory=['./']
         output = modfile.File(self.pirpath, 'w')
         ndnlist=[]
@@ -121,7 +121,7 @@ class pir(object):
         for f in filelist:
             try:
             #if 1:
-                mdl=model(e)
+                mdl=Model(e)
                 if os.path.isfile('needattachtobase'):
                     if os.path.isfile(f+'.pdb.gz'):
                         lf=gzip.open(f+'.pdb.gz').read()
@@ -134,7 +134,7 @@ class pir(object):
                     mdl.read('temp.pdb')
                 else:
                     mdl.read(f)
-                aln=alignment(e)
+                aln=Alignment(e)
                 aln.append_model(mdl,align_codes=f,atom_files=f)
                 aln.write(output,alignment_format='PIR')
                 ndnlist.append(f)
@@ -252,8 +252,8 @@ class pir(object):
 
     def gen_pir(self, pirfiledirectory,pdbset):
         print('Generating pdb file')
-        env = environ()
-        aln = alignment(env)
+        env = Environ()
+        aln = Alignment(env)
         pdbfile='pdb_'+pdbset+'.pir'
         listoffiles=os.listdir(pirfiledirectory)
         for filen in listoffiles:
@@ -278,8 +278,8 @@ class pir(object):
     def filter_pir(self,inputpirfile,outputpirfile,structuretype='structureX',structureresolution=99.0):
         if (os.access(outputpirfile,os.F_OK)):
             return 0
-        env = environ()
-        aln = alignment(env)
+        env = Environ()
+        aln = Alignment(env)
         input = modfile.File(inputpirfile, 'r')
         output = modfile.File(outputpirfile, 'w')
         while aln.read_one(input, alignment_format='PIR'):
@@ -292,7 +292,7 @@ class pir(object):
         if (os.access(outputpirfile,os.F_OK)):
             return 0
         #log.verbose()
-        env = environ()
+        env = Environ()
         sdb = sequence_db(env, seq_database_file=inputpirfile,
                       seq_database_format='PIR',
                       chains_list='ALL', minmax_db_seq_len=(30, 3000),
@@ -314,8 +314,8 @@ class pir(object):
 
     def gen_pir_new(self,pirfiledirectory,pdbset):
         print('Generating pdb file ' + pdbset)
-        env = environ()
-        aln = alignment(env)
+        env = Environ()
+        aln = Alignment(env)
         pdbfile='pdb_'+pdbset+'.pir'
         listoffiles=os.listdir(pirfiledirectory)
         for filen in listoffiles:
@@ -373,13 +373,13 @@ class pir(object):
             return 0
         self.build_dict()
         pirstring=''
-        env=environ()
+        env=Environ()
         env.io.atom_files_directory=[runenv.opdbdir]
         for key in self.pirdict:
             if len(key)<4:
                 continue
             print(key)
-            mdl=model(env)
+            mdl=Model(env)
             mdl.read(file=key[0:4])
             if mdl.rfactor>rfactor or mdl.resolution>xray or mdl.rfactor==-1 or mdl.resolution==-1:
                 continue
@@ -395,12 +395,12 @@ class pir(object):
         pp.pir_sif(tp, tp[:-4]+'_'+str(sid)+'.pir',si=sid)
 
     def clean_pdb(self):
-        env=environ()
+        env=Environ()
         os.chdir(runenv.basedir+'pdb/')
         env.io.atom_files_directory =['/salilab/park2/database/pdb/divided/']
         codelist=self.get_codelist()
         for code in codelist:
-            mdl=model(env)
+            mdl=Model(env)
             mdl.read(code[0:4])
             mdl.write('pdb'+code[0:4]+'.ent')
             print(os.system('scp pdb'+code[0:4]+'.ent '+runenv.jobserver+':~/pdb/'))

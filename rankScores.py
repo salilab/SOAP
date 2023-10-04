@@ -267,7 +267,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
         bm=self.bm
         features=self.features
         mdtfile=self.ssppath+'.hdf5'
-        env = environ()
+        env = Environ()
         log.minimal()
         io=env.io
         mlib=mdt.Library(env)
@@ -277,16 +277,16 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
         print(mdtfile)
         m.read_hdf5(mdtfile)
         ms=m.shape
-        a=alignment(env)
+        a=Alignment(env)
         ffile=open('score','w')
         csmin, csmax,kcut, kcut1, bs,bsm, errsv,ssp=decode_genmethod(bm)
         fp=0;
         tn=0;
         xp=0
         for k in range(0,len(dnlist)):
-            mdl=model(env)
+            mdl=Model(env)
             mdl.read(file=dnlist[k])
-            aln=alignment(env)
+            aln=Alignment(env)
             aln.append_model(mdl,align_codes=dnlist[k],atom_files=dnlist[k])
             tn=tn+1
             try:
@@ -308,7 +308,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
                     raise Exception('fork failure, quiting')
                 xp=1
             aln=0
-            aln=alignment(env)
+            aln=Alignment(env)
             mdl=[]
         print(tn)
         print(fp)
@@ -319,18 +319,18 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
         pdbfile=fd+naln[0].atom_file
         if self.features=='dope':
             if not 'currentmodel' in self.__dict__.keys():
-                mdl=model(env)
+                mdl=Model(env)
                 mdl.read(pdbfile+'.pdb')
             else:
                 mdl=self.currentmodel
-            return selection(mdl).assess_dope()
+            return Selection(mdl).assess_dope()
         elif self.features.startswith('soap'):
             if not 'currentmodel' in self.__dict__.keys():
-                mdl=model(env)
+                mdl=Model(env)
                 mdl.read(pdbfile+'.pdb')
             else:
                 mdl=self.currentmodel
-            return selection(mdl).energy()[0]
+            return Selection(mdl).energy()[0]
         else:
             raise Exception('Do not know how to calculate scores using potential '+self.features)
 
@@ -339,7 +339,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
         ddbfile='pdbs'+str(runnumber)
         tmpdir=scratchdir
         bm=self.bm
-        env = environ()
+        env = Environ()
         if self.atompairclustering and self.decomposition:
             dnlist=pir(ddbfile).get_codelist()
             idist=self.calc_individual_sp(ddbfile,dnlist,'apdecompscore')
@@ -403,14 +403,14 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
             m=mdt.Table(mlib,features=featurelist,shape=[-1]*len(featurelist))
             print(mdtfile)
             m.read_hdf5(mdtfile)
-        a=alignment(env)
+        a=Alignment(env)
         f=modfile.File(self.runpath+ddbfile,'r')
         csmin, csmax,kcut, kcut1, bs,bsm, errsv,ssp=decode_genmethod(bm)
         fp=0;
         tn=0;
         xp=0
         scorestr=''
-        aln=alignment(env)
+        aln=Alignment(env)
         tmml=[]
         fdl=[]
         while aln.read_one(f):
@@ -464,7 +464,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
                     if not self.test:
                         raise e
             aln=0
-            aln=alignment(env)
+            aln=Alignment(env)
         print(tn)
         print(fp)
         print(xp)
@@ -820,7 +820,7 @@ class spdsscore(dsscore,scaledsp): #the score from distributions
         return scorestr
 
     def complete_pdb(self,pdbfile):
-        env=environ()
+        env=Environ()
         env.io.hydrogen=True
         env.libs.topology.read('${LIB}/top_heav.lib')
         env.libs.parameters.read('${LIB}/par.lib')

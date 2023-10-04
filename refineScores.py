@@ -123,7 +123,7 @@ class sprefinescore(object):
 
     def mdrefine(self,code,templ=[],samplits=0, step=0):
         log.verbose()
-        env = environ()
+        env = Environ()
         env.io.atom_files_directory = [runenv.ddbdir,'./']
         env.libs.topology.read(file='$(LIB)/top_heav.lib')
         env.libs.parameters.read(file='$(LIB)/par.lib')
@@ -133,10 +133,10 @@ class sprefinescore(object):
         env.edat.dynamic_lennard = False
         env.edat.dynamic_sphere = False
         env.edat.dynamic_modeller = True
-        aln=alignment(env)
+        aln=Alignment(env)
         pir( code).make_pir_single_forautomodel()
         aln.append(file= code+'.pir')
-        mdl=automodel.automodel(env, alnfile=code+'.pir', knowns=code, sequence=code+'.refine.ini')
+        mdl=automodel.AutoModel(env, alnfile=code+'.pir', knowns=code, sequence=code+'.refine.ini')
         mdl.clear_topology()
         mdl.generate_topology(aln[code+'decoys'],patch_default=True)
         print("generating topology finished")
@@ -144,7 +144,7 @@ class sprefinescore(object):
         mdl.transfer_xyz(aln, cluster_cut=-1.0)
         mdl.build(initialize_xyz=False, build_method='INTERNAL_COORDINATES')
         mdl.write(code+'.refine.native.pdb')
-        atmsel = selection(mdl)
+        atmsel = Selection(mdl)
         rsr = mdl.restraints
         rsr.clear()
         #charm restraint
@@ -192,19 +192,19 @@ class sprefinescore(object):
                 mdfilelist.append(item)
         self.cluster_models(mdfilelist,mdl,env,cluster_cut=1.5)
         mdl.write(code+'.refine.pdb')
-        atmstl=selection(mdl)
+        atmstl=Selection(mdl)
         (totalscore,terms) = atmsel.energy()
         stereoscore=terms[physical.bond]+terms[physical.angle]+terms[physical.dihedral]+terms[physical.improper]
         scoref.write(code+'.refine.pdb score: '+str(totalscore)+','+str(stereoscore)+','+str(terms[physical.nonbond_spline])+'\n')
-        mdl2=model(env)
+        mdl2=Model(env)
         mdl2.read(code)
         r = atmsel.superpose(mdl2, aln)
         scoref.write('armsd '+str(r.rms))
         scoref.close()
 
     def cluster_models(self,mdfilelist,mdl, env,cluster_cut=1.5):
-        aln=alignment(env)
-        m=model(env)
+        aln=Alignment(env)
+        m=Model(env)
         for mf in mdfilelist:
             m.read(mf)
             aln.append_model(mdl=m,align_codes=mf[:-4],atom_files=mf[:-4])
@@ -213,11 +213,11 @@ class sprefinescore(object):
                          atom_files='cluster.opt')
         mdl.transfer_xyz(aln,cluster_cut=cluster_cut)
         mdl.write(file='cluster.ini')
-        atmsel=selection(mdl)
-        cg = optimizers.conjugate_gradients()
+        atmsel=Selection(mdl)
+        cg = optimizers.ConjugateGradients()
         cg.optimize(atmsel, max_iterations=5000, output=mdl.optimize_output, min_atom_shift=0.01)
 
-class refinemodel(model):
+class refinemodel(Model):
     def decode_refinem(self,refinem):
         rsrm=refinem[0]
         optm=refinem[1]
@@ -236,7 +236,7 @@ class refinemodel(model):
         """Select atoms to be optimized in the model building procedure. By
            default, this selects all atoms, but you can redefine this routine
            to select a subset instead."""
-        return selection(self)
+        return Selection(self)
 
     def homcsr(self, exit_stage):
         """Construct the initial model and restraints"""
@@ -254,7 +254,7 @@ class refinemodel(model):
 
         # make and write the stereochemical, homology, and special restraints?
         if self.create_restraints:
-            self.mkhomcsr(selection(self), aln)
+            self.mkhomcsr(Selection(self), aln)
             self.restraints.condense()
             self.restraints.write(self.csrfile)
 
@@ -351,16 +351,16 @@ older versions of Modeller""")
             self.final_refine_hot(atmsel)
 
         # Get a final conjugate gradients refined structure:
-        cg = conjugate_gradients()
+        cg = ConjugateGradients()
         cg.optimize(atmsel, max_iterations=200, output=self.optimize_output,
                     actions=actions)
 
         # Evaluate gross changes between the initial and final refined model:
         if 'NO_FIT' not in self.fit_in_refine:
-            aln = alignment(self.env)
+            aln = Alignment(self.env)
             mdl2 = read_model(file='TO_BE_REFINED.TMP')
-            casel = selection(self).only_atom_types('CA')
+            casel = Selection(self).only_atom_types('CA')
             casel.superpose(mdl2, aln)
-            casel = selection(self)
+            casel = Selection(self)
             casel.superpose(mdl2, aln)
             modfile.delete('TO_BE_REFINED.TMP')

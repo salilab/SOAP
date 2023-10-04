@@ -1,1 +1,1 @@
-class conjugate_gradients(object): pass
+class ConjugateGradients(object): pass

@@ -184,7 +184,7 @@ class rawsp(object):
         features=self.features
         pdbfile='pdbs'+str(runnumber)
         print('running pdb: '+pdbfile)
-        env = environ()
+        env = Environ()
         #log.minimal()
         io=env.io
         if self.opdb:
@@ -199,13 +199,13 @@ class rawsp(object):
         #print(featurelist)
         m=mdt.Table(mlib,features=featurelist,shape=[-1]*len(featurelist))
         fl=len(featurelist)
-        a=alignment(env)
+        a=Alignment(env)
         f=modfile.File(self.runpath+pdbfile,'r')
         csmin, csmax,kcut, kcut1, bs,bsm, errsv,ssp=decode_genmethod(self.genmethod)
         refy=0
         rmdt=None
         if re.search('ref(.*)$',self.genmethod):
-            env2=environ()
+            env2=Environ()
             mlib2=mdt.Library(env2)
             featurelist=feature(self.features,mlib2).get_featurelist()
             refrer=re.search('ref(.*)$',self.genmethod)
@@ -228,11 +228,11 @@ class rawsp(object):
             fd,naln=self.get_pdbfile(pdbfdir,[],a[0].code,env,a,scratchdir)
             try:
                 if self.opdb:
-                    aln=alignment(env)
-                    mdl=model(env)
+                    aln=Alignment(env)
+                    mdl=Model(env)
                     if len(a[0].code)==5:
                         cc=a[0].code[-1]
-                        m2=model(env)
+                        m2=Model(env)
                         m2.read(a[0].code[0:4])
                         cl=[c.name for c in m2.chains]
                         ci=ord(cc)-65
@@ -366,7 +366,7 @@ class rawsp(object):
         self.save_npy(sparray)
 
     def get_empty_table(self,write=True):
-        env = environ()
+        env = Environ()
         mlib=mdt.Library(env)
         featurelist=feature(self.features,mlib).get_featurelist()
         m=mdt.Table(mlib,features=featurelist,shape=[-1]*len(featurelist))
@@ -467,7 +467,7 @@ class rawsp(object):
             #wdir=self.sppath
             os.chdir(wdir)
         #combine mdts in the current directory
-        env = environ()
+        env = Environ()
         mlib=mdt.Library(env)
         featurelist=feature(self.features,mlib).get_featurelist()
         m1=mdt.Table(mlib,features=featurelist,shape=[-1]*len(featurelist))
@@ -591,7 +591,7 @@ class rawsp(object):
         features=self.features
         bm=self.genmethod
         tmpdir=scratchdir
-        env = environ()
+        env = Environ()
         log.minimal()
         mlib=mdt.Library(env)
         mlib.bond_classes.read('${LIB}/bndgrp.lib')
@@ -608,7 +608,7 @@ class rawsp(object):
             tal=tal*si
         refdista=np.zeros([len(dnlist)]+[tal])
         f=modfile.File(pirfile,'r')
-        aln=alignment(env)
+        aln=Alignment(env)
         k=0
         while aln.read_one(f):
             sr=0;
@@ -639,7 +639,7 @@ class rawsp(object):
             m=mdt.Table(mlib,features=featurelist,shape=[-1]*len(featurelist))
             fl=len(featurelist)
             #m=m.reshape(featurelist,[0 for i in range(0,fl)], [-1 for i in range(0,fl)])
-            aln=alignment(env)
+            aln=Alignment(env)
         #print(os.system('rm -rf '+tmpdir))
         return refdista
 
@@ -647,7 +647,7 @@ class rawsp(object):
      #generate distributions for calculate benchmark score for reference state
         features=self.features
         bm=self.genmethod
-        env = environ()
+        env = Environ()
         log.minimal()
         mlib=mdt.Library(env)
         mlib.bond_classes.read('${LIB}/bndgrp.lib')
@@ -664,9 +664,9 @@ class rawsp(object):
         for si in ms:
             tal=tal*si
         for k in range(0,len(dnlist)):
-            mdl=model(env)
+            mdl=Model(env)
             mdl.read(file=dnlist[k])
-            aln=alignment(env)
+            aln=Alignment(env)
             codelist=dnlist[k].split('.')
             if len(codelist)>1:
                 print(runenv.ddbdir+codelist[0]+'/'+codelist[1]+'/')
@@ -693,7 +693,7 @@ class rawsp(object):
     def calc_individual_sp(self, pirfile,dnlist,ptype):
         #get the mdt tables only for ddb
         features=self.features
-        env = environ()
+        env = Environ()
         tmpdir=scratchdir
         log.minimal()
         mlib=mdt.Library(env)
@@ -781,7 +781,7 @@ class rawsp(object):
             csmin, csmax,kcut, kcut1, bs,bsm, errsv,ssp=decode_genmethod(self.bm)
         #loop through all the structures to generate the table for individual structures
         f=modfile.File(pirfile,'r')
-        aln=alignment(env)
+        aln=Alignment(env)
         k=0
         while aln.read_one(f):
             sr=0;
@@ -1010,22 +1010,22 @@ class rawsp(object):
                 env.libs.parameters.read(file='$(LIB)/par.lib')
                 self.currentdsname=codelist[0]+'.'+codelist[1]
                 #print(self.currentdsname)
-                self.basemodel=model(env,file=pdbdir+self.currentdsname+'.base.pdb')
-                taln=alignment(env)
+                self.basemodel=Model(env,file=pdbdir+self.currentdsname+'.base.pdb')
+                taln=Alignment(env)
                 taln.append_model(self.basemodel,align_codes='original')
                 taln.append_model(self.basemodel,align_codes='tbt')
                 self.basealn=taln
-                self.currentmodel=model(env)
+                self.currentmodel=Model(env)
                 self.currentmodel.generate_topology(taln[0])
                 if len(self.basemodel.chains)>2:
                     raise Excpetion('more than 2 chains in base pdb')
             self.currentmodel.transfer_xyz(self.basealn)
-            sel=selection(self.currentmodel.chains[1])
+            sel=Selection(self.currentmodel.chains[1])
             sel.rotate_origin((1,0,0),tm[0]*57.29577951308232)
             sel.rotate_origin((0,1,0),-tm[1]*57.29577951308232)
             sel.rotate_origin((0,0,1),tm[2]*57.29577951308232)
             sel.translate(tm[3:6])
-            naln=alignment(env)
+            naln=Alignment(env)
             naln.append_model(self.currentmodel,align_codes='formdt')
             return [pdbdir,naln]
         elif 0 and isinstance(pdbdir, list):
@@ -1063,7 +1063,7 @@ class rawsp(object):
         f.close()
         if self.bl<ms[self.bp]:
             print("reshaping original mdt")
-            env = environ()
+            env = Environ()
             log.minimal()
             mlib=mdt.Library(env)
             featurelist=feature(self.features,mlib).get_featurelist()
@@ -1313,7 +1313,7 @@ class rawsp(object):
                                   +' '+runenv.jobserver+':~/lib/')
 
     def write_hdf5(self,path, mdtarray, permute=False):
-        env = environ()
+        env = Environ()
         env.libs.topology.read('${LIB}/top_heav.lib')
         env.libs.parameters.read('${LIB}/par.lib')
         mlib=mdt.Library(env)
@@ -1321,9 +1321,9 @@ class rawsp(object):
         mlib.bond_classes.read('${LIB}/bndgrp.lib')
         featurelist=feature(self.features,mlib).get_featurelist()
         m=mdt.Table(mlib,features=featurelist,bin_type=mdt.Float,shape=[-1]*len(featurelist))
-        mdl = model(env)
+        mdl = Model(env)
         mdl.build_sequence('CCG/CCG')
-        aln = alignment(env)
+        aln = Alignment(env)
         aln.append_model(mdl, align_codes='tmp')
         csmin, csmax,kcut, kcut1, bs,bsm, errsv,ssp=decode_genmethod(self.genmethod)
         m.add_alignment(aln,chain_span_range=(-csmax,-csmin,csmin,csmax),residue_span_range=(-kcut1,-kcut,kcut,kcut1),bond_span_range=(bs,bsm))#,startpos=0,endpos=0,scale=0,refyes=False,refmdt='',io=io)
@@ -1683,7 +1683,7 @@ class scaledsp(rawsp):
 
 
     def write_lib(self,path=[],mdtarray=[]):
-        env = environ()
+        env = Environ()
         log.minimal()
         mlib=mdt.Library(env)
         featurelist=feature(self.features,mlib).get_featurelist()

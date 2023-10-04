@@ -1,1 +1,1 @@
-class action(object): pass
+class Action(object): pass

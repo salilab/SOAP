@@ -1,3 +1,3 @@
-class schedule(object): pass
+class Schedule(object): pass
 
-class step(object): pass
+class Step(object): pass

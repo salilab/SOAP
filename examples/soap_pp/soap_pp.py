@@ -7,7 +7,7 @@ import sys
 fl=os.listdir(sys.argv[1])
 pfl=[f for f in fl if f.endswith('.pdb')]
 scriptpath=os.path.dirname(os.path.abspath(__file__))
-env=environ()
+env=Environ()
 env.io.atom_files_directory=[sys.argv[1]]
 mlib=mdt.Library(env)
 
@@ -34,9 +34,9 @@ m2.read_hdf5(os.path.join(scriptpath,'mdt2.hdf5'))
 
 scorelist=[]
 for pf in pfl:
-    mdl=model(env)
+    mdl=Model(env)
     mdl.read(file=pf)
-    aln=alignment(env)
+    aln=Alignment(env)
     aln.append_model(mdl,align_codes='p',atom_files=pf)
     sr1=m.open_alignment(aln)
     score1=sr1.sum(chain_span_range=(-99,-1,1,99),residue_span_range=(9999,0,0, 9999),bond_span_range=(-1,-1))

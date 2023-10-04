@@ -65,11 +65,11 @@ for d in fl:
     else:
         pdb.set_trace()
         raise Exception('Do not know how to handle pdbs')
-    env=environ()
+    env=Environ()
     env.io.hetatm=False
     env.io.hydrogen=True
-    m1=model(env)
-    m2=model(env)
+    m1=Model(env)
+    m2=Model(env)
     m1.read(sd['orpdb'])
     m2.read(sd['olpdb'])
     m1cl=''
@@ -91,8 +91,8 @@ for d in fl:
     sd['olcl']=m2cl
     m1.write(sd['orpdb'],no_ter=True)
     m2.write(sd['olpdb'],no_ter=True)
-    #m1=model(env)
-    #m2=model(env)
+    #m1=Model(env)
+    #m2=Model(env)
     print(os.system('cp '+sd['orpdb']+' '+sd['orpdb']+'.AB'))
     print(os.system('cp '+sd['olpdb']+' '+sd['olpdb']+'.AB'))
     sd['orpdbAB']=sd['orpdb']+'.AB'

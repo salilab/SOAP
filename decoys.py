@@ -437,9 +437,9 @@ class Decoys4Single(object):
             else:
                 open('temp','w').write(open(bf[0]).read()+'\n'+lf)
             nativefile='temp'
-        env=environ()
-        mdl=model(env,file=nativefile)
-        aln=alignment(env)
+        env=Environ()
+        mdl=Model(env,file=nativefile)
+        aln=Alignment(env)
         aln.append_model(mdl,align_codes='base')
         aln[0].name='tbrname'
         aln.write('base.pir')
@@ -681,7 +681,7 @@ class Decoys4Single(object):
 
     def rmsd_2file(self,file1,file2,rmsdtype='all',looprmsd=False, nofit=True):
         e=runenv.env
-        aln=alignment(runenv.env)
+        aln=Alignment(runenv.env)
         m1=Mymodel(e,file=file1)
         print('start calculating rmsd')
         print(file1)
@@ -692,7 +692,7 @@ class Decoys4Single(object):
         if looprmsd:
             atmsel=m1.select_loop_atoms(self.loops)
         else:
-            atmsel=selection(m1)
+            atmsel=Selection(m1)
         if rmsdtype=='all':
             pass
         elif rmsdtype=='mcrmsd':
@@ -750,7 +750,7 @@ class Decoys4Single(object):
             looprmsd=True
         else:
             looprmsd=False
-        e = environ()
+        e = Environ()
         e.io.atom_files_directory = ['./']
         for i in range(len(dnlist)):
             print(dnlist[i] + '  '+str(sa[i]['rmsd']))

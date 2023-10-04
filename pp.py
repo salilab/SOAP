@@ -10,7 +10,7 @@ from modeller.automodel import *
 from modeller.automodel.autosched import *
 # Load in optimizer and schedule support
 from modeller import optimizers
-from modeller.schedule import schedule, step
+from modeller.schedule import Schedule, Step
 from modeller.optimizers import actions
 import sys
 import pdb
@@ -169,8 +169,8 @@ class entirepdb(object):
     def get_seqlist(dsname):
         dsdir=decoysdir[dsname]
         fl=os.listdir(dsdir)
-        env=environ()
-        aln=alignment(env)
+        env=Environ()
+        aln=Alignment(env)
         asl=[]
         for f in fl:
             cl,sl=mymodel(f+'_r_u.pdb.HB').get_structure_chain_sequence()
@@ -272,7 +272,7 @@ class entirepdb(object):
         env
         for cs in csl:
             for dss in decoysseqlist:
-                aln=alignment(env)
+                aln=Alignment(env)
                 aln.append_sequence(cs)
                 aln.append_sequence(dss)
                 sid=aln.id_table()
@@ -323,7 +323,7 @@ class entirepdb(object):
 
     def update_ph(self):
         os.chdir(originaldir)
-        env=environ()
+        env=Environ()
         self.load_dict()
         for code in self.pdbdict:
             self.pdbdict[code]['ph']=sp.get_ph(code)
@@ -337,7 +337,7 @@ class tmhpdb(entirepdb):
 
     def convert_tochains(self,path=''):
         self.path=path
-        env=environ()
+        env=Environ()
         os.chdir(path)
         fl=os.listdir('./')
         fl=[item[:-4] for item in fl if item.endswith('pdb')]
@@ -377,7 +377,7 @@ class tmhmcpdb(entirepdb):
 
     def convert_tochains(self,path=''):
         self.path=path
-        env=environ()
+        env=Environ()
         os.chdir(path)
         fl=os.listdir('./')
         fl=[item for item in fl if item.startswith('THAC') and item.endswith('pdb')]
@@ -419,7 +419,7 @@ class bioupdb(entirepdb):
         self.pdbdict={}
 
     def build_pdbdict(self,opath,tpath):
-        env=environ()
+        env=Environ()
         ep=entirepdb()
         ep.load_dict()
         fl=os.listdir(opath)
@@ -440,7 +440,7 @@ class bioupdb(entirepdb):
                 if pdbcode not in ep.pdbdict or pdbcode in ['1smv']:
                     print('skipping because of not in pdbdict'+f2)
                     continue
-                mdl=model(env)
+                mdl=Model(env)
                 try:
                     if not os.path.isfile(tpath+mycode+'.pdb'):
                         try:
@@ -595,13 +595,13 @@ class loop(object): #loopchain,looplength,loopstart,loopend,looptype
         loopdict=cPickle.load(fh)
         fh.close()
         selectedloopdict={}
-        env = environ()
+        env = Environ()
         log.minimal()
         env.io.atom_files_directory=['/salilab/park2/database/pdb/divided/']
         env.libs.topology.read(file='$(LIB)/top_heav.lib')
         env.libs.parameters.read(file='$(LIB)/par.lib')
         env.io.hetatm=True
-        aln=alignment(env)
+        aln=Alignment(env)
         from sp import *
         po=pir(self.env,runenv.pdbpirdir+pdbset)
         po.filter_pir(xray=Xray,rfactor=Rfactor,phrange=phrange,sid=sid)
@@ -617,13 +617,13 @@ class loop(object): #loopchain,looplength,loopstart,loopend,looptype
             else:
                 continue
             selectedloops=[]
-            mdl=model(env)
+            mdl=Model(env)
             mdl.read(file=code[0:4])
-            accmdl=model(env)
+            accmdl=Model(env)
             accmdl.read(file=code[0:4])
             accmdl.write_data('PSA',accessibility_type=2,file=None)
-            asel=selection(mdl)
-            nonstds=selection(mdl)-asel.only_std_residues()
+            asel=Selection(mdl)
+            nonstds=Selection(mdl)-asel.only_std_residues()
             meanbiso=0
             bisomean,bstd=self.calc_model_biso(mdl)
             bisothresd=bisomean+isotempfactorstd*bstd
@@ -644,7 +644,7 @@ class loop(object): #loopchain,looplength,loopstart,loopend,looptype
                         continue
                     if not (nonstdres or missingatoms):
                         try:
-                            s=selection(mdl.residue_range(str(loop[2])+':'+loop[0],str(loop[3])+':'+loop[0]))
+                            s=Selection(mdl.residue_range(str(loop[2])+':'+loop[0],str(loop[3])+':'+loop[0]))
                         except:
                             continue
                         s=s.only_std_residues()
@@ -712,13 +712,13 @@ class loop(object): #loopchain,looplength,loopstart,loopend,looptype
         loopdict=cPickle.load(fh)
         fh.close()
         selectedloopdict={}
-        env = environ()
+        env = Environ()
         log.minimal()
         env.io.atom_files_directory=['/salilab/park2/database/pdb/divided/']
         env.libs.topology.read(file='$(LIB)/top_heav.lib')
         env.libs.parameters.read(file='$(LIB)/par.lib')
         env.io.hetatm=True
-        aln=alignment(env)
+        aln=Alignment(env)
         from sp import *
         po=pir(self.env,runenv.pdbpirdir+pdbset)
         po.filter_pir(xray=Xray,rfactor=Rfactor,phrange=phrange,sid=sid)
@@ -734,13 +734,13 @@ class loop(object): #loopchain,looplength,loopstart,loopend,looptype
             else:
                 continue
             selectedloops=[]
-            mdl=model(env)
+            mdl=Model(env)
             mdl.read(file=code[0:4])
-            accmdl=model(env)
+            accmdl=Model(env)
             accmdl.read(file=code[0:4])
             accmdl.write_data('PSA',accessibility_type=2,file=None)
-            asel=selection(mdl)
-            nonstds=selection(mdl)-asel.only_std_residues()
+            asel=Selection(mdl)
+            nonstds=Selection(mdl)-asel.only_std_residues()
             meanbiso=0
             bisomean,bstd=self.calc_model_biso(mdl)
             bisothresd=bisomean+isotempfactorstd*bstd
@@ -761,7 +761,7 @@ class loop(object): #loopchain,looplength,loopstart,loopend,looptype
                         continue
                     if not (nonstdres or missingatoms):
                         try:
-                            s=selection(mdl.residue_range(str(loop[2])+':'+loop[0],str(loop[3])+':'+loop[0]))
+                            s=Selection(mdl.residue_range(str(loop[2])+':'+loop[0],str(loop[3])+':'+loop[0]))
                         except:
                             continue
                         s=s.only_std_residues()
@@ -939,7 +939,7 @@ class loop(object): #loopchain,looplength,loopstart,loopend,looptype
 def list2pir(pdblist):
     pdb.set_trace()
 
-class mymodel(model):
+class mymodel(Model):
     def __init__(self,env,code):
         if code.endswith('pdb'):
             model.__init__(self,env,file=code)
@@ -963,13 +963,13 @@ class mymodel(model):
         return rer
 
     def select_loop_atoms(self,loops):
-        s=selection()
+        s=Selection()
         for loop in loops:
             try:
-                s.add(selection(self.residue_range(str(loop[2])+':'+loop[0],str(loop[3])+':'+loop[0])))
+                s.add(Selection(self.residue_range(str(loop[2])+':'+loop[0],str(loop[3])+':'+loop[0])))
             except:
                 lind=self.residues[str(loop[2])+':'+loop[0]].index
-                s.add(selection(self.residues[lind:(lind+loop[1])]))
+                s.add(Selection(self.residues[lind:(lind+loop[1])]))
         return s
 
     def convert_tmh_tochains(self,path='',fn=''):
@@ -992,9 +992,9 @@ class mymodel(model):
 
     def get_structure_sequence(self):
         code=self.code
-        env=environ()
-        m=model(env,file=code)
-        aln=alignment(env)
+        env=Environ()
+        m=Model(env,file=code)
+        aln=Alignment(env)
         aln.append_model(self,align_codes=code,atom_files=code)
         aln.write(code+'.s.pir')
         fh=open(code+'.s.pir')
@@ -1003,7 +1003,7 @@ class mymodel(model):
         return replace_structure_type(fc,self.type)
 
     def get_structure_chain_sequence(self):
-        e=environ()
+        e=Environ()
         cc=[]
         cs=[]
         for c in self.chains:
@@ -1199,7 +1199,7 @@ class SingleStructure(object):
         os.chdir(originaldir)
         if not os.path.isfile('pdb'+self.code+'.pdb'):
             raise Exception('Pdb file does not exist '+self.code)
-        env=environ()
+        env=Environ()
         env.io.hetatm=False
         self.originalm=mymodel(env,self.code)
 
@@ -1513,21 +1513,21 @@ class SingleStructure(object):
         tarpath=finaldir
         code=self.code
         os.chdir(path)
-        e=environ()
+        e=Environ()
         #io=e.io
         #e.io.hetatm=False
         e.libs.topology.read(file='$(LIB)/top_heav.lib')
         e.libs.parameters.read(file='$(LIB)/par.lib')
-        aln=alignment(e)
+        aln=Alignment(e)
         aln.append(code+'.ali')
-        mdl=model(e)
+        mdl=Model(e)
         mdl.generate_topology(aln[-1])
         mdl.transfer_xyz(aln)
         mdl.write(tarpath+'pdb'+code+'.pdb')
 
     def load_final_model(self):
         os.chdir(finaldir)
-        env=environ()
+        env=Environ()
         self.finalm=mymodel(env,self.code)
 
     def get_chain_pir(self):
@@ -1572,7 +1572,7 @@ def combine_models(modellist,fmn):
     if len(modellist)==1:
         print(os.system('cp '+modellist[0]+' '+fmn))
         return 0
-    env=environ()
+    env=Environ()
     env.io.hetatm=False
     cl=['A','B','C','D','E','F','G','H','I','J','K',
         'L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
@@ -1584,7 +1584,7 @@ def combine_models(modellist,fmn):
     ci=0
     mnl=''
     for mn in modellist:
-        mdl=model(env,file=mn)
+        mdl=Model(env,file=mn)
         for i in range(0,len(mdl.chains)):
             chain=mdl.chains[i]
             chain.name=cl[ci]
@@ -1766,7 +1766,7 @@ def update_pdball():
     pir_err(pfd+'pdball.pir')
 
 def gen_pdb_A():
-    e = environ()
+    e = Environ()
     e.io.atom_files_directory = ['/salilab/park2/database/pdb/divided/']
     k=0
     pdball=modfile.File(pfd+'pdb_A_temp.pir','w')
@@ -1774,7 +1774,7 @@ def gen_pdb_A():
         for fname in file:
             fpath=root+'/'+fname
             try:
-                m = model(e, file=fpath)
+                m = Model(e, file=fpath)
                 for c in m.chains:
                     if c.filter(minimal_chain_length=1, minimal_resolution=99.0,
                         minimal_stdres=1, chop_nonstd_termini=True,
@@ -1865,8 +1865,8 @@ def opm_tmpl():
 def gen_pir(pdbfiles):
     pfd=basedir+'pdbpir/'
     print('Generating pdb file ' + pdbfiles)
-    env = environ()
-    aln = alignment(env)
+    env = Environ()
+    aln = Alignment(env)
     pdbfile='pdb_'+pdbfiles+'.pir'
     if re.search('([0-9]{1}\.[0-9]{1})A',pdbfiles):
         rer=re.search('([0-9]{1}\.[0-9]{1})A',pdbfiles)
@@ -1949,9 +1949,9 @@ def pir_ief(inputpirfile,outputpirfile,mlist,inc=1,fnl=4):
 
 def pir_xrf(inputpirfile,outputpirfile,structuretype='structureX',structureresolution=99.0):
     print('converting '+inputpirfile+' to '+outputpirfile)
-    env = environ()
+    env = Environ()
     env.io.atom_files_directory=['/salilab/park2/database/pdb/divided/']
-    aln = alignment(env)
+    aln = Alignment(env)
     input = modfile.File(inputpirfile, 'r')
     output = modfile.File(outputpirfile, 'w')
 #    rs=1
@@ -1979,7 +1979,7 @@ def pir_xrf(inputpirfile,outputpirfile,structuretype='structureX',structureresol
 def pir_sif(inputpirfile,outputpirfile,si=30):
     print('converting '+inputpirfile+' to '+outputpirfile)
     log.verbose()
-    env = environ()
+    env = Environ()
     sdb = sequence_db(env, seq_database_file=inputpirfile,
                   seq_database_format='PIR',
                   chains_list='ALL', minmax_db_seq_len=(30, 3000),
@@ -2174,7 +2174,7 @@ def pir_cc(inputfile,outputfile):
         line=pdball.readline()
 
 def gen_sc():
-    e = environ()
+    e = Environ()
     e.io.atom_files_directory = ['/salilab/park2/database/pdb/divided/']
     k=0
     pdball=modfile.File(pfd+'pdb_S.pir','w')
@@ -2182,7 +2182,7 @@ def gen_sc():
         for fname in file:
             fpath=root+'/'+fname
             try:
-                m = model(e, file=fpath)
+                m = Model(e, file=fpath)
                 if len(m.chains) > 1:
                     continue
                 for c in m.chains:
@@ -2199,14 +2199,14 @@ def gen_sc():
                 print(e)
 
 def decoys_pir(ddir):
-    e = environ()
+    e = Environ()
     e.io.atom_files_directory = [ddir]
     k=0
     pirfile=modfile.File(ddir+'all.pir','w')
     files=os.listdir(ddir)
     for name in files:
         try:
-            m = model(e, file=ddir+name)
+            m = Model(e, file=ddir+name)
             for c in m.chains:
                 print(name)
                 c.write(pirfile, name[:-4], name[:-4], format='PIR',chop_nonstd_termini=True)

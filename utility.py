@@ -654,12 +654,12 @@ def load_scorer(originalscorer,indexlen):
         pass
     return scorer
 
-class Mymodel(model):
+class Mymodel(Model):
     """
     Modeller model class with customized functions.
     """
     def select_loop_atoms(self,loops):
-        s=selection()
+        s=Selection()
         if not isinstance(loops[0],list):
             self.add_loop2selection(loops,s)
         else:
@@ -671,10 +671,10 @@ class Mymodel(model):
         if loop[0]=='':
             loop[0]=self.chains[0].name
         try:
-            s.add(selection(self.residue_range(str(loop[2])+':'+loop[0],str(loop[3])+':'+loop[0])))
+            s.add(Selection(self.residue_range(str(loop[2])+':'+loop[0],str(loop[3])+':'+loop[0])))
         except:
             lind=self.residues[str(loop[2])+':'+loop[0]].index
-            s.add(selection(self.residues[lind:(lind+loop[1])]))
+            s.add(Selection(self.residues[lind:(lind+loop[1])]))
 
     def load_model_file(self,nativef):
         if nativef[-2:]=='gz':
@@ -835,13 +835,13 @@ class Mymodel(model):
         return clashlist,contactlist
 
     def select(self,loops):
-        s=selection()
+        s=Selection()
         for loop in loops:
             try:
-                s.add(selection(self.residue_range(str(loop[2])+':'+loop[0],str(loop[3])+':'+loop[0])))
+                s.add(Selection(self.residue_range(str(loop[2])+':'+loop[0],str(loop[3])+':'+loop[0])))
             except:
                 lind=self.residues[str(loop[2])+':'+loop[0]].index
-                s.add(selection(self.residues[lind:(lind+loop[1])]))
+                s.add(Selection(self.residues[lind:(lind+loop[1])]))
         return s
 
     def get_residues(self,loops):

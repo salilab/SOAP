@@ -5,14 +5,14 @@
 from __future__ import print_function
 from env import *
 from modeller import physical
-from modeller.automodel import loopmodel
-from modeller.schedule import schedule, step
+from modeller.automodel import LoopModel
+from modeller.schedule import Schedule, Step
 from modeller.optimizers import actions
-from modeller.optimizers import conjugate_gradients as CG
+from modeller.optimizers import ConjugateGradients as CG
 from modeller.automodel.autosched import *
 log.none()
 
-class MyLoop(loopmodel):
+class MyLoop(LoopModel):
     """
     SOAP loop modeling class
     """
@@ -23,7 +23,7 @@ class MyLoop(loopmodel):
                  refinepot=['$(LIB)/atmcls-mf.lib','$(LIB)/dist-mf.lib'],
                  loops=[],calcrmsds='111',nonbond_spine=0.1,contact_shell=12.0,
                  deviations=50,energytrace=False,assess_trace=True):
-        loopmodel.__init__(self, env, sequence, alnfile, knowns, inimodel,
+        LoopModel.__init__(self, env, sequence, alnfile, knowns, inimodel,
                  deviation, library_schedule, csrfile,
                  inifile, assess_methods, loop_assess_methods)
         self.loops=loops
@@ -33,7 +33,7 @@ class MyLoop(loopmodel):
         self.deviations=deviations
         self.energytrace=energytrace
         self.assess_trace=assess_trace
-        self.loop.env.schedule_scale = physical.values(default=1.0,
+        self.loop.env.schedule_scale = physical.Values(default=1.0,
                                                        nonbond_spline=nonbond_spine)#0.6
         edat = self.loop.env.edat
         edat.contact_shell=contact_shell
@@ -54,7 +54,7 @@ class MyLoop(loopmodel):
         #self.load_native_model()
         s2=self.select_loop_atoms()
         self.s2=s2
-        aln=alignment(self.env)
+        aln=Alignment(self.env)
         aln.append_model(self.ormdl, align_codes='c1', atom_files=self.inimodel)
         aln.append_model(self, align_codes='c2')
         self.aln=aln
@@ -87,7 +87,7 @@ class MyLoop(loopmodel):
         self.special_restraints(aln)
 
     def select_loop_atoms(self):
-        s=selection()
+        s=Selection()
         if not isinstance(self.loops[0],list):
             self.add_loop2selection(self.loops,s)
         else:
@@ -99,10 +99,10 @@ class MyLoop(loopmodel):
         if loop[0]=='':
             loop[0]=self.chains[0].name
         try:
-            s.add(selection(self.residue_range(str(loop[2])+':'+loop[0],str(loop[3])+':'+loop[0])))
+            s.add(Selection(self.residue_range(str(loop[2])+':'+loop[0],str(loop[3])+':'+loop[0])))
         except:
             lind=self.residues[str(loop[2])+':'+loop[0]].index
-            s.add(selection(self.residues[lind:(lind+loop[1])]))
+            s.add(Selection(self.residues[lind:(lind+loop[1])]))
 
     def loop_model_analysis(self, atmsel, ini_model, filename, out, id1, num):
         """Energy evaluation and assessment, and write out the loop model"""
@@ -219,7 +219,7 @@ class MyLoop(loopmodel):
         for id1 in range(self.loop.starting_model, self.loop.ending_model + 1):
             r = self.single_loop_model(atmsel, ini_model, num, id1, sched)
 
-class ORLoop(loopmodel):
+class ORLoop(LoopModel):
     """
     Original loop modeling class
     """
@@ -230,7 +230,7 @@ class ORLoop(loopmodel):
                  inifile=None, assess_methods=None, loop_assess_methods=None,
                  refinepot=['$(LIB)/atmcls-mf.lib','$(LIB)/dist-mf.lib'],assess_trace=False,
                  loops=[],calcrmsds='111',nonbond_spine=0.1,contact_shell=12.0,deviations=50,energytrace=False):
-        loopmodel.__init__(self, env, sequence, alnfile, knowns, inimodel,
+        LoopModel.__init__(self, env, sequence, alnfile, knowns, inimodel,
                  deviation, library_schedule, csrfile,
                  inifile, assess_methods, loop_assess_methods)
         self.loops=loops
@@ -248,14 +248,14 @@ class ORLoop(loopmodel):
         #self.load_native_model()
         s2=self.select_loop_atoms()
         self.s2=s2
-        aln=alignment(self.env)
+        aln=Alignment(self.env)
         aln.append_model(self.ormdl, align_codes='c1', atom_files=self.inimodel)
         aln.append_model(self, align_codes='c2')
         self.aln=aln
         self.rmsd_calc_initialized=True
 
     def select_loop_atoms(self):
-        s=selection()
+        s=Selection()
         if not isinstance(self.loops[0],list):
             self.add_loop2selection(self.loops,s)
         else:
@@ -267,10 +267,10 @@ class ORLoop(loopmodel):
         if loop[0]=='':
             loop[0]=self.chains[0].name
         try:
-            s.add(selection(self.residue_range(str(loop[2])+':'+loop[0],str(loop[3])+':'+loop[0])))
+            s.add(Selection(self.residue_range(str(loop[2])+':'+loop[0],str(loop[3])+':'+loop[0])))
         except:
             lind=self.residues[str(loop[2])+':'+loop[0]].index
-            s.add(selection(self.residues[lind:(lind+loop[1])]))
+            s.add(Selection(self.residues[lind:(lind+loop[1])]))
 
     def loop_model_analysis(self, atmsel, ini_model, filename, out, id1, num):
         """Energy evaluation and assessment, and write out the loop model"""
@@ -554,9 +554,9 @@ class sprefine(object):
         except:
             rs=-2        # directories for input atom files
 
-        env = environ(rand_seed=rs)
+        env = Environ(rand_seed=rs)
         env.io.atom_files_directory = [os.path.join(runenv.loopStructurePath,self.dslist),scratchdir,runenv.opdbdir,'.']
-        # Create a new class based on 'loopmodel' so that we can redefine
+        # Create a new class based on 'LoopModel' so that we can redefine
         # select_loop_atoms (necessary)
         if self.assess_method=='SOAP':
             from modeller import soap_loop
@@ -957,7 +957,7 @@ class sprefine(object):
                 else:
                     rmsddict=pickle.load(open(os.path.join(sdspath,'rmsd.pickle'), 'rb'))
                     scoredict=pickle.load(open(os.path.join(sdspath,'score.pickle'), 'rb'))
-                env=environ()
+                env=Environ()
                 env.io.atom_files_directory = [os.path.join(runenv.loopStructurePath,self.dslist),scratchdir,runenv.opdbdir,'.']
                 basem=Mymodel(env)
                 basem.load_model_file(os.path.join(runenv.opdbdir,code[1:3],'pdb'+code+'.ent.gz'))
@@ -1012,18 +1012,18 @@ def sgmdrefine(atmsel, actions, cap, timestep, equil_its, equil_equil,
             init_vel=False
 
 def loopschedule():
-    return schedule(4,
-           [ step(CG, None, mk_scale(default=1.00, nonbond=0.0, spline=1.00)),
-             step(CG, None, mk_scale(default=2.00, nonbond=0.01, spline=0.01)),
-             step(CG, None, mk_scale(default=1.00, nonbond=0.10, spline=0.10)),
-             step(CG, None, mk_scale(default=1.00, nonbond=0.50, spline=0.50)),
-             step(CG, None, physical.values(default=4.00)) ])
+    return Schedule(4,
+           [ Step(CG, None, mk_scale(default=1.00, nonbond=0.0, spline=1.00)),
+             Step(CG, None, mk_scale(default=2.00, nonbond=0.01, spline=0.01)),
+             Step(CG, None, mk_scale(default=1.00, nonbond=0.10, spline=0.10)),
+             Step(CG, None, mk_scale(default=1.00, nonbond=0.50, spline=0.50)),
+             Step(CG, None, physical.Values(default=4.00)) ])
 
-class checkRMSD(actions.action):
+class checkRMSD(actions.Action):
     """Calculate the RMSDs of intermediate loops"""
     def __init__(self, skip, loopObj,first=False,
                  last=False, start=0):
-        actions.action.__init__(self, skip, first, last)
+        actions.Action.__init__(self, skip, first, last)
         self.num = start
         self.loopObj=loopObj
 
