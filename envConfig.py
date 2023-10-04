@@ -187,8 +187,11 @@ from modeller.scripts import complete_pdb
 from modeller.parallel import *
 import mdt
 import mdt.features
-import cPickle
 import pickle
+if sys.version_info[0] >= 3:
+    cPickle = pickle
+else:
+    import cPickle
 import subprocess
 from operator import itemgetter, attrgetter
 import random
